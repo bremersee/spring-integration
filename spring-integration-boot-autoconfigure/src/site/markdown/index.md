@@ -1,0 +1,1 @@
+# Spring Integration Boot Autoconfigure
