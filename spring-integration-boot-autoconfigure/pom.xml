@@ -56,7 +56,6 @@
       <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
-
     <dependency>
       <groupId>org.bremersee</groupId>
       <artifactId>spring-integration-data-commons</artifactId>
@@ -69,10 +68,21 @@
       <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
-
     <dependency>
       <groupId>org.bremersee</groupId>
       <artifactId>spring-integration-thymeleaf</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.bremersee</groupId>
+      <artifactId>spring-integration-web</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.bremersee</groupId>
+      <artifactId>spring-integration-webflux</artifactId>
       <version>${project.version}</version>
       <optional>true</optional>
     </dependency>

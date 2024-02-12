@@ -27,7 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
 import org.bremersee.spring.web.multipart.FileAwareMultipartFile;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
@@ -51,7 +50,6 @@ import reactor.util.function.Tuple2;
  *
  * @author Christian Bremer
  */
-@Slf4j
 public class MultipartFileBuilderImpl implements MultipartFileBuilder {
 
   private final File tmpDir;
@@ -112,9 +110,8 @@ public class MultipartFileBuilderImpl implements MultipartFileBuilder {
             DataUrl dataUrl = null;
             try {
               dataUrl = new DataUrlSerializer().unserialize(value);
-            } catch (Exception e) {
-              log.debug("Parsing form field as data url failed, "
-                  + "treating value as plain/text (value = {}).", value);
+            } catch (Exception ignored) {
+              // Parsing form field as data url failed, treating value as plain/text.
             }
             if (dataUrl != null) {
               data = dataUrl.getData();
