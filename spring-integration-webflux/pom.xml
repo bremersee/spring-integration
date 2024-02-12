@@ -9,9 +9,9 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>spring-integration-data-commons</artifactId>
+  <artifactId>spring-integration-webflux</artifactId>
 
-  <name>Spring Integration Data Commons</name>
+  <name>Spring Integration WebFlux</name>
 
   <developers>
     <developer>
@@ -41,16 +41,30 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.bremersee</groupId>
-      <artifactId>spring-integration-core</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.data</groupId>
-      <artifactId>spring-data-commons</artifactId>
+      <groupId>org.bremersee</groupId>
+      <artifactId>spring-integration-web</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webflux</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>eu.maxschuster</groupId>
+      <artifactId>dataurl</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.projectreactor</groupId>
+      <artifactId>reactor-test</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>

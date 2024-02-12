@@ -28,6 +28,8 @@
     <module>spring-integration-boot-autoconfigure</module>
     <module>spring-integration-thymeleaf</module>
     <module>spring-integration-test-api-comparator</module>
+    <module>spring-integration-web</module>
+    <module>spring-integration-webflux</module>
   </modules>
 
   <properties>

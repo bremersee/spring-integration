@@ -9,9 +9,9 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>spring-integration-data-commons</artifactId>
+  <artifactId>spring-integration-web</artifactId>
 
-  <name>Spring Integration Data Commons</name>
+  <name>Spring Integration Web</name>
 
   <developers>
     <developer>
@@ -41,14 +41,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.bremersee</groupId>
-      <artifactId>spring-integration-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.data</groupId>
-      <artifactId>spring-data-commons</artifactId>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
     </dependency>
 
     <dependency>
