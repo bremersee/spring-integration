@@ -29,7 +29,7 @@ import org.springframework.validation.annotation.Validated;
  *
  * @author Christian Bremer
  */
-@ConfigurationProperties(prefix = "bremersee.spring.upload")
+@ConfigurationProperties(prefix = "bremersee.upload")
 @Getter
 @Setter
 @ToString

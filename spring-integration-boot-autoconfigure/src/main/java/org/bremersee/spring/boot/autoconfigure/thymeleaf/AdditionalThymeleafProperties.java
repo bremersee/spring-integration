@@ -36,7 +36,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  *
  * @author Christian Bremer
  */
-@ConfigurationProperties("bremersee.spring.thymeleaf")
+@ConfigurationProperties("bremersee.thymeleaf")
 @Getter
 @Setter
 @ToString

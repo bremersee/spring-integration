@@ -36,7 +36,7 @@ import org.springframework.validation.annotation.Validated;
  *
  * @author Christian Bremer
  */
-@ConfigurationProperties("bremersee.spring.messages")
+@ConfigurationProperties("bremersee.messages")
 @Getter
 @Setter
 @ToString

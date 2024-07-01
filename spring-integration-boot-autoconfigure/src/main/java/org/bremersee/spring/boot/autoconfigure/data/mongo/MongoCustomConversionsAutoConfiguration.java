@@ -40,7 +40,7 @@ import org.springframework.util.ClassUtils;
  * @author Christian Bremer
  */
 @ConditionalOnProperty(
-    name = "bremersee.spring.data.mongo.custom-conversions.enable",
+    name = "bremersee.data.mongo.custom-conversions.enable",
     havingValue = "true",
     matchIfMissing = true)
 @EnableConfigurationProperties(MongoProperties.class)

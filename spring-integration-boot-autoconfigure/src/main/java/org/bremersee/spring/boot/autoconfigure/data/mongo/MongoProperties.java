@@ -27,7 +27,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  * @author Christian Bremer
  */
-@ConfigurationProperties(prefix = "bremersee.spring.data.mongo")
+@ConfigurationProperties(prefix = "bremersee.data.mongo")
 @Data
 @NoArgsConstructor
 public class MongoProperties {

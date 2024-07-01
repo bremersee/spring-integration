@@ -16,7 +16,7 @@
 
 package org.bremersee.spring.boot.autoconfigure.thymeleaf;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -78,7 +78,8 @@ class AdditionalThymeleafAutoConfigurationTest {
     properties.getResolvers().add(resolver1);
     configuration.registerTemplateResolver();
 
-    assertEquals(2, templateEngine.getTemplateResolvers().size());
+    assertThat(templateEngine.getTemplateResolvers())
+        .hasSize(2);
   }
 
 }

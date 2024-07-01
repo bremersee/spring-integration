@@ -25,17 +25,23 @@
     <module>spring-integration-core</module>
     <module>spring-integration-data-commons</module>
     <module>spring-integration-data-mongodb</module>
-    <module>spring-integration-boot-autoconfigure</module>
-    <module>spring-integration-thymeleaf</module>
+    <module>spring-integration-ldaptive</module>
+    <module>spring-integration-minio</module>
+    <module>spring-integration-security</module>
+    <module>spring-integration-security-ldaptive</module>
     <module>spring-integration-test-api-comparator</module>
+    <module>spring-integration-thymeleaf</module>
     <module>spring-integration-web</module>
     <module>spring-integration-webflux</module>
+    <module>spring-integration-boot-autoconfigure</module>
   </modules>
 
   <properties>
     <github.repo>spring-integration</github.repo>
     <!--suppress UnresolvedMavenProperty -->
     <gh-pages-staging-dir>${maven.multiModuleProjectDirectory}/target/staging</gh-pages-staging-dir>
+
+    <common-exception.version>1.0.0-SNAPSHOT</common-exception.version>
   </properties>
 
   <developers>
@@ -87,5 +93,15 @@
       </url>
     </site>
   </distributionManagement>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.bremersee</groupId>
+        <artifactId>common-exception</artifactId>
+        <version>${common-exception.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
 </project>

@@ -1,0 +1,1 @@
+package org.bremersee.spring.boot.autoconfigure.security;

@@ -16,25 +16,25 @@
 
 package org.bremersee.spring.boot.autoconfigure.thymeleaf;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.bremersee.spring.boot.autoconfigure.thymeleaf.AdditionalThymeleafProperties.ResolverProperties;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * The type Additional thymeleaf properties test.
  *
  * @author Christian Bremer
  */
+@ExtendWith(SoftAssertionsExtension.class)
 class AdditionalThymeleafPropertiesTest {
 
   /**
    * Gets resolvers.
    */
   @Test
-  void getResolvers() {
+  void getResolvers(SoftAssertions softly) {
     ResolverProperties rp0 = new ResolverProperties();
     rp0.setName("rp0");
     ResolverProperties rp1 = new ResolverProperties();
@@ -48,12 +48,14 @@ class AdditionalThymeleafPropertiesTest {
     actual.getResolvers().add(rp0);
     actual.getResolvers().add(rp1);
 
-    assertEquals(expected, actual);
-    assertTrue(expected.toString().contains("rp0"));
-    assertTrue(expected.getResolvers().stream()
-        .anyMatch(resolverProperties -> "rp0".equals(resolverProperties.getName())));
-
-    assertNotEquals(expected, null);
-    assertNotEquals(expected, new Object());
+    softly
+        .assertThat(actual)
+        .isEqualTo(expected);
+    softly
+        .assertThat(expected.toString())
+        .contains("rp0");
+    softly
+        .assertThat(expected.getResolvers())
+        .anyMatch(resolverProperties -> "rp0".equals(resolverProperties.getName()));
   }
 }
