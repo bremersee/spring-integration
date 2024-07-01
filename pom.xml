@@ -41,7 +41,7 @@
     <!--suppress UnresolvedMavenProperty -->
     <gh-pages-staging-dir>${maven.multiModuleProjectDirectory}/target/staging</gh-pages-staging-dir>
 
-    <common-exception.version>1.0.0-SNAPSHOT</common-exception.version>
+    <common-exception.version>1.0.0</common-exception.version>
   </properties>
 
   <developers>

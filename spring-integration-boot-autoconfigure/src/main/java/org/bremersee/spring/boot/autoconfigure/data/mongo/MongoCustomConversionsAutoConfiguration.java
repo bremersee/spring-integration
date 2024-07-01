@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.spring.boot.autoconfigure.data.mongo.MongoCustomConversionsFilter.DefaultFilter;
+import org.bremersee.spring.data.mongodb.core.convert.MongoCustomConversionsProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -44,7 +45,9 @@ import org.springframework.util.ClassUtils;
     havingValue = "true",
     matchIfMissing = true)
 @EnableConfigurationProperties(MongoProperties.class)
-@ConditionalOnClass({MongoCustomConversions.class})
+@ConditionalOnClass(name = {
+    "org.bremersee.spring.data.mongodb.core.convert.MongoCustomConversionsProvider",
+    "org.springframework.data.mongodb.core.convert.MongoCustomConversions"})
 @AutoConfiguration
 @Slf4j
 public class MongoCustomConversionsAutoConfiguration {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bremersee.spring.boot.autoconfigure.data.mongo;
+package org.bremersee.spring.data.mongodb.core.convert;
 
 import java.util.List;
 import org.springframework.core.convert.converter.Converter;
