@@ -17,6 +17,7 @@
 package org.bremersee.spring.core.convert.support;
 
 import java.util.Locale;
+import java.util.Objects;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
 
@@ -32,4 +33,16 @@ public class LocaleToStringConverter implements Converter<Locale, String> {
     return source.toLanguageTag();
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    return o != null && getClass() == o.getClass();
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getClass());
+  }
 }

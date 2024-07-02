@@ -17,6 +17,7 @@
 package org.bremersee.spring.data.convert;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.ToString;
 import org.springframework.core.convert.converter.Converter;
@@ -37,5 +38,18 @@ public class LocaleReadConverter implements Converter<String, Locale> {
   public Locale convert(@NonNull String source) {
     return Optional.ofNullable(StringUtils.parseLocale(source))
         .orElse(Locale.ENGLISH);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    return o != null && getClass() == o.getClass();
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getClass());
   }
 }

@@ -16,6 +16,7 @@
 
 package org.bremersee.spring.core.convert.support;
 
+import java.util.Objects;
 import java.util.TimeZone;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
@@ -30,6 +31,19 @@ public class TimeZoneToStringConverter implements Converter<TimeZone, String> {
   @Override
   public String convert(@NonNull TimeZone source) {
     return source.getID();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    return o != null && getClass() == o.getClass();
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getClass());
   }
 
 }

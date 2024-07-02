@@ -18,6 +18,12 @@ class MongoCustomConversionsAutoConfigurationTest {
   }
 
   @Test
+  void defaultMongoCustomConversions() {
+    assertThat(target.defaultMongoCustomConversions())
+        .isNotNull();
+  }
+
+  @Test
   void mongoCustomConversionsFilter() {
     assertThat(target.mongoCustomConversionsFilter())
         .isNotNull();

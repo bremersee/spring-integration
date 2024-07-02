@@ -22,6 +22,14 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.spring.boot.autoconfigure.data.mongo.MongoCustomConversionsFilter.DefaultFilter;
+import org.bremersee.spring.data.convert.DateToOffsetDateTimeReadConverter;
+import org.bremersee.spring.data.convert.InstantToOffsetDateTimeReadConverter;
+import org.bremersee.spring.data.convert.LocaleReadConverter;
+import org.bremersee.spring.data.convert.LocaleWriteConverter;
+import org.bremersee.spring.data.convert.OffsetDateTimeToDateWriteConverter;
+import org.bremersee.spring.data.convert.OffsetDateTimeToInstantWriteConverter;
+import org.bremersee.spring.data.convert.TimeZoneReadConverter;
+import org.bremersee.spring.data.convert.TimeZoneWriteConverter;
 import org.bremersee.spring.data.mongodb.core.convert.MongoCustomConversionsProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -79,6 +87,20 @@ public class MongoCustomConversionsAutoConfiguration {
         ClassUtils.getUserClass(getClass()).getSimpleName(), properties);
   }
 
+  @Bean
+  public MongoCustomConversionsProvider defaultMongoCustomConversions() {
+    return () -> List.of(
+        new DateToOffsetDateTimeReadConverter(),
+        new InstantToOffsetDateTimeReadConverter(),
+        new LocaleReadConverter(),
+        new LocaleWriteConverter(),
+        new OffsetDateTimeToDateWriteConverter(),
+        new OffsetDateTimeToInstantWriteConverter(),
+        new TimeZoneReadConverter(),
+        new TimeZoneWriteConverter()
+    );
+  }
+
   /**
    * Create mongo custom conversions filter bean.
    *
@@ -112,6 +134,7 @@ public class MongoCustomConversionsAutoConfiguration {
         .flatMap(Collection::stream)
         .filter(Objects::nonNull)
         .filter(mongoCustomConversionsFilter)
+        .distinct()
         .collect(Collectors.toList()));
   }
 

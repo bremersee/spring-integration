@@ -19,6 +19,7 @@ package org.bremersee.spring.data.convert;
 
 import java.time.OffsetDateTime;
 import java.util.Date;
+import java.util.Objects;
 import lombok.ToString;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
@@ -35,5 +36,18 @@ public class OffsetDateTimeToDateWriteConverter implements Converter<OffsetDateT
   @Override
   public Date convert(OffsetDateTime offsetDateTime) {
     return Date.from(offsetDateTime.toInstant());
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    return o != null && getClass() == o.getClass();
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getClass());
   }
 }

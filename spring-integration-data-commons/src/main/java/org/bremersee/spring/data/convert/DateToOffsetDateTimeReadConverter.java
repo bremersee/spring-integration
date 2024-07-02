@@ -19,6 +19,7 @@ package org.bremersee.spring.data.convert;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.Objects;
 import lombok.ToString;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
@@ -35,6 +36,19 @@ public class DateToOffsetDateTimeReadConverter implements Converter<Date, Offset
   @Override
   public OffsetDateTime convert(Date date) {
     return OffsetDateTime.ofInstant(date.toInstant(), ZoneOffset.UTC);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    return o != null && getClass() == o.getClass();
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getClass());
   }
 
 }

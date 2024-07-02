@@ -16,6 +16,8 @@
 
 package org.bremersee.spring.web.multipart;
 
+import static java.util.Objects.nonNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,7 +34,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -166,7 +167,7 @@ public class FileAwareMultipartFile implements MultipartFile {
       String parameterName,
       String originalFilename,
       String contentType) throws IOException {
-    if (inputStream != null) {
+    if (nonNull(inputStream)) {
       this.file = getTmpFile(tmpDir);
       FileCopyUtils.copy(
           inputStream,
@@ -194,7 +195,9 @@ public class FileAwareMultipartFile implements MultipartFile {
       String parameterName,
       String originalFilename,
       String contentType) {
-    this.file = file != null ? file.toFile() : null;
+    this.file = Optional.ofNullable(file)
+        .map(Path::toFile)
+        .orElse(null);
     this.parameterName = parameterName;
     this.originalFilename = originalFilename;
     this.contentType = contentType;
@@ -234,7 +237,7 @@ public class FileAwareMultipartFile implements MultipartFile {
    * @param multipartFile the multipart file
    */
   public static void delete(MultipartFile multipartFile) {
-    if (multipartFile != null && multipartFile.getResource().isFile()) {
+    if (nonNull(multipartFile) && multipartFile.getResource().isFile()) {
       try {
         Files.delete(multipartFile.getResource().getFile().toPath());
       } catch (Exception ignored) {
@@ -244,7 +247,11 @@ public class FileAwareMultipartFile implements MultipartFile {
   }
 
   private static File getTmpDir(String tmpDir) {
-    return getTmpDir(StringUtils.hasText(tmpDir) ? new File(tmpDir) : null);
+    return Optional.ofNullable(tmpDir)
+        .filter(dir -> !dir.isBlank())
+        .map(File::new)
+        .map(FileAwareMultipartFile::getTmpDir)
+        .orElse(null);
   }
 
   private static File getTmpDir(File tmpDir) {
@@ -265,9 +272,10 @@ public class FileAwareMultipartFile implements MultipartFile {
 
   @Override
   public String getOriginalFilename() {
-    return !StringUtils.hasText(originalFilename) && file != null
-        ? file.getName()
-        : originalFilename;
+    return Optional.ofNullable(originalFilename)
+        .filter(name -> !name.isBlank())
+        .or(() -> Optional.ofNullable(file).map(File::getName))
+        .orElse(null);
   }
 
   @Override
@@ -311,7 +319,7 @@ public class FileAwareMultipartFile implements MultipartFile {
   }
 
   private boolean isFileValid() {
-    return file != null && file.exists() && file.isFile() && file.canRead();
+    return nonNull(file) && file.exists() && file.isFile() && file.canRead();
   }
 
   @SuppressWarnings("Lombok")

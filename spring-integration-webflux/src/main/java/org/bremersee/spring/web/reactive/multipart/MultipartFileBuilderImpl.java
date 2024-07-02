@@ -16,6 +16,10 @@
 
 package org.bremersee.spring.web.reactive.multipart;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static org.springframework.util.ObjectUtils.isEmpty;
+
 import eu.maxschuster.dataurl.DataUrl;
 import eu.maxschuster.dataurl.DataUrlSerializer;
 import java.io.ByteArrayInputStream;
@@ -38,7 +42,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MimeType;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
@@ -58,7 +61,7 @@ public class MultipartFileBuilderImpl implements MultipartFileBuilder {
    * Instantiates a new multipart file builder.
    */
   public MultipartFileBuilderImpl() {
-    this((File) null);
+    this((String) null);
   }
 
   /**
@@ -67,7 +70,10 @@ public class MultipartFileBuilderImpl implements MultipartFileBuilder {
    * @param tmpDir the tmp dir
    */
   public MultipartFileBuilderImpl(String tmpDir) {
-    this(StringUtils.hasText(tmpDir) ? new File(tmpDir) : null);
+    this(Optional.ofNullable(tmpDir)
+        .filter(str -> !str.isBlank())
+        .map(File::new)
+        .orElseGet(() -> new File(System.getProperty("java.io.tmpdir"))));
   }
 
   /**
@@ -76,65 +82,68 @@ public class MultipartFileBuilderImpl implements MultipartFileBuilder {
    * @param tmpDir the tmp dir
    */
   public MultipartFileBuilderImpl(File tmpDir) {
-    this.tmpDir = tmpDir != null && tmpDir.isDirectory()
-        ? tmpDir
-        : new File(System.getProperty("java.io.tmpdir"));
+    this.tmpDir = Optional.ofNullable(tmpDir)
+        .filter(dir -> dir.exists() && dir.isDirectory() && dir.canRead() && dir.canWrite())
+        .orElseGet(() -> new File(System.getProperty("java.io.tmpdir")));
   }
 
   private Mono<MultipartFile> build(FilePart filePart) {
-    if (filePart == null) {
-      return Mono.just(FileAwareMultipartFile.empty());
-    }
-    File file = newTmpFile();
-    return filePart.transferTo(file)
-        .then(Mono.just(new FileAwareMultipartFile(
-            file,
-            filePart.name(),
-            filePart.filename(),
-            Optional.of(filePart)
-                .map(part -> part.headers().getContentType())
-                .map(MimeType::toString)
-                .orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE))));
+    return Optional.ofNullable(filePart)
+        .map(fp -> {
+          File file = newTmpFile();
+          return filePart.transferTo(file)
+              .then(Mono.just(new FileAwareMultipartFile(
+                  file,
+                  filePart.name(),
+                  filePart.filename(),
+                  Optional.of(filePart)
+                      .map(part -> part.headers().getContentType())
+                      .map(MimeType::toString)
+                      .orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE))));
+        })
+        .orElseGet(() -> Mono.just(FileAwareMultipartFile.empty()))
+        .cast(MultipartFile.class);
   }
 
   private Mono<MultipartFile> build(FormFieldPart formFieldPart) {
-    if (formFieldPart == null || !StringUtils.hasText(formFieldPart.value())) {
-      return Mono.just(FileAwareMultipartFile.empty());
-    }
-    return Mono.just(formFieldPart)
-        .handle((part, sink) -> {
-          String value = part.value();
-          byte[] data = null;
-          String contentType = null;
-          if (value.toLowerCase().startsWith("data:") && value.indexOf(',') > -1) {
-            DataUrl dataUrl = null;
-            try {
-              dataUrl = new DataUrlSerializer().unserialize(value);
-            } catch (Exception ignored) {
-              // Parsing form field as data url failed, treating value as plain/text.
-            }
-            if (dataUrl != null) {
-              data = dataUrl.getData();
-              contentType = dataUrl.getMimeType();
-            }
-          }
-          if (data == null) {
-            data = value.getBytes(StandardCharsets.UTF_8);
-            contentType = MediaType.TEXT_PLAIN_VALUE;
-          }
-          try {
-            sink.next(new FileAwareMultipartFile(
-                new ByteArrayInputStream(data),
-                tmpDir,
-                part.name(),
-                null,
-                contentType));
+    return Optional.ofNullable(formFieldPart)
+        .filter(ffp -> !isEmpty(ffp.value()))
+        .map(ffp -> Mono.just(ffp)
+            .handle((part, sink) -> {
+              String value = part.value();
+              byte[] data = null;
+              String contentType = null;
+              if (value.toLowerCase().startsWith("data:") && value.indexOf(',') > -1) {
+                DataUrl dataUrl = null;
+                try {
+                  dataUrl = new DataUrlSerializer().unserialize(value);
+                } catch (Exception ignored) {
+                  // Parsing form field as data url failed, treating value as plain/text.
+                }
+                if (nonNull(dataUrl)) {
+                  data = dataUrl.getData();
+                  contentType = dataUrl.getMimeType();
+                }
+              }
+              if (isNull(data)) {
+                data = value.getBytes(StandardCharsets.UTF_8);
+                contentType = MediaType.TEXT_PLAIN_VALUE;
+              }
+              try {
+                sink.next(new FileAwareMultipartFile(
+                    new ByteArrayInputStream(data),
+                    tmpDir,
+                    part.name(),
+                    null,
+                    contentType));
 
-          } catch (IOException e) {
-            sink.error(
-                new MultipartException("Creating multipart file from form field part failed.", e));
-          }
-        });
+              } catch (IOException e) {
+                sink.error(new MultipartException(
+                    "Creating multipart file from form field part failed.", e));
+              }
+            }))
+        .orElseGet(() -> Mono.just(FileAwareMultipartFile.empty()))
+        .cast(MultipartFile.class);
   }
 
   @Override
