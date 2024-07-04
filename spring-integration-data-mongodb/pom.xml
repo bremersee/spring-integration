@@ -41,6 +41,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.bremersee</groupId>
+      <artifactId>spring-integration-data-commons</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-mongodb</artifactId>
     </dependency>

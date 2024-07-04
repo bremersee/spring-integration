@@ -69,7 +69,7 @@ public class MessageSourceProperties {
   private boolean useCodeAsDefaultMessage = false; // from AbstractMessageSource
 
   /**
-   * Set an list of basenames, each following the basic ResourceBundle convention of not specifying
+   * Set a list of base names, each following the basic ResourceBundle convention of not specifying
    * file extension or language codes. The resource location format is up to the specific
    * {@code MessageSource} implementation.
    *

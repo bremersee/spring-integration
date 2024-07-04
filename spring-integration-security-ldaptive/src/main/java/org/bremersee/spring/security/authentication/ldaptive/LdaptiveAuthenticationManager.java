@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
@@ -32,8 +33,8 @@ import lombok.Setter;
 import org.bremersee.ldaptive.LdaptiveEntryMapper;
 import org.bremersee.ldaptive.LdaptiveException;
 import org.bremersee.ldaptive.LdaptiveTemplate;
-import org.bremersee.spring.security.authentication.ldaptive.provider.NoAccountControlEvaluator;
 import org.bremersee.spring.security.authentication.AuthenticationSource;
+import org.bremersee.spring.security.authentication.ldaptive.provider.NoAccountControlEvaluator;
 import org.ldaptive.BindConnectionInitializer;
 import org.ldaptive.CompareRequest;
 import org.ldaptive.ConnectionConfig;
@@ -85,6 +86,8 @@ public class LdaptiveAuthenticationManager
   @Getter(AccessLevel.PROTECTED)
   private final LdaptiveAuthenticationProperties authenticationProperties;
 
+  private Function<ConnectionFactory, LdaptiveTemplate> ldaptiveTemplateFn;
+
   @Getter(AccessLevel.PROTECTED)
   private UsernameToBindDnConverter usernameToBindDnConverter;
 
@@ -109,10 +112,18 @@ public class LdaptiveAuthenticationManager
       LdaptiveAuthenticationProperties authenticationProperties) {
     this.connectionConfig = connectionConfig;
     this.authenticationProperties = authenticationProperties;
+    this.ldaptiveTemplateFn = LdaptiveTemplate::new;
     this.usernameToBindDnConverter = authenticationProperties
         .getUsernameToBindDnConverter()
         .apply(authenticationProperties);
     this.tokenConverter = new LdaptiveAuthenticationTokenConverter(authenticationProperties);
+  }
+
+  public void setLdaptiveTemplateFn(
+      Function<ConnectionFactory, LdaptiveTemplate> ldaptiveTemplateFn) {
+    if (nonNull(ldaptiveTemplateFn)) {
+      this.ldaptiveTemplateFn = ldaptiveTemplateFn;
+    }
   }
 
   public void setUsernameToBindDnConverter(
@@ -220,7 +231,7 @@ public class LdaptiveAuthenticationManager
   }
 
   protected LdaptiveTemplate getLdapTemplate(String username, String password) {
-    return new LdaptiveTemplate(getConnectionFactory(username, password));
+    return ldaptiveTemplateFn.apply(getConnectionFactory(username, password));
   }
 
   /**

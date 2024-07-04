@@ -17,6 +17,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.bremersee.ldaptive.DefaultLdaptiveErrorHandler;
 import org.bremersee.ldaptive.LdaptiveException;
+import org.bremersee.ldaptive.LdaptiveSambaTemplate;
 import org.bremersee.ldaptive.LdaptiveTemplate;
 import org.bremersee.ldaptive.serializable.SerLdapEntry;
 import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationProperties.GroupFetchStrategy;
@@ -56,6 +57,7 @@ class LdaptiveAuthenticationManagerTest {
     assertThatExceptionOfType(IllegalStateException.class)
         .isThrownBy(target::init);
 
+    target.setLdaptiveTemplateFn(LdaptiveSambaTemplate::new);
     target.setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
     target.init();
   }

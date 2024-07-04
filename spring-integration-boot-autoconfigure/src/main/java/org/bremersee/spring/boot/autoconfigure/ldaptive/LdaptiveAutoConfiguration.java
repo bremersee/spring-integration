@@ -16,6 +16,7 @@
 
 package org.bremersee.spring.boot.autoconfigure.ldaptive;
 
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.ldaptive.LdaptiveOperations;
 import org.bremersee.ldaptive.LdaptiveProperties;
@@ -56,6 +57,8 @@ import org.springframework.util.ClassUtils;
 @Slf4j
 public class LdaptiveAutoConfiguration {
 
+  private final Class<? extends LdaptiveTemplate> ldaptiveTemplateClass;
+
   private final LdaptiveProperties properties;
 
   /**
@@ -64,6 +67,8 @@ public class LdaptiveAutoConfiguration {
    * @param properties the ldaptive connection properties
    */
   public LdaptiveAutoConfiguration(LdaptiveConnectionProperties properties) {
+    this.ldaptiveTemplateClass = Objects
+        .requireNonNullElse(properties.getLdaptiveTemplateClass(), LdaptiveTemplate.class);
     this.properties = PropertiesMapper.INSTANCE.map(properties);
   }
 
@@ -129,7 +134,15 @@ public class LdaptiveAutoConfiguration {
   @ConditionalOnMissingBean(LdaptiveOperations.class)
   @Bean
   public LdaptiveTemplate ldaptiveTemplate(ConnectionFactory connectionFactory) {
-    return new LdaptiveTemplate(connectionFactory);
+    try {
+      return ldaptiveTemplateClass
+          .getConstructor(ConnectionFactory.class)
+          .newInstance(connectionFactory);
+    } catch (Exception e) {
+      log.warn("Could not instantiate LdaptiveTemplate {}. Instantiate default template.",
+          ldaptiveTemplateClass.getName(), e);
+      return new LdaptiveTemplate(connectionFactory);
+    }
   }
 
   /**

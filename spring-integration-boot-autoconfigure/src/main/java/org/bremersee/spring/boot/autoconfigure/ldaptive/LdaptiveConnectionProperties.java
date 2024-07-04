@@ -25,6 +25,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.bremersee.ldaptive.LdaptiveTemplate;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -39,6 +40,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @EqualsAndHashCode(exclude = {"bindCredentials"})
 @NoArgsConstructor
 public class LdaptiveConnectionProperties {
+
+  private Class<? extends LdaptiveTemplate> ldaptiveTemplateClass = LdaptiveTemplate.class;
 
   /**
    * Specifies whether the connection configuration is immutable or not.
