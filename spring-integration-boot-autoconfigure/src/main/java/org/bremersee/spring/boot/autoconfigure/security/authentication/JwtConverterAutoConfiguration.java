@@ -19,6 +19,7 @@ package org.bremersee.spring.boot.autoconfigure.security.authentication;
 import static java.util.Objects.isNull;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -91,11 +92,18 @@ public class JwtConverterAutoConfiguration {
         .rolesValueSeparator(properties.getRolesValueSeparator())
         .roleMapping(Stream.ofNullable(properties.getRoleMapping())
             .flatMap(Collection::stream)
-            .collect(Collectors.toMap(RoleMapping::getSource, RoleMapping::getTarget)))
+            .collect(Collectors.toMap(
+                RoleMapping::getSource,
+                RoleMapping::getTarget,
+                (first, second) -> first,
+                LinkedHashMap::new)))
         .roleStringReplacements(Stream.ofNullable(properties.getRoleStringReplacements())
             .flatMap(Collection::stream)
-            .collect(Collectors
-                .toMap(StringReplacement::getRegex, StringReplacement::getReplacement)))
+            .collect(Collectors.toMap(
+                StringReplacement::getRegex,
+                StringReplacement::getReplacement,
+                (first, second) -> first,
+                LinkedHashMap::new)))
         .roleCaseTransformation(getCaseTransformation(properties.getRoleCaseTransformation()))
         .rolePrefix(properties.getRolePrefix())
         .defaultRoles(properties.getDefaultRoles())

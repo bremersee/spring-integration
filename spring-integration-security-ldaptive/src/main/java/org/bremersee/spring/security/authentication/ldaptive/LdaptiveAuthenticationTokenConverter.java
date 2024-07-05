@@ -17,6 +17,7 @@
 package org.bremersee.spring.security.authentication.ldaptive;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.bremersee.ldaptive.serializable.SerLdapEntry;
@@ -43,14 +44,21 @@ public class LdaptiveAuthenticationTokenConverter
         properties.getDefaultRoles(),
         Stream.ofNullable(properties.getRoleMapping())
             .flatMap(Collection::stream)
-            .collect(Collectors.toMap(RoleMapping::getSource, RoleMapping::getTarget)),
+            .collect(Collectors.toMap(
+                RoleMapping::getSource,
+                RoleMapping::getTarget,
+                (first, second) -> first,
+                LinkedHashMap::new)),
         properties.getRolePrefix(),
         properties.getRoleCaseTransformation(),
         Stream
             .ofNullable(properties.getRoleStringReplacements())
             .flatMap(Collection::stream)
-            .collect(Collectors
-                .toMap(StringReplacement::getRegex, StringReplacement::getReplacement)));
+            .collect(Collectors.toMap(
+                StringReplacement::getRegex,
+                StringReplacement::getReplacement,
+                (first, second) -> first,
+                LinkedHashMap::new)));
     this.properties = properties;
   }
 
