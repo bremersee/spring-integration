@@ -34,9 +34,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 /**
  * The json path jwt converter.
@@ -47,7 +47,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class JsonPathJwtConverter
-    extends AuthenticationConverter<Jwt, JwtAuthenticationToken> {
+    extends AuthenticationConverter<Jwt, AbstractAuthenticationToken> {
 
   private final String nameJsonPath;
 
@@ -77,6 +77,7 @@ public class JsonPathJwtConverter
       String rolePrefix,
       CaseTransformation roleCaseTransformation,
       Map<String, String> roleStringReplacements) {
+
     super(defaultRoles, roleMapping, rolePrefix, roleCaseTransformation, roleStringReplacements);
     this.nameJsonPath = nameJsonPath;
     this.firstNameJsonPath = firstNameJsonPath;

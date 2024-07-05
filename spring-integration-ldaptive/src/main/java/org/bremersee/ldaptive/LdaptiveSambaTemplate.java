@@ -147,14 +147,14 @@ public class LdaptiveSambaTemplate extends LdaptiveTemplate {
       }
     };
     List<CharacterRule> rules = List.of(
-        // at least one upper-case character
-        new CharacterRule(EnglishCharacterData.UpperCase, 1),
+        // at least five upper-case character
+        new CharacterRule(EnglishCharacterData.UpperCase, 5),
 
-        // at least one lower-case character
-        new CharacterRule(EnglishCharacterData.LowerCase, 1),
+        // at least five lower-case character
+        new CharacterRule(EnglishCharacterData.LowerCase, 5),
 
-        // at least one digit character
-        new CharacterRule(EnglishCharacterData.Digit, 1),
+        // at least three digit character
+        new CharacterRule(EnglishCharacterData.Digit, 3),
 
         // at least one special character
         new CharacterRule(special, 1));

@@ -22,11 +22,11 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.spring.security.authentication.CaseTransformation;
-import org.bremersee.spring.security.authentication.JsonPathJwtConverter;
 import org.bremersee.spring.boot.autoconfigure.security.authentication.AuthenticationProperties.JwtConverterProperties;
 import org.bremersee.spring.boot.autoconfigure.security.authentication.AuthenticationProperties.RoleMapping;
 import org.bremersee.spring.boot.autoconfigure.security.authentication.AuthenticationProperties.StringReplacement;
+import org.bremersee.spring.security.authentication.CaseTransformation;
+import org.bremersee.spring.security.authentication.JsonPathJwtConverter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -36,8 +36,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -79,7 +79,7 @@ public class JwtConverterAutoConfiguration {
 
   @ConditionalOnMissingBean
   @Bean
-  public Converter<Jwt, JwtAuthenticationToken> jwtConverter() {
+  public Converter<Jwt, AbstractAuthenticationToken> jwtConverter() {
     return JsonPathJwtConverter.builder()
         .nameJsonPath(properties.getNameJsonPath())
         .firstNameJsonPath(properties.getFirstNameJsonPath())
