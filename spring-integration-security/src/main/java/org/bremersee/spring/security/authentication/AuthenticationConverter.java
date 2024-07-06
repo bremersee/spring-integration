@@ -40,7 +40,15 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * The type NormalizedAuthenticationConverter.
+ * The normalized authentication converter supports normalization of roles.
+ *
+ * <p>The order of normalization is:
+ * <ul>
+ * <li>1. role mapping</li>
+ * <li>2. case transformation</li>
+ * <li>3. string replacements</li>
+ * <li>4. adding of prefix</li>
+ * </ul>
  *
  * @param <S> the type of the authentication source
  * @param <T> the type of the normalized authentication
