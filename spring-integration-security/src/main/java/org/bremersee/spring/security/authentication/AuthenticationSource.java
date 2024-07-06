@@ -21,14 +21,30 @@ import java.util.Collection;
 /**
  * The interface AuthenticationValues.
  *
+ * @param <A> the type parameter
  * @author Christian Bremer
  */
 public interface AuthenticationSource<A> {
 
+  /**
+   * Gets name.
+   *
+   * @return the name
+   */
   String getName();
 
+  /**
+   * Gets authorities.
+   *
+   * @return the authorities
+   */
   Collection<? extends String> getAuthorities();
 
+  /**
+   * Gets attributes.
+   *
+   * @return the attributes
+   */
   A getAttributes();
 
 }

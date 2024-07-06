@@ -31,12 +31,31 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 public class NormalizedJwtAuthenticationToken extends JwtAuthenticationToken
     implements NormalizedAuthentication {
 
+  /**
+   * The first name.
+   */
   private final String firstName;
 
+  /**
+   * The last name.
+   */
   private final String lastName;
 
+  /**
+   * The email.
+   */
   private final String mail;
 
+  /**
+   * Instantiates a new Normalized jwt authentication token.
+   *
+   * @param jwt the jwt
+   * @param authorities the authorities
+   * @param name the name
+   * @param firstName the first name
+   * @param lastName the last name
+   * @param mail the mail
+   */
   public NormalizedJwtAuthenticationToken(
       Jwt jwt,
       Collection<? extends GrantedAuthority> authorities,

@@ -28,10 +28,25 @@ public interface NormalizedAuthentication extends Authentication {
   @Override
   String getName();
 
+  /**
+   * Gets first name.
+   *
+   * @return the first name
+   */
   String getFirstName();
 
+  /**
+   * Gets last name.
+   *
+   * @return the last name
+   */
   String getLastName();
 
+  /**
+   * Gets mail.
+   *
+   * @return the mail
+   */
   String getMail();
 
 }

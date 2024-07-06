@@ -49,20 +49,58 @@ import org.springframework.security.oauth2.jwt.Jwt;
 public class JsonPathJwtConverter
     extends AuthenticationConverter<Jwt, AbstractAuthenticationToken> {
 
+  /**
+   * The json path to the username.
+   */
   private final String nameJsonPath;
 
+  /**
+   * The json path to the first name.
+   */
   private final String firstNameJsonPath;
 
+  /**
+   * The json path to the last name.
+   */
   private final String lastNameJsonPath;
 
+  /**
+   * The json path to the email.
+   */
   private final String emailJsonPath;
 
+  /**
+   * The json path to the roles.
+   */
   private final String rolesJsonPath;
 
+  /**
+   * Specifies whether the roles are represented as a json array or as a list separated by
+   * {@link #getRolesValueSeparator()}.
+   */
   private final boolean rolesValueList;
 
+  /**
+   * The roles separator to use if {@link #isRolesValueList()} is set to {@code false}.
+   */
   private final String rolesValueSeparator;
 
+  /**
+   * Instantiates a new Json path jwt converter.
+   *
+   * @param nameJsonPath the name json path
+   * @param firstNameJsonPath the first name json path
+   * @param lastNameJsonPath the last name json path
+   * @param emailJsonPath the email json path
+   * @param rolesJsonPath the roles json path
+   * @param rolesValueList the roles value list
+   * @param rolesValueSeparator the roles value separator
+   * @param defaultRoles the default roles
+   * @param roleMapping the role mapping
+   * @param rolePrefix the role prefix
+   * @param roleCaseTransformation the role case transformation
+   * @param roleStringReplacements the role string replacements
+   */
   @Builder(toBuilder = true)
   public JsonPathJwtConverter(
       String nameJsonPath,
@@ -101,6 +139,12 @@ public class JsonPathJwtConverter
         getEmail(parser));
   }
 
+  /**
+   * Gets granted authorities.
+   *
+   * @param parser the parser
+   * @return the granted authorities
+   */
   protected Set<GrantedAuthority> getGrantedAuthorities(JsonPathJwtParser parser) {
     Set<String> authorities = isRolesValueList()
         ? getAuthoritiesFromList(parser)
@@ -108,6 +152,12 @@ public class JsonPathJwtConverter
     return normalize(authorities);
   }
 
+  /**
+   * Gets authorities from list.
+   *
+   * @param parser the parser
+   * @return the authorities from list
+   */
   protected Set<String> getAuthoritiesFromList(JsonPathJwtParser parser) {
     //noinspection unchecked
     return Stream.ofNullable(getRolesJsonPath())
@@ -118,6 +168,12 @@ public class JsonPathJwtConverter
         .collect(Collectors.toSet());
   }
 
+  /**
+   * Gets authorities from value.
+   *
+   * @param parser the parser
+   * @return the authorities from value
+   */
   protected Set<String> getAuthoritiesFromValue(JsonPathJwtParser parser) {
     return Stream.ofNullable(getRolesJsonPath())
         .filter(path -> !isEmpty(getRolesValueSeparator()))
@@ -129,6 +185,13 @@ public class JsonPathJwtConverter
         .collect(Collectors.toSet());
   }
 
+  /**
+   * Gets username.
+   *
+   * @param source the source
+   * @param parser the parser
+   * @return the username
+   */
   protected String getUsername(Jwt source, JsonPathJwtParser parser) {
     return Optional.ofNullable(getNameJsonPath())
         .filter(jsonPath -> !jsonPath.isBlank())
@@ -136,14 +199,32 @@ public class JsonPathJwtConverter
         .orElseGet(source::getSubject);
   }
 
+  /**
+   * Gets first name.
+   *
+   * @param parser the parser
+   * @return the first name
+   */
   protected String getFirstName(JsonPathJwtParser parser) {
     return parser.read(getFirstNameJsonPath(), String.class);
   }
 
+  /**
+   * Gets last name.
+   *
+   * @param parser the parser
+   * @return the last name
+   */
   protected String getLastName(JsonPathJwtParser parser) {
     return parser.read(getLastNameJsonPath(), String.class);
   }
 
+  /**
+   * Gets email.
+   *
+   * @param parser the parser
+   * @return the email
+   */
   protected String getEmail(JsonPathJwtParser parser) {
     return parser.read(getEmailJsonPath(), String.class);
   }

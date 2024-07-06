@@ -42,6 +42,8 @@ import org.springframework.util.ObjectUtils;
 /**
  * The type NormalizedAuthenticationConverter.
  *
+ * @param <S> the type of the authentication source
+ * @param <T> the type of the normalized authentication
  * @author Christian Bremer
  */
 @AllArgsConstructor
@@ -51,16 +53,37 @@ import org.springframework.util.ObjectUtils;
 public abstract class AuthenticationConverter<S, T extends Authentication>
     implements Converter<S, T> {
 
+  /**
+   * The default roles.
+   */
   protected List<String> defaultRoles;
 
+  /**
+   * The role mapping.
+   */
   protected Map<String, String> roleMapping;
 
+  /**
+   * The role prefix.
+   */
   protected String rolePrefix;
 
+  /**
+   * The role case transformation.
+   */
   protected CaseTransformation roleCaseTransformation;
 
+  /**
+   * The role string replacements.
+   */
   protected Map<String, String> roleStringReplacements;
 
+  /**
+   * Normalize authorities.
+   *
+   * @param authorities the authorities
+   * @return the normalized authorities
+   */
   protected Set<GrantedAuthority> normalize(Collection<? extends String> authorities) {
     return Stream.concat(
             Stream.ofNullable(authorities)
@@ -74,6 +97,12 @@ public abstract class AuthenticationConverter<S, T extends Authentication>
         .collect(Collectors.toSet());
   }
 
+  /**
+   * Normalize granted authority.
+   *
+   * @param authority the authority
+   * @return the granted authority
+   */
   protected GrantedAuthority normalize(String authority) {
     Assert.hasText(authority, "Authority must be present.");
     Optional<GrantedAuthority> mappedValue = Stream.ofNullable(getRoleMapping())
