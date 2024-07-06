@@ -86,7 +86,11 @@ public class LdaptiveAuthenticationManager
   @Getter(AccessLevel.PROTECTED)
   private final LdaptiveAuthenticationProperties authenticationProperties;
 
+  @Getter(AccessLevel.PROTECTED)
   private Function<ConnectionFactory, LdaptiveTemplate> ldaptiveTemplateFn;
+
+  @Getter(AccessLevel.PROTECTED)
+  private EmailToUsernameConverter emailToUsernameConverter;
 
   @Getter(AccessLevel.PROTECTED)
   private UsernameToBindDnConverter usernameToBindDnConverter;
@@ -113,12 +117,19 @@ public class LdaptiveAuthenticationManager
     this.connectionConfig = connectionConfig;
     this.authenticationProperties = authenticationProperties;
     this.ldaptiveTemplateFn = LdaptiveTemplate::new;
+    this.emailToUsernameConverter = new EmailToUsernameConverterByLdapAttribute(
+        authenticationProperties, connectionConfig);
     this.usernameToBindDnConverter = authenticationProperties
         .getUsernameToBindDnConverter()
         .apply(authenticationProperties);
     this.tokenConverter = new LdaptiveAuthenticationTokenConverter(authenticationProperties);
   }
 
+  /**
+   * Sets ldaptive template fn.
+   *
+   * @param ldaptiveTemplateFn the ldaptive template fn
+   */
   public void setLdaptiveTemplateFn(
       Function<ConnectionFactory, LdaptiveTemplate> ldaptiveTemplateFn) {
     if (nonNull(ldaptiveTemplateFn)) {
@@ -126,6 +137,23 @@ public class LdaptiveAuthenticationManager
     }
   }
 
+  /**
+   * Sets email to username converter.
+   *
+   * @param emailToUsernameConverter the email to username converter
+   */
+  public void setEmailToUsernameConverter(
+      EmailToUsernameConverter emailToUsernameConverter) {
+    if (nonNull(emailToUsernameConverter)) {
+      this.emailToUsernameConverter = emailToUsernameConverter;
+    }
+  }
+
+  /**
+   * Sets username to bind dn converter.
+   *
+   * @param usernameToBindDnConverter the username to bind dn converter
+   */
   public void setUsernameToBindDnConverter(
       UsernameToBindDnConverter usernameToBindDnConverter) {
     if (nonNull(usernameToBindDnConverter)) {
@@ -145,6 +173,11 @@ public class LdaptiveAuthenticationManager
     }
   }
 
+  /**
+   * Sets authentication token converter.
+   *
+   * @param converter the converter
+   */
   public void setAuthenticationTokenConverter(
       Converter<AuthenticationSource<LdapEntry>, LdaptiveAuthentication> converter) {
     if (nonNull(converter)) {
@@ -152,6 +185,9 @@ public class LdaptiveAuthenticationManager
     }
   }
 
+  /**
+   * Init.
+   */
   public void init() {
     if (!bindWithAuthentication() && isNull(getPasswordEncoder())) {
       throw new IllegalStateException(String.format("A password attribute is set (%s) but no "
@@ -186,12 +222,22 @@ public class LdaptiveAuthenticationManager
   @Override
   public LdaptiveAuthentication authenticate(Authentication authentication)
       throws AuthenticationException {
-    String username = authentication.getName();
+    String username = getEmailToUsernameConverter()
+        .getUsernameByEmail(authentication.getName())
+        .orElseGet(authentication::getName);
     String password = String.valueOf(authentication.getCredentials());
     LdaptiveTemplate ldaptiveTemplate = getLdapTemplate(username, password);
     return authenticate(username, password, ldaptiveTemplate);
   }
 
+  /**
+   * Authenticate ldaptive authentication.
+   *
+   * @param username the username
+   * @param password the password
+   * @param ldaptiveTemplate the ldaptive template
+   * @return the ldaptive authentication
+   */
   protected LdaptiveAuthentication authenticate(
       String username,
       String password,
@@ -212,11 +258,23 @@ public class LdaptiveAuthenticationManager
             user));
   }
 
+  /**
+   * Bind with authentication boolean.
+   *
+   * @return the boolean
+   */
   protected boolean bindWithAuthentication() {
     return isNull(getAuthenticationProperties().getPasswordAttribute())
         || getAuthenticationProperties().getPasswordAttribute().isBlank();
   }
 
+  /**
+   * Gets connection factory.
+   *
+   * @param username the username
+   * @param password the password
+   * @return the connection factory
+   */
   protected ConnectionFactory getConnectionFactory(String username, String password) {
     if (bindWithAuthentication()) {
       ConnectionConfig authConfig = ConnectionConfig.copy(getConnectionConfig());
@@ -230,8 +288,15 @@ public class LdaptiveAuthenticationManager
     return new DefaultConnectionFactory(getConnectionConfig());
   }
 
+  /**
+   * Gets ldap template.
+   *
+   * @param username the username
+   * @param password the password
+   * @return the ldap template
+   */
   protected LdaptiveTemplate getLdapTemplate(String username, String password) {
-    return ldaptiveTemplateFn.apply(getConnectionFactory(username, password));
+    return getLdaptiveTemplateFn().apply(getConnectionFactory(username, password));
   }
 
   /**
@@ -337,6 +402,13 @@ public class LdaptiveAuthenticationManager
     }
   }
 
+  /**
+   * Gets authorities.
+   *
+   * @param ldaptiveTemplate the ldaptive template
+   * @param user the user
+   * @return the authorities
+   */
   protected Collection<? extends String> getAuthorities(
       LdaptiveTemplate ldaptiveTemplate, LdapEntry user) {
 

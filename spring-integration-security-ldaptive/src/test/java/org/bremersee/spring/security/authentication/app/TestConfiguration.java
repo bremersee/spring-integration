@@ -16,6 +16,8 @@
 
 package org.bremersee.spring.security.authentication.app;
 
+import org.bremersee.spring.security.authentication.ldaptive.EmailToUsernameConverter;
+import org.bremersee.spring.security.authentication.ldaptive.EmailToUsernameConverterByLdapAttribute;
 import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager;
 import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationProperties;
 import org.bremersee.spring.security.authentication.ldaptive.provider.OpenLdapTemplate;
@@ -70,12 +72,34 @@ public class TestConfiguration {
   }
 
   @Bean
-  public LdaptiveAuthenticationManager authenticationManager(ConnectionFactory connectionFactory) {
+  public LdaptiveAuthenticationProperties authenticationProperties() {
     LdaptiveAuthenticationProperties authenticationProperties = new OpenLdapTemplate();
     authenticationProperties.setUserBaseDn("ou=people," + baseDn);
-    return new LdaptiveAuthenticationManager(
+    authenticationProperties.setLastNameAttribute("sn");
+    authenticationProperties.setFirstNameAttribute("givenName");
+    authenticationProperties.setEmailAttribute("mail");
+    return authenticationProperties;
+  }
+
+  @Bean
+  public EmailToUsernameConverter emailToUsernameConverter(
+      ConnectionFactory connectionFactory,
+      LdaptiveAuthenticationProperties authenticationProperties) {
+    return new EmailToUsernameConverterByLdapAttribute(
+        authenticationProperties,
+        connectionFactory.getConnectionConfig());
+  }
+
+  @Bean
+  public LdaptiveAuthenticationManager authenticationManager(
+      ConnectionFactory connectionFactory,
+      LdaptiveAuthenticationProperties authenticationProperties,
+      EmailToUsernameConverter emailToUsernameConverter) {
+    LdaptiveAuthenticationManager authenticationManager = new LdaptiveAuthenticationManager(
         connectionFactory.getConnectionConfig(),
         authenticationProperties);
+    authenticationManager.setEmailToUsernameConverter(emailToUsernameConverter);
+    return authenticationManager;
   }
 
 }

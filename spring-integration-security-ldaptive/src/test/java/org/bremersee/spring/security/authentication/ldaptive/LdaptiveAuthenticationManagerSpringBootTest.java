@@ -54,14 +54,16 @@ import org.springframework.web.reactive.function.client.WebClient;
         "spring.ldap.embedded.credential.username=uid=admin",
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=classpath:schema.ldif",
-        "spring.ldap.embedded.validation.enabled=false",
-        "bremersee.authentication.ldaptive.template=open_ldap"
+        "spring.ldap.embedded.validation.enabled=false"
     })
 @ExtendWith({SoftAssertionsExtension.class})
 class LdaptiveAuthenticationManagerSpringBootTest {
 
   @Autowired
   private LdaptiveAuthenticationManager authenticationManager;
+
+  @Autowired
+  private EmailToUsernameConverter emailToUsernameConverter;
 
   @LocalServerPort
   private int port;
@@ -86,14 +88,27 @@ class LdaptiveAuthenticationManagerSpringBootTest {
 
     // authenticate successfully
     LdaptiveAuthentication authenticationToken = authenticationManager
-        .authenticate(new UsernamePasswordAuthenticationToken("anna", "topsecret"));
+        .authenticate(new UsernamePasswordAuthenticationToken(
+            "anna.livia@bremersee.org", "topsecret"));
 
+    softly
+        .assertThat(authenticationToken.isAuthenticated())
+        .isTrue();
     softly
         .assertThat(authenticationToken.getName())
         .isEqualTo("anna");
     softly
-        .assertThat(authenticationToken.isAuthenticated())
-        .isTrue();
+        .assertThat(authenticationToken.getMail())
+        .isEqualTo("anna.livia@bremersee.org");
+    softly
+        .assertThat(authenticationToken.getFirstName())
+        .isEqualTo("Anna Livia");
+    softly
+        .assertThat(authenticationToken.getLastName())
+        .isEqualTo("Plurabelle");
+    softly
+        .assertThat(authenticationToken.getPrincipal().getDn())
+        .isEqualTo("uid=anna,ou=people,dc=bremersee,dc=org");
     List<GrantedAuthority> actual = new ArrayList<>(authenticationToken.getAuthorities());
     List<GrantedAuthority> expectedRoles = List.of(
         new SimpleGrantedAuthority("developers"),
@@ -124,6 +139,16 @@ class LdaptiveAuthenticationManagerSpringBootTest {
     softly
         .assertThat(helloResponse)
         .isEqualTo("Hello!");
+  }
+
+  @Test
+  void emailToUsername(SoftAssertions softly) {
+    softly
+        .assertThat(emailToUsernameConverter.getUsernameByEmail("anna.livia@bremersee.org"))
+        .hasValue("anna");
+    softly
+        .assertThat(emailToUsernameConverter.getUsernameByEmail("anna"))
+        .isEmpty();
   }
 
 }

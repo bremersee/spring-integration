@@ -23,10 +23,12 @@ objectclass: organizationalPerson
 objectclass: inetOrgPerson
 cn: Anna Livia Plurabelle
 sn: Plurabelle
+givenName: Anna Livia
 uid: anna
 memberOf: cn=developers,ou=groups,dc=bremersee,dc=org
 memberOf: cn=managers,ou=groups,dc=bremersee,dc=org
 userPassword: topsecret
+mail: anna.livia@bremersee.org
 
 dn: uid=hans,ou=people,dc=bremersee,dc=org
 objectclass: top
