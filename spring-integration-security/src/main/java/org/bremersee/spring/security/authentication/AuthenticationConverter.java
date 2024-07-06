@@ -44,10 +44,14 @@ import org.springframework.util.ObjectUtils;
  *
  * <p>The order of normalization is:
  * <ul>
- * <li>1. role mapping</li>
- * <li>2. case transformation</li>
- * <li>3. string replacements</li>
- * <li>4. adding of prefix</li>
+ * <li>1. default roles are always added as they are defined (no normalization is done)</li>
+ * <li>2. role mapping (if role is mapped, further steps will be skipped)</li>
+ * <li>3. case transformation ('java-developers' -> 'JAVA-DEVELOPERS')</li>
+ * <li>4. string replacements (replace '-DEVELOPERS' with _DEVELOPER' -> 'JAVA_DEVELOPER')</li>
+ * <li>
+ *   5. adding prefix, if role does not start with prefix
+ *   (prefix is 'ROLE_' -> 'ROLE_JAVA_DEVELOPER')
+ * </li>
  * </ul>
  *
  * @param <S> the type of the authentication source
