@@ -45,6 +45,11 @@ import org.springframework.validation.annotation.Validated;
 public class MessageSourceProperties {
 
   /**
+   * Specifies whether bremersee's message source configuration is enabled or not.
+   */
+  private boolean enabled = false;
+
+  /**
    * Set whether to always apply the {@code MessageFormat} rules, parsing even messages without
    * arguments.
    *

@@ -95,8 +95,7 @@ public class EmailToUsernameConverterByLdapAttribute implements EmailToUsernameC
         .filter(collection -> collection.size() == 1)
         .flatMap(Collection::stream)
         .findFirst()
-        .map(ldapEntry -> ldapEntry.getAttribute(
-            properties.getUsernameAttribute()))
+        .map(ldapEntry -> ldapEntry.getAttribute(properties.getUsernameAttribute()))
         .map(LdapAttribute::getStringValue);
   }
 }

@@ -22,6 +22,7 @@ import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.MessageSource;
@@ -37,6 +38,7 @@ import org.springframework.util.ClassUtils;
  *
  * @author Christian Bremer
  */
+@ConditionalOnProperty(prefix = "bremersee.messages", name = "enabled", havingValue = "true")
 @AutoConfigureBefore({
     org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration.class
 })

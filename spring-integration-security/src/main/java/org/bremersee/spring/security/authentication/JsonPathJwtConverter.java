@@ -96,8 +96,8 @@ public class JsonPathJwtConverter
         source,
         getGrantedAuthorities(parser),
         getUsername(source, parser),
-        getFirstMame(parser),
-        getLastMame(parser),
+        getFirstName(parser),
+        getLastName(parser),
         getEmail(parser));
   }
 
@@ -136,11 +136,11 @@ public class JsonPathJwtConverter
         .orElseGet(source::getSubject);
   }
 
-  protected String getFirstMame(JsonPathJwtParser parser) {
+  protected String getFirstName(JsonPathJwtParser parser) {
     return parser.read(getFirstNameJsonPath(), String.class);
   }
 
-  protected String getLastMame(JsonPathJwtParser parser) {
+  protected String getLastName(JsonPathJwtParser parser) {
     return parser.read(getLastNameJsonPath(), String.class);
   }
 

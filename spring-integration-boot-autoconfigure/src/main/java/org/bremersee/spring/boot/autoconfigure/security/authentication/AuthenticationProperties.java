@@ -37,7 +37,7 @@ public class AuthenticationProperties {
   @Data
   public static class JwtConverterProperties {
 
-    private String nameJsonPath = "$.sub";
+    private String nameJsonPath = "$.sub"; // keycloak: $.preferred_username
 
     private String firstNameJsonPath = "$.given_name";
 
@@ -45,9 +45,9 @@ public class AuthenticationProperties {
 
     private String emailJsonPath = "$.email";
 
-    private String rolesJsonPath = "$.scope"; // $.realm_access.roles
+    private String rolesJsonPath = "$.scope"; // keycloak: $.realm_access.roles
 
-    private boolean rolesValueList = false; // true
+    private boolean rolesValueList = false; // keycloak: true
 
     private String rolesValueSeparator = " ";
 
@@ -55,7 +55,7 @@ public class AuthenticationProperties {
 
     private List<RoleMapping> roleMapping = new ArrayList<>();
 
-    private String rolePrefix = "SCOPE_"; // ROLE_
+    private String rolePrefix = "SCOPE_"; // keycloak: ROLE_
 
     private CaseTransformation roleCaseTransformation;
 
