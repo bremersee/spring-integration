@@ -35,9 +35,17 @@ class LdaptiveAuthenticationTokenConverterTest {
     properties.setEmailAttribute(emailAttr);
     properties.setRolePrefix("ROLE_");
     properties.setRoleCaseTransformation(CaseTransformation.valueOf(transformation));
+    String sourceValue = CaseTransformation.TO_UPPER_CASE
+        .equals(properties.getRoleCaseTransformation())
+        ? "JUNIT_DEVELOPERS"
+        : "junit_developers";
+    String normalizedValue = CaseTransformation.TO_UPPER_CASE
+        .equals(properties.getRoleCaseTransformation())
+        ? "JUNIT_DEVELOPER"
+        : "junit_developer";
     properties.setRoleStringReplacements(List.of(
         new StringReplacement("[-]", "_"),
-        new StringReplacement("_developers", "_developer")));
+        new StringReplacement(sourceValue, normalizedValue)));
     properties.setRoleMapping(List.of(new RoleMapping("foo", "ROLE_BAR")));
     properties.setDefaultRoles(List.of("ROLE_LDAP"));
 
@@ -55,10 +63,6 @@ class LdaptiveAuthenticationTokenConverterTest {
         "junit", authorities, ldapEntry);
     LdaptiveAuthentication actual = requireNonNull(target.convert(source));
 
-    String normalizedValue = CaseTransformation.TO_UPPER_CASE
-        .equals(properties.getRoleCaseTransformation())
-        ? "JUNIT_DEVELOPER"
-        : "junit_developer";
     List<GrantedAuthority> actualAuthorities = new ArrayList<>(actual.getAuthorities());
     softly
         .assertThat(actualAuthorities)
@@ -67,7 +71,7 @@ class LdaptiveAuthenticationTokenConverterTest {
             new SimpleGrantedAuthority("ROLE_BAR"),
             new SimpleGrantedAuthority("ROLE_LDAP")));
     softly
-        .assertThat(actual.getMail())
+        .assertThat(actual.getEmail())
         .isEqualTo("test@example.org");
     softly
         .assertThat(actual.getName())

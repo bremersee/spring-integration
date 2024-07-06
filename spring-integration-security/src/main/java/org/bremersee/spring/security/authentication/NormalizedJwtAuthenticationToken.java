@@ -44,7 +44,7 @@ public class NormalizedJwtAuthenticationToken extends JwtAuthenticationToken
   /**
    * The email.
    */
-  private final String mail;
+  private final String email;
 
   /**
    * Instantiates a new Normalized jwt authentication token.
@@ -54,7 +54,7 @@ public class NormalizedJwtAuthenticationToken extends JwtAuthenticationToken
    * @param name the name
    * @param firstName the first name
    * @param lastName the last name
-   * @param mail the mail
+   * @param email the email
    */
   public NormalizedJwtAuthenticationToken(
       Jwt jwt,
@@ -62,11 +62,11 @@ public class NormalizedJwtAuthenticationToken extends JwtAuthenticationToken
       String name,
       String firstName,
       String lastName,
-      String mail) {
+      String email) {
     super(jwt, authorities, name);
     this.firstName = firstName;
     this.lastName = lastName;
-    this.mail = mail;
+    this.email = email;
   }
 
 }

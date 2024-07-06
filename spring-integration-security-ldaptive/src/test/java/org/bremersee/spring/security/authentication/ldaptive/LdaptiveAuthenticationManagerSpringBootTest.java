@@ -98,7 +98,7 @@ class LdaptiveAuthenticationManagerSpringBootTest {
         .assertThat(authenticationToken.getName())
         .isEqualTo("anna");
     softly
-        .assertThat(authenticationToken.getMail())
+        .assertThat(authenticationToken.getEmail())
         .isEqualTo("anna.livia@bremersee.org");
     softly
         .assertThat(authenticationToken.getFirstName())

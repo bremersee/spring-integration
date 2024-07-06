@@ -67,7 +67,7 @@ class JsonPathJwtConverterTest {
         .assertThat(actual.getLastName())
         .isEqualTo("Plurabelle");
     softly
-        .assertThat(actual.getMail())
+        .assertThat(actual.getEmail())
         .isEqualTo("anna@example.org");
     softly
         .assertThat(actual.getAuthorities())
@@ -101,7 +101,7 @@ class JsonPathJwtConverterTest {
         .assertThat(actual.getLastName())
         .isEqualTo("Plurabelle");
     softly
-        .assertThat(actual.getMail())
+        .assertThat(actual.getEmail())
         .isEqualTo("anna@example.org");
     softly
         .assertThat(actual.getAuthorities())

@@ -43,10 +43,10 @@ public interface NormalizedAuthentication extends Authentication {
   String getLastName();
 
   /**
-   * Gets mail.
+   * Gets email.
    *
-   * @return the mail
+   * @return the email
    */
-  String getMail();
+  String getEmail();
 
 }

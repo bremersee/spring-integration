@@ -39,6 +39,9 @@ public class LdaptiveAuthenticationProperties implements Serializable {
   @Serial
   private static final long serialVersionUID = 1L;
 
+  /**
+   * The username (like 'anna') to bind dn (like 'cn=anna,ou=people,dc=example,dc=org') converter.
+   */
   protected UsernameToBindDnConverterProperty usernameToBindDnConverter;
 
   /**
@@ -98,40 +101,93 @@ public class LdaptiveAuthenticationProperties implements Serializable {
    */
   protected String emailAttribute;
 
+  /**
+   * The account control evaluator.
+   */
   protected AccountControlEvaluatorProperty accountControlEvaluator;
 
-
+  /**
+   * The group fetch strategy.
+   */
   protected GroupFetchStrategy groupFetchStrategy;
 
+  /**
+   * The member attribute.
+   */
   protected String memberAttribute;
 
+  /**
+   * The group base dn (like 'ou=groups,dc=example,dc=org'). It's only required, if
+   * {@link #getGroupFetchStrategy()} is set to {@link GroupFetchStrategy#GROUP_CONTAINS_USERS}
+   */
   protected String groupBaseDn;
 
+  /**
+   * The group search scope. It's only required, if {@link #getGroupFetchStrategy()} is set to
+   * {@link GroupFetchStrategy#GROUP_CONTAINS_USERS}
+   */
   protected SearchScope groupSearchScope;
 
+  /**
+   * The group object class. It's only required, if {@link #getGroupFetchStrategy()} is set to
+   * {@link GroupFetchStrategy#GROUP_CONTAINS_USERS}
+   */
   protected String groupObjectClass;
 
+  /**
+   * The group id attribute. It's only required, if {@link #getGroupFetchStrategy()} is set to
+   * {@link GroupFetchStrategy#GROUP_CONTAINS_USERS}
+   */
   protected String groupIdAttribute;
 
+  /**
+   * The group member attribute. It's only required, if {@link #getGroupFetchStrategy()} is set to
+   * {@link GroupFetchStrategy#GROUP_CONTAINS_USERS}
+   */
   protected String groupMemberAttribute;
 
+  /**
+   * The group member format. It's only required, if {@link #getGroupFetchStrategy()} is set to
+   * {@link GroupFetchStrategy#GROUP_CONTAINS_USERS}
+   */
   protected String groupMemberFormat;
 
+  /**
+   * The role mappings.
+   */
   protected List<RoleMapping> roleMapping;
 
+  /**
+   * The default roles.
+   */
   protected List<String> defaultRoles;
 
+  /**
+   * The role prefix (like 'ROLE_').
+   */
   protected String rolePrefix;
 
+  /**
+   * The role case transformation.
+   */
   protected CaseTransformation roleCaseTransformation;
 
+  /**
+   * The string replacements for roles.
+   */
   protected List<StringReplacement> roleStringReplacements;
 
+  /**
+   * The ldaptive authentication properties with defaults.
+   */
   public static class WithDefaults extends LdaptiveAuthenticationProperties {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Instantiates a new ldaptive authentication properties with defaults.
+     */
     public WithDefaults() {
       usernameToBindDnConverter = UsernameToBindDnConverterProperty.BY_USER_RDN_ATTRIBUTE;
 
@@ -176,7 +232,7 @@ public class LdaptiveAuthenticationProperties implements Serializable {
   }
 
   /**
-   * The enum Group fetch strategy.
+   * The group fetch strategy.
    */
   public enum GroupFetchStrategy {
 
@@ -196,6 +252,9 @@ public class LdaptiveAuthenticationProperties implements Serializable {
     GROUP_CONTAINS_USERS
   }
 
+  /**
+   * The string replacement.
+   */
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
@@ -216,6 +275,9 @@ public class LdaptiveAuthenticationProperties implements Serializable {
     private String replacement;
   }
 
+  /**
+   * The role mapping.
+   */
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
@@ -224,8 +286,14 @@ public class LdaptiveAuthenticationProperties implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The value from the ldap (like 'developers').
+     */
     private String source;
 
+    /**
+     * The value in the spring security context (like 'ROLE_DEVELOPER').
+     */
     private String target;
   }
 

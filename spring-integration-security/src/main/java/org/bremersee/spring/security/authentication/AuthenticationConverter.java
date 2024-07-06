@@ -115,17 +115,17 @@ public abstract class AuthenticationConverter<S, T extends Authentication>
       return mappedValue.get();
     }
     String value = authority;
-    if (!isEmpty(getRoleStringReplacements())) {
-      for (Map.Entry<String, String> replacement : getRoleStringReplacements().entrySet()) {
-        value = value.replaceAll(replacement.getKey(), replacement.getValue());
-      }
-    }
     if (nonNull(getRoleCaseTransformation())) {
       value = switch (getRoleCaseTransformation()) {
         case TO_LOWER_CASE -> value.toLowerCase();
         case TO_UPPER_CASE -> value.toUpperCase();
         case NONE -> value;
       };
+    }
+    if (!isEmpty(getRoleStringReplacements())) {
+      for (Map.Entry<String, String> replacement : getRoleStringReplacements().entrySet()) {
+        value = value.replaceAll(replacement.getKey(), replacement.getValue());
+      }
     }
     if (!isEmpty(getRolePrefix()) && !value.startsWith(getRolePrefix())) {
       value = getRolePrefix() + value;

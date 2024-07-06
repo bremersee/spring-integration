@@ -129,7 +129,7 @@ class LdaptiveAuthenticationManagerTest {
         .assertThat(actual.getLastName())
         .isEqualTo("Tester");
     softly
-        .assertThat(actual.getMail())
+        .assertThat(actual.getEmail())
         .isEqualTo("junit@example.org");
     List<GrantedAuthority> authorities = new ArrayList<>(actual.getAuthorities());
     softly
@@ -218,7 +218,7 @@ class LdaptiveAuthenticationManagerTest {
         .assertThat(actual.getLastName())
         .isEqualTo("Tester");
     softly
-        .assertThat(actual.getMail())
+        .assertThat(actual.getEmail())
         .isEqualTo("junit@example.org");
     List<GrantedAuthority> authorities = new ArrayList<>(actual.getAuthorities());
     softly

@@ -102,7 +102,7 @@ public class LdaptiveAuthenticationToken
   }
 
   @Override
-  public String getMail() {
+  public String getEmail() {
     return Optional.ofNullable(properties.getEmailAttribute())
         .map(attr -> ldapEntry.getAttributes().get(attr))
         .map(SerLdapAttr::getStringValue)
