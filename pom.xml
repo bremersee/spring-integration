@@ -1,0 +1,112 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.bremersee</groupId>
+    <artifactId>common-parent</artifactId>
+    <version>3.0.1</version>
+    <relativePath/>
+  </parent>
+
+  <artifactId>spring-integration-parent</artifactId>
+  <version>0.0.1</version>
+  <packaging>pom</packaging>
+
+  <name>Spring Integration Parent</name>
+  <description>
+    This project contains some spring integrations.
+  </description>
+  <inceptionYear>2015</inceptionYear>
+  <url>https://github.com/bremersee/spring-integration</url>
+
+  <modules>
+    <module>spring-integration-core</module>
+    <module>spring-integration-data-commons</module>
+    <module>spring-integration-data-mongodb</module>
+    <module>spring-integration-ldaptive</module>
+    <module>spring-integration-minio</module>
+    <module>spring-integration-security</module>
+    <module>spring-integration-security-ldaptive</module>
+    <module>spring-integration-test-api-comparator</module>
+    <module>spring-integration-thymeleaf</module>
+    <module>spring-integration-web</module>
+    <module>spring-integration-webflux</module>
+    <module>spring-integration-boot-autoconfigure</module>
+  </modules>
+
+  <properties>
+    <github.repo>spring-integration</github.repo>
+    <!--suppress UnresolvedMavenProperty -->
+    <gh-pages-staging-dir>${maven.multiModuleProjectDirectory}/target/staging</gh-pages-staging-dir>
+
+    <common-exception.version>1.0.0</common-exception.version>
+  </properties>
+
+  <developers>
+    <developer>
+      <id>bremersee</id>
+      <name>Christian Bremer</name>
+      <organization>bremersee.org</organization>
+      <organizationUrl>https://bremersee.org</organizationUrl>
+      <email>christian@bremersee.org</email>
+      <timezone>+1</timezone>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <organization>
+    <name>bremersee.org</name>
+    <url>https://bremersee.org</url>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>https://github.com/bremersee/spring-integration</url>
+    <connection>scm:git:git://github.com/bremersee/spring-integration.git</connection>
+    <developerConnection>scm:git:git@github.com:bremersee/spring-integration.git</developerConnection>
+  </scm>
+
+  <issueManagement>
+    <url>https://github.com/bremersee/spring-integration/issues</url>
+    <system>GitHub Issues</system>
+  </issueManagement>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <site>
+      <id>bremersee-sites</id>
+      <url>
+        dav:https://nexus.bremersee.org/repository/maven-sites/spring-integration/${project.version}
+      </url>
+    </site>
+  </distributionManagement>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.bremersee</groupId>
+        <artifactId>common-exception</artifactId>
+        <version>${common-exception.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.passay</groupId>
+        <artifactId>passay</artifactId>
+        <version>1.6.4</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+</project>
