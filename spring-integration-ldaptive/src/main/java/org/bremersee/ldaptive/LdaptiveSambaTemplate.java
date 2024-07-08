@@ -33,7 +33,7 @@ import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;
 
 /**
- * The type LdaptiveSambaTemplate.
+ * The ldaptive samba template.
  *
  * @author Christian Bremer
  */
@@ -42,7 +42,7 @@ public class LdaptiveSambaTemplate extends LdaptiveTemplate {
   private Supplier<String> passwordGenerator;
 
   /**
-   * Instantiates a new ldap template.
+   * Instantiates a new ldaptive samba template.
    *
    * @param connectionFactory the connection factory
    */
@@ -51,6 +51,11 @@ public class LdaptiveSambaTemplate extends LdaptiveTemplate {
     this.passwordGenerator = getDefaultPasswordGenerator();
   }
 
+  /**
+   * Sets password generator.
+   *
+   * @param passwordGenerator the password generator
+   */
   public void setPasswordGenerator(Supplier<String> passwordGenerator) {
     if (Objects.nonNull(passwordGenerator)) {
       this.passwordGenerator = passwordGenerator;

@@ -37,19 +37,29 @@ public class LdaptiveAuthenticationToken
   @Serial
   private static final long serialVersionUID = 1L;
 
+  /**
+   * The username.
+   */
   private final String username;
 
+  /**
+   * The ldap entry.
+   */
   private final SerLdapEntry ldapEntry;
 
+  /**
+   * The properties.
+   */
   private final LdaptiveAuthenticationProperties properties;
 
   /**
    * Creates a token with the supplied array of authorities.
    *
    * @param username the username
-   * @param ldapEntry the ldap entry
-   * @param authorities the collection of <tt>GrantedAuthority</tt>s for the principal
+   * @param authorities the collection of {@code GrantedAuthority}s for the principal
    *     represented by this authentication object.
+   * @param ldapEntry the ldap entry
+   * @param properties the properties
    */
   public LdaptiveAuthenticationToken(
       String username,

@@ -22,7 +22,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * The type AuthenticationProperties.
+ * The authentication properties.
  *
  * @author Christian Bremer
  */
@@ -30,44 +30,99 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 public class AuthenticationProperties {
 
+  /**
+   * The jwt converter properties.
+   */
   private JwtConverterProperties jwtConverter = new JwtConverterProperties();
 
+  /**
+   * The ldaptive properties.
+   */
   private LdaptiveProperties ldaptive = new LdaptiveProperties();
 
+  /**
+   * The jwt converter properties.
+   */
   @Data
   public static class JwtConverterProperties {
 
+    /**
+     * The json path to the username.
+     */
     private String nameJsonPath = "$.sub"; // keycloak: $.preferred_username
 
+    /**
+     * The json path to the first name.
+     */
     private String firstNameJsonPath = "$.given_name";
 
+    /**
+     * The json path to the last name.
+     */
     private String lastNameJsonPath = "$.family_name";
 
+    /**
+     * The json path to the email.
+     */
     private String emailJsonPath = "$.email";
 
+    /**
+     * The json path to the roles.
+     */
     private String rolesJsonPath = "$.scope"; // keycloak: $.realm_access.roles
 
+    /**
+     * Specifies whether the roles are represented as a json array or as a list separated by
+     * {@link #getRolesValueSeparator()}.
+     */
     private boolean rolesValueList = false; // keycloak: true
 
+    /**
+     * The roles separator to use if {@link #isRolesValueList()} is set to {@code false}.
+     */
     private String rolesValueSeparator = " ";
 
+    /**
+     * The default roles.
+     */
     private List<String> defaultRoles = new ArrayList<>();
 
+    /**
+     * The role mappings.
+     */
     private List<RoleMapping> roleMapping = new ArrayList<>();
 
+    /**
+     * The role prefix (like 'ROLE_' or 'SCOPE_').
+     */
     private String rolePrefix = "SCOPE_"; // keycloak: ROLE_
 
+    /**
+     * The role case transformation.
+     */
     private CaseTransformation roleCaseTransformation;
 
+    /**
+     * The string replacements for roles.
+     */
     private List<StringReplacement> roleStringReplacements;
 
   }
 
+  /**
+   * The ldaptive properties.
+   */
   @Data
   public static class LdaptiveProperties {
 
+    /**
+     * The ldap template with default configuration properties.
+     */
     private Template template = Template.ACTIVE_DIRECTORY;
 
+    /**
+     * The username to bind dn converter property.
+     */
     private UsernameToBindDnConverterProperty usernameToBindDnConverter;
 
     /**
@@ -128,34 +183,85 @@ public class AuthenticationProperties {
      */
     private String emailAttribute;
 
+    /**
+     * The account control evaluator.
+     */
     private AccountControlEvaluatorProperty accountControlEvaluator;
 
+    /**
+     * The group fetch strategy.
+     */
     private GroupFetchStrategy groupFetchStrategy;
 
+    /**
+     * The member attribute.
+     */
     private String memberAttribute;
 
+    /**
+     * The group base dn (like 'ou=groups,dc=example,dc=org'). It's only required, if
+     * {@code groupFetchStrategy} is set to {@code GROUP_CONTAINS_USERS}.
+     */
     private String groupBaseDn;
 
+    /**
+     * The group search scope. It's only required, if {@code groupFetchStrategy} is set to
+     * {@code GROUP_CONTAINS_USERS},
+     */
     private SearchScope groupSearchScope;
 
+    /**
+     * The group object class. It's only required, if {@code groupFetchStrategy} is set to
+     * {@code GROUP_CONTAINS_USERS}
+     */
     private String groupObjectClass;
 
+    /**
+     * The group id attribute. It's only required, if {@code groupFetchStrategy} is set to
+     * {@code GROUP_CONTAINS_USERS}
+     */
     private String groupIdAttribute;
 
+    /**
+     * The group member attribute. It's only required, if {@code groupFetchStrategy} is set to
+     * {@code GROUP_CONTAINS_USERS}
+     */
     private String groupMemberAttribute;
 
+    /**
+     * The group member format. It's only required, if {@code groupFetchStrategy} is set to
+     * {@code GROUP_CONTAINS_USERS}
+     */
     private String groupMemberFormat;
 
+    /**
+     * The role mappings.
+     */
     private List<RoleMapping> roleMapping;
 
+    /**
+     * The default roles.
+     */
     private List<String> defaultRoles;
 
+    /**
+     * The role prefix (like 'ROLE_').
+     */
     private String rolePrefix;
 
+    /**
+     * The role case transformation.
+     */
     private CaseTransformation roleCaseTransformation;
 
+    /**
+     * The string replacements for roles.
+     */
     private List<StringReplacement> roleStringReplacements;
 
+    /**
+     * The search scope.
+     */
     public enum SearchScope {
 
       /**
@@ -179,13 +285,25 @@ public class AuthenticationProperties {
       SUBORDINATE
     }
 
+    /**
+     * The username to bind dn converter property.
+     */
     public enum UsernameToBindDnConverterProperty {
 
+      /**
+       * By user rdn attribute username to bind dn converter property.
+       */
       BY_USER_RDN_ATTRIBUTE,
 
+      /**
+       * By domain email username to bind dn converter property.
+       */
       BY_DOMAIN_EMAIL
     }
 
+    /**
+     * The account control evaluator property.
+     */
     public enum AccountControlEvaluatorProperty {
 
       /**
@@ -249,6 +367,9 @@ public class AuthenticationProperties {
     }
   }
 
+  /**
+   * The role mapping.
+   */
   @Data
   public static class RoleMapping {
 
@@ -278,6 +399,9 @@ public class AuthenticationProperties {
     TO_LOWER_CASE
   }
 
+  /**
+   * The string replacement.
+   */
   @Data
   public static class StringReplacement {
 

@@ -25,7 +25,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.bremersee.ldaptive.LdaptiveTemplate;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -41,7 +40,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @NoArgsConstructor
 public class LdaptiveConnectionProperties {
 
-  private Class<? extends LdaptiveTemplate> ldaptiveTemplateClass = LdaptiveTemplate.class;
+  /**
+   * The ldaptive template class.
+   */
+  private Class<?> ldaptiveTemplateClass;
 
   /**
    * Specifies whether the connection configuration is immutable or not.
@@ -50,7 +52,7 @@ public class LdaptiveConnectionProperties {
 
   /**
    * URL of the LDAP server(s) separated by space. For example
-   * {@code ldaps://ldap1.example.org:636 ldaps://ldap2.example.org:636}
+   * {@code ldaps://ldap1.example.org:636 ldaps://ldap2.example.org:636}.
    */
   private String ldapUrl;
 
@@ -204,9 +206,8 @@ public class LdaptiveConnectionProperties {
 
     /**
      * Queries a DNS server for SRV records and uses those records to construct a list of URLs. When
-     * configuring this strategy you must use your DNS server for
-     * {@link LdaptiveConnectionProperties#setLdapUrl(String)} in the form
-     * {@code dns://my.server.com}.
+     * configuring this strategy you must use your DNS server for {@code setLdapUrl(String)} in the
+     * form {@code dns://my.server.com}.
      */
     DNS
 
@@ -341,6 +342,9 @@ public class LdaptiveConnectionProperties {
     private Duration idleTime = Duration.ofMinutes(10);
   }
 
+  /**
+   * The enum Search scope.
+   */
   public enum SearchScope {
 
     /**

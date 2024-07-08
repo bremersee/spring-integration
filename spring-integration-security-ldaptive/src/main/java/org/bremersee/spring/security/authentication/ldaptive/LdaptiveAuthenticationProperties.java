@@ -76,8 +76,8 @@ public class LdaptiveAuthenticationProperties implements Serializable {
   protected String passwordAttribute;
 
   /**
-   * The filter to find the user. If it is empty, it will be generated from 'userObjectClass' and
-   * 'usernameAttribute' like this '(&(objectClass=inetOrgPerson)(uid={0}))'.
+   * The filter to find the user. If it is empty, it will be generated from {@code userObjectClass}
+   * and {@code usernameAttribute} like this {@code (&(objectClass=inetOrgPerson)(uid={0}))}.
    */
   protected String userFindOneFilter;
 
@@ -118,37 +118,37 @@ public class LdaptiveAuthenticationProperties implements Serializable {
 
   /**
    * The group base dn (like 'ou=groups,dc=example,dc=org'). It's only required, if
-   * {@link #getGroupFetchStrategy()} is set to {@link GroupFetchStrategy#GROUP_CONTAINS_USERS}
+   * {@code groupFetchStrategy} is set to {@code GROUP_CONTAINS_USERS}.
    */
   protected String groupBaseDn;
 
   /**
-   * The group search scope. It's only required, if {@link #getGroupFetchStrategy()} is set to
-   * {@link GroupFetchStrategy#GROUP_CONTAINS_USERS}
+   * The group search scope. It's only required, if {@code groupFetchStrategy} is set to
+   * {@code GROUP_CONTAINS_USERS},
    */
   protected SearchScope groupSearchScope;
 
   /**
-   * The group object class. It's only required, if {@link #getGroupFetchStrategy()} is set to
-   * {@link GroupFetchStrategy#GROUP_CONTAINS_USERS}
+   * The group object class. It's only required, if {@code groupFetchStrategy} is set to
+   * {@code GROUP_CONTAINS_USERS}
    */
   protected String groupObjectClass;
 
   /**
-   * The group id attribute. It's only required, if {@link #getGroupFetchStrategy()} is set to
-   * {@link GroupFetchStrategy#GROUP_CONTAINS_USERS}
+   * The group id attribute. It's only required, if {@code groupFetchStrategy} is set to
+   * {@code GROUP_CONTAINS_USERS}
    */
   protected String groupIdAttribute;
 
   /**
-   * The group member attribute. It's only required, if {@link #getGroupFetchStrategy()} is set to
-   * {@link GroupFetchStrategy#GROUP_CONTAINS_USERS}
+   * The group member attribute. It's only required, if {@code groupFetchStrategy} is set to
+   * {@code GROUP_CONTAINS_USERS}
    */
   protected String groupMemberAttribute;
 
   /**
-   * The group member format. It's only required, if {@link #getGroupFetchStrategy()} is set to
-   * {@link GroupFetchStrategy#GROUP_CONTAINS_USERS}
+   * The group member format. It's only required, if {@code groupFetchStrategy} is set to
+   * {@code GROUP_CONTAINS_USERS}
    */
   protected String groupMemberFormat;
 
@@ -210,6 +210,11 @@ public class LdaptiveAuthenticationProperties implements Serializable {
       roleCaseTransformation = CaseTransformation.NONE;
     }
 
+    /**
+     * Get user rdn attribute.
+     *
+     * @return the user rdn attribute
+     */
     @Override
     public String getUserRdnAttribute() {
       if (ObjectUtils.isEmpty(userRdnAttribute)) {
@@ -218,6 +223,11 @@ public class LdaptiveAuthenticationProperties implements Serializable {
       return userRdnAttribute;
     }
 
+    /**
+     * Get user find one filter.
+     *
+     * @return the user find one filter
+     */
     @Override
     public String getUserFindOneFilter() {
       if (ObjectUtils.isEmpty(userFindOneFilter)

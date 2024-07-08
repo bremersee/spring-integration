@@ -46,6 +46,11 @@ public class CorsConfigurationSourceAutoConfiguration {
 
   private final CorsProperties corsProperties;
 
+  /**
+   * Instantiates a new Cors configuration source autoconfiguration.
+   *
+   * @param corsProperties the cors properties
+   */
   public CorsConfigurationSourceAutoConfiguration(CorsProperties corsProperties) {
     this.corsProperties = corsProperties;
   }
@@ -65,6 +70,11 @@ public class CorsConfigurationSourceAutoConfiguration {
         corsProperties);
   }
 
+  /**
+   * Creates cors configuration source.
+   *
+   * @return the cors configuration source
+   */
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

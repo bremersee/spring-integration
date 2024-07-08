@@ -6,8 +6,14 @@ import org.bremersee.spring.boot.autoconfigure.web.UploadProperties;
 import org.bremersee.spring.web.reactive.multipart.MultipartFileBuilder;
 import org.junit.jupiter.api.Test;
 
+/**
+ * The type Multipart file builder auto configuration test.
+ */
 class MultipartFileBuilderAutoConfigurationTest {
 
+  /**
+   * Multipart file builder.
+   */
   @Test
   void multipartFileBuilder() {
     UploadProperties props = new UploadProperties();

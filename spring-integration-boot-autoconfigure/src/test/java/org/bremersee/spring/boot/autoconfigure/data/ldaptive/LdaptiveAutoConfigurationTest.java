@@ -7,10 +7,19 @@ import org.bremersee.spring.boot.autoconfigure.ldaptive.LdaptiveConnectionProper
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * The type Ldaptive auto configuration test.
+ */
 class LdaptiveAutoConfigurationTest {
 
+  /**
+   * The Target.
+   */
   LdaptiveAutoConfiguration target;
 
+  /**
+   * Init.
+   */
   @BeforeEach
   void init() {
     LdaptiveConnectionProperties properties = new LdaptiveConnectionProperties();
@@ -19,24 +28,36 @@ class LdaptiveAutoConfigurationTest {
     target.init();
   }
 
+  /**
+   * Connection config.
+   */
   @Test
   void connectionConfig() {
     assertThat(target.connectionConfig())
         .isNotNull();
   }
 
+  /**
+   * Connection factory.
+   */
   @Test
   void connectionFactory() {
     assertThat(target.connectionFactory(target.connectionConfig()))
         .isNotNull();
   }
 
+  /**
+   * Ldaptive template.
+   */
   @Test
   void ldaptiveTemplate() {
     assertThat(target.ldaptiveTemplate(target.connectionFactory(target.connectionConfig())))
         .isNotNull();
   }
 
+  /**
+   * Reactive ldaptive template.
+   */
   @Test
   void reactiveLdaptiveTemplate() {
     assertThat(target.reactiveLdaptiveTemplate(target.connectionFactory(target.connectionConfig())))

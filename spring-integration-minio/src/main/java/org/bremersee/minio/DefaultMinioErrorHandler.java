@@ -36,6 +36,9 @@ import org.springframework.util.StringUtils;
  */
 public class DefaultMinioErrorHandler extends AbstractMinioErrorHandler {
 
+  /**
+   * The error code prefix.
+   */
   static final String ERROR_CODE_PREFIX = "MINIO_";
 
   @Override

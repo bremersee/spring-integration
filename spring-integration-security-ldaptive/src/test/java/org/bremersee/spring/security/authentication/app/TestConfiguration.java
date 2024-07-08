@@ -71,6 +71,11 @@ public class TestConfiguration {
         .build();
   }
 
+  /**
+   * Authentication properties ldaptive authentication properties.
+   *
+   * @return the ldaptive authentication properties
+   */
   @Bean
   public LdaptiveAuthenticationProperties authenticationProperties() {
     LdaptiveAuthenticationProperties authenticationProperties = new OpenLdapTemplate();
@@ -81,6 +86,13 @@ public class TestConfiguration {
     return authenticationProperties;
   }
 
+  /**
+   * Email to username converter email to username converter.
+   *
+   * @param connectionFactory the connection factory
+   * @param authenticationProperties the authentication properties
+   * @return the email to username converter
+   */
   @Bean
   public EmailToUsernameConverter emailToUsernameConverter(
       ConnectionFactory connectionFactory,
@@ -90,6 +102,14 @@ public class TestConfiguration {
         connectionFactory.getConnectionConfig());
   }
 
+  /**
+   * Authentication manager ldaptive authentication manager.
+   *
+   * @param connectionFactory the connection factory
+   * @param authenticationProperties the authentication properties
+   * @param emailToUsernameConverter the email to username converter
+   * @return the ldaptive authentication manager
+   */
   @Bean
   public LdaptiveAuthenticationManager authenticationManager(
       ConnectionFactory connectionFactory,

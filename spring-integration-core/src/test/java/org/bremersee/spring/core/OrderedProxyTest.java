@@ -83,6 +83,9 @@ class OrderedProxyTest {
     assertEquals(123, proxy.getOrder());
   }
 
+  /**
+   * The interface Say hello.
+   */
   interface SayHello {
 
     /**
@@ -93,10 +96,16 @@ class OrderedProxyTest {
     String sayHello();
   }
 
+  /**
+   * The type Target.
+   */
   record Target(String name) {
 
   }
 
+  /**
+   * The type Say hello target.
+   */
   record SayHelloTarget(String name) implements SayHello {
 
     @Override
@@ -105,6 +114,9 @@ class OrderedProxyTest {
     }
   }
 
+  /**
+   * The type Ordered target.
+   */
   record OrderedTarget(int value) implements Ordered {
 
     @Override

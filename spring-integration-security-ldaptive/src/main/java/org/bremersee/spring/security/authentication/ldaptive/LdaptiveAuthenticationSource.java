@@ -31,9 +31,18 @@ import org.ldaptive.LdapEntry;
 @AllArgsConstructor
 public class LdaptiveAuthenticationSource implements AuthenticationSource<LdapEntry> {
 
+  /**
+   * The Name.
+   */
   private final String name;
 
+  /**
+   * The Authorities.
+   */
   private final Collection<? extends String> authorities;
 
+  /**
+   * The Attributes.
+   */
   private final LdapEntry attributes;
 }

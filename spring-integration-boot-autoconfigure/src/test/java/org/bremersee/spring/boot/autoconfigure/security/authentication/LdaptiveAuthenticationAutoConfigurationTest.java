@@ -10,30 +10,51 @@ import org.junit.jupiter.api.Test;
 import org.ldaptive.ConnectionConfig;
 import org.springframework.beans.factory.ObjectProvider;
 
+/**
+ * The type Ldaptive authentication auto configuration test.
+ */
 class LdaptiveAuthenticationAutoConfigurationTest {
 
+  /**
+   * The Properties.
+   */
   final AuthenticationProperties properties = new AuthenticationProperties();
 
+  /**
+   * The Target.
+   */
   LdaptiveAuthenticationAutoConfiguration target;
 
+  /**
+   * Init.
+   */
   @BeforeEach
   void init() {
     properties.getLdaptive().setUserBaseDn("cn=users,dc=example,dc=org");
     target = new LdaptiveAuthenticationAutoConfiguration(properties);
   }
 
+  /**
+   * Ldaptive password encoder provider.
+   */
   @Test
   void ldaptivePasswordEncoderProvider() {
     assertThat(target.ldaptivePasswordEncoderProvider())
         .isNotNull();
   }
 
+  /**
+   * Ldaptive authentication token converter.
+   */
   @Test
   void ldaptiveAuthenticationTokenConverter() {
     assertThat(target.ldaptiveAuthenticationTokenConverter())
         .isNotNull();
   }
 
+  /**
+   * Ldaptive authentication manager.
+   */
   @Test
   void ldaptiveAuthenticationManager() {
     ConnectionConfig connectionConfig = ConnectionConfig.builder().build();
@@ -49,6 +70,9 @@ class LdaptiveAuthenticationAutoConfigurationTest {
         .isNotNull();
   }
 
+  /**
+   * Reactive ldaptive authentication manager.
+   */
   @Test
   void reactiveLdaptiveAuthenticationManager() {
     ConnectionConfig connectionConfig = ConnectionConfig.builder().build();

@@ -331,8 +331,8 @@ public class LdaptiveProperties {
 
     /**
      * Queries a DNS server for SRV records and uses those records to construct a list of URLs. When
-     * configuring this strategy you must use your DNS server for
-     * {@link LdaptiveProperties#setLdapUrl(String)} in the form {@code dns://my.server.com}.
+     * configuring this strategy you must use your DNS server for {@code ldapUrl} in the form
+     * {@code dns://my.server.com}.
      */
     DNS(new DnsSrvConnectionStrategy());
 

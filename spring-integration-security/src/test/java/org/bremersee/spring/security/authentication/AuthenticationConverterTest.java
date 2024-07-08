@@ -13,8 +13,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+/**
+ * The type Authentication converter test.
+ */
 class AuthenticationConverterTest {
 
+  /**
+   * Normalize.
+   *
+   * @param transformation the transformation
+   */
   @ParameterizedTest
   @ValueSource(strings = {"TO_UPPER_CASE", "TO_LOWER_CASE"})
   void normalize(String transformation) {
@@ -39,8 +47,20 @@ class AuthenticationConverterTest {
             new SimpleGrantedAuthority("ROLE_LDAP")));
   }
 
+  /**
+   * The type Authentication converter.
+   */
   static class AuthenticationConverterImpl extends AuthenticationConverter<Object, Authentication> {
 
+    /**
+     * Instantiates a new Authentication converter.
+     *
+     * @param defaultRoles the default roles
+     * @param roleMapping the role mapping
+     * @param rolePrefix the role prefix
+     * @param roleCaseTransformation the role case transformation
+     * @param roleStringReplacements the role string replacements
+     */
     public AuthenticationConverterImpl(
         List<String> defaultRoles,
         Map<String, String> roleMapping,

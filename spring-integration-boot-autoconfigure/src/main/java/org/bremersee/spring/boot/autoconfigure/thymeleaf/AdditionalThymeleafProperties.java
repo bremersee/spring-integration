@@ -54,46 +54,109 @@ public class AdditionalThymeleafProperties {
   @EqualsAndHashCode
   public static class ResolverProperties {
 
+    /**
+     * The Cacheable.
+     */
     private boolean cacheable = false;
 
+    /**
+     * The Cacheable patterns.
+     */
     private Set<String> cacheablePatterns = new LinkedHashSet<>();
 
+    /**
+     * The Cache ttlms.
+     */
     private Long cacheTtlms;
 
+    /**
+     * The Character encoding.
+     */
     private String characterEncoding = StandardCharsets.UTF_8.name();
 
+    /**
+     * The Check existence.
+     */
     private boolean checkExistence = false;
 
+    /**
+     * The Css template mode patterns.
+     */
     private Set<String> cssTemplateModePatterns = new LinkedHashSet<>();
 
+    /**
+     * The Force suffix.
+     */
     private boolean forceSuffix = false;
 
+    /**
+     * The Force template mode.
+     */
     private boolean forceTemplateMode = false;
 
+    /**
+     * The Html template mode patterns.
+     */
     private Set<String> htmlTemplateModePatterns = new LinkedHashSet<>();
 
+    /**
+     * The Java script template mode patterns.
+     */
     private Set<String> javaScriptTemplateModePatterns = new LinkedHashSet<>();
 
+    /**
+     * The Name.
+     */
     private String name;
 
+    /**
+     * The Non cacheable patterns.
+     */
     private Set<String> nonCacheablePatterns = new LinkedHashSet<>();
 
+    /**
+     * The Prefix.
+     */
     private String prefix = "classpath:"; // important
 
+    /**
+     * The Raw template mode patterns.
+     */
     private Set<String> rawTemplateModePatterns = new LinkedHashSet<>();
 
+    /**
+     * The Resolvable patterns.
+     */
     private Set<String> resolvablePatterns = new LinkedHashSet<>(); // important
 
+    /**
+     * The Suffix.
+     */
     private String suffix = ".html";  // important
 
+    /**
+     * The Template aliases.
+     */
     private Map<String, String> templateAliases = new LinkedHashMap<>();
 
+    /**
+     * The Template mode.
+     */
     private TemplateMode templateMode;
 
+    /**
+     * The Text template mode patterns.
+     */
     private Set<String> textTemplateModePatterns = new LinkedHashSet<>();
 
+    /**
+     * The Use decoupled logic.
+     */
     private boolean useDecoupledLogic = false;
 
+    /**
+     * The Xml template mode patterns.
+     */
     private Set<String> xmlTemplateModePatterns = new LinkedHashSet<>();
 
     /**

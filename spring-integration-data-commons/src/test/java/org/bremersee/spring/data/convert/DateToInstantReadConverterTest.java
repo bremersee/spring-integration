@@ -6,8 +6,14 @@ import java.time.Instant;
 import java.util.Date;
 import org.junit.jupiter.api.Test;
 
+/**
+ * The type Date to instant read converter test.
+ */
 class DateToInstantReadConverterTest {
 
+  /**
+   * Convert.
+   */
   @Test
   void convert() {
     Date date = new Date();

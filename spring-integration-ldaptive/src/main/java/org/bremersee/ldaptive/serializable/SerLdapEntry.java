@@ -42,8 +42,14 @@ public class SerLdapEntry implements Serializable {
   @Serial
   private static final long serialVersionUID = 1L;
 
+  /**
+   * The distinguished name.
+   */
   private final String dn;
 
+  /**
+   * The attributes.
+   */
   private final Map<String, SerLdapAttr> attributes;
 
   /**

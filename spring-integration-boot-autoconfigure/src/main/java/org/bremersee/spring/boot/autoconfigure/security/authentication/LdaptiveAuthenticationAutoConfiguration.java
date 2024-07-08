@@ -65,6 +65,11 @@ public class LdaptiveAuthenticationAutoConfiguration {
 
   private final LdaptiveAuthenticationProperties properties;
 
+  /**
+   * Instantiates a new ldaptive authentication autoconfiguration.
+   *
+   * @param properties the properties
+   */
   public LdaptiveAuthenticationAutoConfiguration(AuthenticationProperties properties) {
     LdaptiveAuthenticationProperties tmp = PropertiesMapper.INSTANCE.map(properties.getLdaptive());
     Template template;
@@ -94,18 +99,38 @@ public class LdaptiveAuthenticationAutoConfiguration {
         properties);
   }
 
+  /**
+   * Creates ldaptive password encoder provider.
+   *
+   * @return the ldaptive password encoder provider
+   */
   @ConditionalOnMissingBean
   @Bean
   public LdaptivePasswordEncoderProvider ldaptivePasswordEncoderProvider() {
     return LdaptivePasswordEncoderProvider.defaultProvider();
   }
 
+  /**
+   * Creates ldaptive authentication token converter.
+   *
+   * @return the ldaptive authentication token converter
+   */
   @ConditionalOnMissingBean
   @Bean
   public LdaptiveAuthenticationTokenConverter ldaptiveAuthenticationTokenConverter() {
     return new LdaptiveAuthenticationTokenConverter(properties);
   }
 
+  /**
+   * Creates ldaptive authentication manager.
+   *
+   * @param connectionConfig the connection config
+   * @param usernameToBindDnProvider the username to bind dn provider
+   * @param ldaptivePasswordEncoderProvider the ldaptive password encoder provider
+   * @param accountControlEvaluatorProvider the account control evaluator provider
+   * @param tokenConverter the token converter
+   * @return the ldaptive authentication manager
+   */
   @ConditionalOnWebApplication(type = Type.SERVLET)
   @Bean(initMethod = "init")
   public LdaptiveAuthenticationManager ldaptiveAuthenticationManager(
@@ -126,6 +151,16 @@ public class LdaptiveAuthenticationAutoConfiguration {
     return manager;
   }
 
+  /**
+   * Creates reactive ldaptive authentication manager.
+   *
+   * @param connectionConfig the connection config
+   * @param usernameToBindDnProvider the username to bind dn provider
+   * @param ldaptivePasswordEncoderProvider the ldaptive password encoder provider
+   * @param accountControlEvaluatorProvider the account control evaluator provider
+   * @param tokenConverter the token converter
+   * @return the reactive ldaptive authentication manager
+   */
   @ConditionalOnWebApplication(type = Type.REACTIVE)
   @Bean
   public ReactiveLdaptiveAuthenticationManager reactiveLdaptiveAuthenticationManager(
@@ -143,11 +178,23 @@ public class LdaptiveAuthenticationAutoConfiguration {
             tokenConverter));
   }
 
+  /**
+   * The interface Properties mapper.
+   */
   @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
   interface PropertiesMapper {
 
+    /**
+     * The constant INSTANCE.
+     */
     PropertiesMapper INSTANCE = Mappers.getMapper(PropertiesMapper.class);
 
+    /**
+     * Map ldaptive authentication properties.
+     *
+     * @param source the source
+     * @return the ldaptive authentication properties
+     */
     LdaptiveAuthenticationProperties map(AuthenticationProperties.LdaptiveProperties source);
 
   }

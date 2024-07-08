@@ -5,10 +5,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * The type Jwt converter auto configuration test.
+ */
 class JwtConverterAutoConfigurationTest {
 
+  /**
+   * The Target.
+   */
   JwtConverterAutoConfiguration target;
 
+  /**
+   * Init.
+   */
   @BeforeEach
   void init() {
     AuthenticationProperties properties = new AuthenticationProperties();
@@ -16,6 +25,9 @@ class JwtConverterAutoConfigurationTest {
     target.init();
   }
 
+  /**
+   * Jwt converter.
+   */
   @Test
   void jwtConverter() {
     assertThat(target.jwtConverter())

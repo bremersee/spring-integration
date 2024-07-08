@@ -8,9 +8,17 @@ import org.bremersee.spring.security.authentication.ldaptive.UsernameToBindDnCon
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+/**
+ * The type Username to bind dn converter test.
+ */
 @ExtendWith({SoftAssertionsExtension.class})
 class UsernameToBindDnConverterTest {
 
+  /**
+   * Convert by user rdn attribute.
+   *
+   * @param softly the softly
+   */
   @Test
   void convertByUserRdnAttribute(SoftAssertions softly) {
     LdaptiveAuthenticationProperties properties = new WithDefaults();
@@ -29,6 +37,11 @@ class UsernameToBindDnConverterTest {
         .isEqualTo("cn=junit,cn=users,dc=example,dc=org");
   }
 
+  /**
+   * Convert by domain email.
+   *
+   * @param softly the softly
+   */
   @Test
   void convertByDomainEmail(SoftAssertions softly) {
     LdaptiveAuthenticationProperties properties = new WithDefaults();

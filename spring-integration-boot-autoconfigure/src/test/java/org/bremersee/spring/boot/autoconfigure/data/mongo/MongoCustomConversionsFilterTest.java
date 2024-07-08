@@ -11,8 +11,14 @@ import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.lang.NonNull;
 
+/**
+ * The type Mongo custom conversions filter test.
+ */
 class MongoCustomConversionsFilterTest {
 
+  /**
+   * Accept all.
+   */
   @Test
   void acceptAll() {
     DefaultFilter target = new DefaultFilter(false, List.of());
@@ -20,6 +26,9 @@ class MongoCustomConversionsFilterTest {
         .isTrue();
   }
 
+  /**
+   * Accept with no annotation.
+   */
   @Test
   void acceptWithNoAnnotation() {
     DefaultFilter target = new DefaultFilter(true, List.of());
@@ -27,6 +36,9 @@ class MongoCustomConversionsFilterTest {
         .isFalse();
   }
 
+  /**
+   * Accept with write converter.
+   */
   @Test
   void acceptWithWriteConverter() {
     DefaultFilter target = new DefaultFilter(true, List.of());
@@ -34,6 +46,9 @@ class MongoCustomConversionsFilterTest {
         .isTrue();
   }
 
+  /**
+   * Accept with read converter.
+   */
   @Test
   void acceptWithReadConverter() {
     DefaultFilter target = new DefaultFilter(true, List.of());
@@ -41,6 +56,9 @@ class MongoCustomConversionsFilterTest {
         .isTrue();
   }
 
+  /**
+   * Accept no converter.
+   */
   @Test
   void acceptNoConverter() {
     DefaultFilter target = new DefaultFilter(false, List.of("^\\."));
@@ -48,6 +66,9 @@ class MongoCustomConversionsFilterTest {
         .isFalse();
   }
 
+  /**
+   * Accept specified converter.
+   */
   @Test
   void acceptSpecifiedConverter() {
     DefaultFilter target = new DefaultFilter(false, List.of("^org.bremersee\\..*"));

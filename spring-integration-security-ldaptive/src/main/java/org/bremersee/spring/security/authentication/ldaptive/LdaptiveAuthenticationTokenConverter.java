@@ -38,6 +38,11 @@ public class LdaptiveAuthenticationTokenConverter
 
   private final LdaptiveAuthenticationProperties properties;
 
+  /**
+   * Instantiates a new Ldaptive authentication token converter.
+   *
+   * @param properties the properties
+   */
   public LdaptiveAuthenticationTokenConverter(
       LdaptiveAuthenticationProperties properties) {
     super(
@@ -72,6 +77,12 @@ public class LdaptiveAuthenticationTokenConverter
         properties);
   }
 
+  /**
+   * Serialize ser ldap entry.
+   *
+   * @param ldapEntry the ldap entry
+   * @return the ser ldap entry
+   */
   protected SerLdapEntry serialize(LdapEntry ldapEntry) {
     return new SerLdapEntry(ldapEntry);
   }

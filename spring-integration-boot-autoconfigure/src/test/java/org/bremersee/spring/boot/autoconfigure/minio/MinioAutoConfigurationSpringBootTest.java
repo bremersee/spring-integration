@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
+/**
+ * The type Minio auto configuration spring boot test.
+ */
 @SpringBootTest(
     classes = TestConfiguration.class,
     webEnvironment = WebEnvironment.NONE,
@@ -21,18 +24,30 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
     })
 class MinioAutoConfigurationSpringBootTest {
 
+  /**
+   * The Minio client.
+   */
   @Autowired(required = false)
   MinioClient minioClient;
 
+  /**
+   * The Minio template.
+   */
   @Autowired(required = false)
   MinioTemplate minioTemplate;
 
+  /**
+   * Minio client.
+   */
   @Test
   void minioClient() {
     assertThat(minioClient)
         .isNotNull();
   }
 
+  /**
+   * Minio template.
+   */
   @Test
   void minioTemplate() {
     assertThat(minioTemplate)

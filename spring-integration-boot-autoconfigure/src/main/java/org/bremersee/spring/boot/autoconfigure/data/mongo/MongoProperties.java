@@ -32,13 +32,28 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @NoArgsConstructor
 public class MongoProperties {
 
+  /**
+   * The custom conversions properties.
+   */
   private CustomConversionsProperties customConversions = new CustomConversionsProperties();
 
+  /**
+   * The custom conversions properties.
+   */
   @Data
   public static class CustomConversionsProperties {
 
+    /**
+     * Specifies whether custom conversions should be created as primary bean or not. Default is
+     * {@code true}.
+     */
     private boolean enable = true;
 
+    /**
+     * Specifies whether the converters must be annotated with
+     * {@code org.springframework.data.convert.ReadingConverter} and
+     * {@code org.springframework.data.convert.WritingConverter}. Default is {@code true}.
+     */
     private boolean readWriteAnnotationRequired = true;
 
     /**

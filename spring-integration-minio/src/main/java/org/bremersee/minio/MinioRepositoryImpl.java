@@ -62,9 +62,15 @@ public class MinioRepositoryImpl implements MinioRepository {
 
   private final MinioOperations minio;
 
+  /**
+   * The region.
+   */
   @Getter
   private final String region;
 
+  /**
+   * The bucket.
+   */
   @Getter
   private final String bucket;
 

@@ -44,9 +44,15 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 
+/**
+ * The type Ldaptive authentication manager test.
+ */
 @ExtendWith({SoftAssertionsExtension.class})
 class LdaptiveAuthenticationManagerTest {
 
+  /**
+   * Init.
+   */
   @Test
   void init() {
     UserContainsGroupsTemplate properties = new UserContainsGroupsTemplate();
@@ -62,6 +68,9 @@ class LdaptiveAuthenticationManagerTest {
     target.init();
   }
 
+  /**
+   * Supports.
+   */
   @Test
   void supports() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -73,6 +82,11 @@ class LdaptiveAuthenticationManagerTest {
         .isTrue();
   }
 
+  /**
+   * Authenticate with bind.
+   *
+   * @param softly the softly
+   */
   @Test
   void authenticateWithBind(SoftAssertions softly) {
     ActiveDirectoryTemplate properties = new ActiveDirectoryTemplate();
@@ -137,6 +151,11 @@ class LdaptiveAuthenticationManagerTest {
         .containsExactlyInAnyOrder(new SimpleGrantedAuthority("test-group"));
   }
 
+  /**
+   * Authenticate with user password.
+   *
+   * @param softly the softly
+   */
   @Test
   void authenticateWithUserPassword(SoftAssertions softly) {
     GroupContainsUsersTemplate properties = new GroupContainsUsersTemplate();
@@ -226,6 +245,9 @@ class LdaptiveAuthenticationManagerTest {
         .containsExactlyInAnyOrder(new SimpleGrantedAuthority("test-group"));
   }
 
+  /**
+   * Gets ldaptive template.
+   */
   @Test
   void getLdaptiveTemplate() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -236,6 +258,9 @@ class LdaptiveAuthenticationManagerTest {
         .isNotNull();
   }
 
+  /**
+   * Gets user with username not found exception.
+   */
   @Test
   void getUserWithUsernameNotFoundException() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -249,6 +274,9 @@ class LdaptiveAuthenticationManagerTest {
         .isThrownBy(() -> target.getUser(ldaptiveTemplate, "junit"));
   }
 
+  /**
+   * Gets user with bad credentials exception by result code.
+   */
   @Test
   void getUserWithBadCredentialsExceptionByResultCode() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -264,6 +292,9 @@ class LdaptiveAuthenticationManagerTest {
         .isThrownBy(() -> target.getUser(ldaptiveTemplate, "junit"));
   }
 
+  /**
+   * Gets user with bad credentials exception by message.
+   */
   @Test
   void getUserWithBadCredentialsExceptionByMessage() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -280,6 +311,9 @@ class LdaptiveAuthenticationManagerTest {
         .isThrownBy(() -> target.getUser(ldaptiveTemplate, "junit"));
   }
 
+  /**
+   * Gets user with ldaptive exception.
+   */
   @Test
   void getUserWithLdaptiveException() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -295,6 +329,9 @@ class LdaptiveAuthenticationManagerTest {
         .isThrownBy(() -> target.getUser(ldaptiveTemplate, "junit"));
   }
 
+  /**
+   * Change password.
+   */
   @Test
   void changePassword() {
     LdaptiveAuthenticationManager target = spy(new LdaptiveAuthenticationManager(
@@ -313,6 +350,9 @@ class LdaptiveAuthenticationManagerTest {
     target.changePassword("junit", "old", "new");
   }
 
+  /**
+   * Check password fails.
+   */
   @Test
   void checkPasswordFails() {
     OpenLdapTemplate properties = new OpenLdapTemplate();
@@ -330,6 +370,9 @@ class LdaptiveAuthenticationManagerTest {
         .isThrownBy(() -> target.checkPassword(ldaptiveTemplate, user, "wrong"));
   }
 
+  /**
+   * Check account control throws disabled exception.
+   */
   @Test
   void checkAccountControlThrowsDisabledException() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -345,6 +388,9 @@ class LdaptiveAuthenticationManagerTest {
         .isThrownBy(() -> target.checkAccountControl(user));
   }
 
+  /**
+   * Check account control throws locked exception.
+   */
   @Test
   void checkAccountControlThrowsLockedException() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -363,6 +409,9 @@ class LdaptiveAuthenticationManagerTest {
         .isThrownBy(() -> target.checkAccountControl(user));
   }
 
+  /**
+   * Check account control throws account expired exception.
+   */
   @Test
   void checkAccountControlThrowsAccountExpiredException() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -384,6 +433,9 @@ class LdaptiveAuthenticationManagerTest {
         .isThrownBy(() -> target.checkAccountControl(user));
   }
 
+  /**
+   * Check account control throws credentials expired exception.
+   */
   @Test
   void checkAccountControlThrowsCredentialsExpiredException() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -408,6 +460,9 @@ class LdaptiveAuthenticationManagerTest {
         .isThrownBy(() -> target.checkAccountControl(user));
   }
 
+  /**
+   * Gets authorities.
+   */
   @Test
   void getAuthorities() {
     OpenLdapTemplate properties = new OpenLdapTemplate();
@@ -421,6 +476,9 @@ class LdaptiveAuthenticationManagerTest {
         .isEmpty();
   }
 
+  /**
+   * Gets authority filter.
+   */
   @Test
   void getAuthorityFilter() {
     OpenLdapTemplate properties = new OpenLdapTemplate();
@@ -443,6 +501,9 @@ class LdaptiveAuthenticationManagerTest {
         .isEqualTo("(&(objectClass=group)(member=cn=junit,cn=users,dc=example,dc=org))");
   }
 
+  /**
+   * Gets authority name.
+   */
   @Test
   void getAuthorityName() {
     OpenLdapTemplate properties = new OpenLdapTemplate();
@@ -456,14 +517,23 @@ class LdaptiveAuthenticationManagerTest {
         .isEqualTo("junit");
   }
 
+  /**
+   * Gets authorities by groups in user.
+   */
   @Test
   void getAuthoritiesByGroupsInUser() {
   }
 
+  /**
+   * Gets authorities by groups with user.
+   */
   @Test
   void getAuthoritiesByGroupsWithUser() {
   }
 
+  /**
+   * Gets username.
+   */
   @Test
   void getUsername() {
   }

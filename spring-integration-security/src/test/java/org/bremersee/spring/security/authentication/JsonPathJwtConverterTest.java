@@ -41,6 +41,8 @@ class JsonPathJwtConverterTest {
 
   /**
    * Convert jwt.
+   *
+   * @param softly the softly
    */
   @Test
   void convertWithScopes(SoftAssertions softly) {
@@ -77,6 +79,11 @@ class JsonPathJwtConverterTest {
             new SimpleGrantedAuthority("ROLE_PROFILE"));
   }
 
+  /**
+   * Convert with roles.
+   *
+   * @param softly the softly
+   */
   @Test
   void convertWithRoles(SoftAssertions softly) {
     JsonPathJwtConverter converter = JsonPathJwtConverter.builder()

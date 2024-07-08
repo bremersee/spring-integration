@@ -29,10 +29,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Group {
 
+  /**
+   * The Cn.
+   */
   private String cn;
 
+  /**
+   * The Ou.
+   */
   private String ou;
 
+  /**
+   * The Members.
+   */
   private Set<String> members;
 
 }

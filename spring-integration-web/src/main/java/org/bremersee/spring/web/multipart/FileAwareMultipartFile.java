@@ -322,8 +322,7 @@ public class FileAwareMultipartFile implements MultipartFile {
     return nonNull(file) && file.exists() && file.isFile() && file.canRead();
   }
 
-  @SuppressWarnings("Lombok")
-  @EqualsAndHashCode
+  @EqualsAndHashCode(callSuper = false)
   private static class EmptyResource extends AbstractResource {
 
     private EmptyResource() {

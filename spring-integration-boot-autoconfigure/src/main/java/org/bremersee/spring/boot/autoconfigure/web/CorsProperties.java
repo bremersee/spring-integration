@@ -36,6 +36,11 @@ public class CorsProperties {
 
   private List<UrlBasedCorsConfiguration> configurations = new ArrayList<>();
 
+  /**
+   * To cors configurations map.
+   *
+   * @return the map
+   */
   public Map<String, CorsConfiguration> toCorsConfigurations() {
     if (getConfigurations().isEmpty()) {
       return Map.of("/**", new CorsConfiguration().applyPermitDefaultValues());
@@ -47,11 +52,20 @@ public class CorsProperties {
             CorsConfiguration::combine));
   }
 
+  /**
+   * Theurl based cors configuration.
+   */
   @Data
   public static class UrlBasedCorsConfiguration {
 
+    /**
+     * The path.
+     */
     private String path;
 
+    /**
+     * The configuration for the path.
+     */
     @NestedConfigurationProperty
     private CorsConfiguration configuration = new CorsConfiguration();
   }

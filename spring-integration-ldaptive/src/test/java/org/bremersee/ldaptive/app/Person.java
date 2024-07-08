@@ -28,9 +28,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Person {
 
+  /**
+   * The Uid.
+   */
   private String uid;
 
+  /**
+   * The Cn.
+   */
   private String cn;
 
+  /**
+   * The Sn.
+   */
   private String sn;
 }

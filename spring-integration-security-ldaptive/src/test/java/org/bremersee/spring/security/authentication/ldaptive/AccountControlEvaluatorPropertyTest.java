@@ -7,9 +7,17 @@ import org.bremersee.spring.security.authentication.ldaptive.provider.NoAccountC
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+/**
+ * The type Account control evaluator property test.
+ */
 @ExtendWith({SoftAssertionsExtension.class})
 class AccountControlEvaluatorPropertyTest {
 
+  /**
+   * Get.
+   *
+   * @param softly the softly
+   */
   @Test
   void get(SoftAssertions softly) {
     softly

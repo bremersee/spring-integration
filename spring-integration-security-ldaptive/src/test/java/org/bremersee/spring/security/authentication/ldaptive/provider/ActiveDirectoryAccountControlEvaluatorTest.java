@@ -7,11 +7,17 @@ import org.junit.jupiter.api.Test;
 import org.ldaptive.LdapAttribute;
 import org.ldaptive.LdapEntry;
 
+/**
+ * The type Active directory account control evaluator test.
+ */
 class ActiveDirectoryAccountControlEvaluatorTest {
 
   private static final ActiveDirectoryAccountControlEvaluator target
       = new ActiveDirectoryAccountControlEvaluator();
 
+  /**
+   * Is account non expired.
+   */
   @Test
   void isAccountNonExpired() {
     LdapEntry user = LdapEntry.builder()
@@ -21,6 +27,9 @@ class ActiveDirectoryAccountControlEvaluatorTest {
         .isTrue();
   }
 
+  /**
+   * Is account non locked.
+   */
   @Test
   void isAccountNonLocked() {
     LdapEntry user = LdapEntry.builder()
@@ -30,6 +39,9 @@ class ActiveDirectoryAccountControlEvaluatorTest {
         .isTrue();
   }
 
+  /**
+   * Is credentials non expired.
+   */
   @Test
   void isCredentialsNonExpired() {
     LdapEntry user = LdapEntry.builder()
@@ -39,6 +51,9 @@ class ActiveDirectoryAccountControlEvaluatorTest {
         .isTrue();
   }
 
+  /**
+   * Is enabled.
+   */
   @Test
   void isEnabled() {
     LdapEntry user = LdapEntry.builder()

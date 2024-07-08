@@ -73,7 +73,7 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
   private LdaptiveErrorHandler errorHandler = new DefaultLdaptiveErrorHandler();
 
   /**
-   * Instantiates a new ldap template.
+   * Instantiates a new ldaptive template.
    *
    * @param connectionFactory the connection factory
    */

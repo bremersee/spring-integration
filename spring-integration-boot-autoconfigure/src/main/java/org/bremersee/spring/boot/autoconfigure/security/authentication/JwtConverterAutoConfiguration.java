@@ -59,6 +59,11 @@ public class JwtConverterAutoConfiguration {
 
   private final JwtConverterProperties properties;
 
+  /**
+   * Instantiates a new Jwt converter auto configuration.
+   *
+   * @param properties the properties
+   */
   public JwtConverterAutoConfiguration(AuthenticationProperties properties) {
     this.properties = properties.getJwtConverter();
   }
@@ -78,6 +83,11 @@ public class JwtConverterAutoConfiguration {
         properties);
   }
 
+  /**
+   * Creates jwt converter.
+   *
+   * @return the converter
+   */
   @ConditionalOnMissingBean
   @Bean
   public Converter<Jwt, AbstractAuthenticationToken> jwtConverter() {

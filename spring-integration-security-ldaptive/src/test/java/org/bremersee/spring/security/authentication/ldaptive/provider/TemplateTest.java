@@ -7,9 +7,17 @@ import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticat
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+/**
+ * The type Template test.
+ */
 @ExtendWith({SoftAssertionsExtension.class})
 class TemplateTest {
 
+  /**
+   * Apply template.
+   *
+   * @param softly the softly
+   */
   @Test
   void applyTemplate(SoftAssertions softly) {
     LdaptiveAuthenticationProperties source = new WithDefaults();

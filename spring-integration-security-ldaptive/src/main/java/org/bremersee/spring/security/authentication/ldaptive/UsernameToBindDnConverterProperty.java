@@ -28,8 +28,14 @@ import org.bremersee.spring.security.authentication.ldaptive.UsernameToBindDnCon
 public enum UsernameToBindDnConverterProperty
     implements Function<LdaptiveAuthenticationProperties, UsernameToBindDnConverter> {
 
+  /**
+   * By user rdn attribute username to bind dn converter property.
+   */
   BY_USER_RDN_ATTRIBUTE(ByUserRdnAttribute::new),
 
+  /**
+   * By domain email username to bind dn converter property.
+   */
   BY_DOMAIN_EMAIL(ByDomainEmail::new);
 
   private final Function<LdaptiveAuthenticationProperties, UsernameToBindDnConverter> resolverFn;

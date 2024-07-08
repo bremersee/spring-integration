@@ -37,6 +37,9 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class UploadProperties {
 
+  /**
+   * The tmp dir.
+   */
   private File tmpDir = new File(System.getProperty("java.io.tmpdir"));
 
 }

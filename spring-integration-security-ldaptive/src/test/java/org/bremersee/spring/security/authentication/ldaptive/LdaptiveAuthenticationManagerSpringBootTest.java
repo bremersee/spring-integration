@@ -77,6 +77,11 @@ class LdaptiveAuthenticationManagerSpringBootTest {
     System.setProperty("spring.ldap.embedded.port", String.valueOf(embeddedLdapPort));
   }
 
+  /**
+   * Authenticate.
+   *
+   * @param softly the softly
+   */
   @Test
   void authenticate(SoftAssertions softly) {
 
@@ -118,6 +123,11 @@ class LdaptiveAuthenticationManagerSpringBootTest {
         .containsExactlyInAnyOrderElementsOf(expectedRoles);
   }
 
+  /**
+   * Say hello endpoint.
+   *
+   * @param softly the softly
+   */
   @Test
   void sayHelloEndpoint(SoftAssertions softly) {
     softly
@@ -141,6 +151,11 @@ class LdaptiveAuthenticationManagerSpringBootTest {
         .isEqualTo("Hello!");
   }
 
+  /**
+   * Email to username.
+   *
+   * @param softly the softly
+   */
   @Test
   void emailToUsername(SoftAssertions softly) {
     softly

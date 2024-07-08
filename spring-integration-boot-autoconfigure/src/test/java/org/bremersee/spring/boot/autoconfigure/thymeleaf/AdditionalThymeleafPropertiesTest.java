@@ -32,6 +32,8 @@ class AdditionalThymeleafPropertiesTest {
 
   /**
    * Gets resolvers.
+   *
+   * @param softly the softly
    */
   @Test
   void getResolvers(SoftAssertions softly) {

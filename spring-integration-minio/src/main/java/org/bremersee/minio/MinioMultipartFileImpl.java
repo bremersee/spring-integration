@@ -50,14 +50,23 @@ public class MinioMultipartFileImpl implements MinioMultipartFile {
 
   private final MinioOperations minioOperations;
 
+  /**
+   * The region.
+   */
   @Getter
   private final String region;
 
+  /**
+   * The bucket.
+   */
   @Getter
   private final String bucket;
 
   private final String name;
 
+  /**
+   * The version id.
+   */
   @Getter
   private final String versionId;
 

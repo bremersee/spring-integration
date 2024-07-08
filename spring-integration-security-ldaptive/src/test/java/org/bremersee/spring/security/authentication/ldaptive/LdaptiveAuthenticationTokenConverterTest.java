@@ -19,9 +19,18 @@ import org.ldaptive.LdapEntry;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+/**
+ * The type Ldaptive authentication token converter test.
+ */
 @ExtendWith({SoftAssertionsExtension.class})
 class LdaptiveAuthenticationTokenConverterTest {
 
+  /**
+   * Convert.
+   *
+   * @param transformation the transformation
+   * @param softly the softly
+   */
   @ParameterizedTest
   @ValueSource(strings = {"TO_UPPER_CASE", "TO_LOWER_CASE"})
   void convert(String transformation, SoftAssertions softly) {

@@ -7,8 +7,14 @@ import org.bremersee.spring.security.authentication.ldaptive.UsernameToBindDnCon
 import org.bremersee.spring.security.authentication.ldaptive.UsernameToBindDnConverter.ByUserRdnAttribute;
 import org.junit.jupiter.api.Test;
 
+/**
+ * The type Username to bind dn converter property test.
+ */
 class UsernameToBindDnConverterPropertyTest {
 
+  /**
+   * Apply by user rdn attribute.
+   */
   @Test
   void applyByUserRdnAttribute() {
     UsernameToBindDnConverterProperty target = UsernameToBindDnConverterProperty
@@ -19,6 +25,9 @@ class UsernameToBindDnConverterPropertyTest {
         .isEqualTo(ByUserRdnAttribute.class);
   }
 
+  /**
+   * Apply by domain email.
+   */
   @Test
   void applyByDomainEmail() {
     UsernameToBindDnConverterProperty target = UsernameToBindDnConverterProperty

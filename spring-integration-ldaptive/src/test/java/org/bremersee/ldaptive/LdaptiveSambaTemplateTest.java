@@ -15,22 +15,40 @@ import org.ldaptive.BindRequest;
 import org.ldaptive.ConnectionFactory;
 import org.ldaptive.ModifyRequest;
 
+/**
+ * The type Ldaptive samba template test.
+ */
 class LdaptiveSambaTemplateTest {
 
+  /**
+   * The Connection factory.
+   */
   ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
+  /**
+   * The Target.
+   */
   LdaptiveSambaTemplate target = spy(new LdaptiveSambaTemplate(connectionFactory));
 
+  /**
+   * Sets password generator.
+   */
   @Test
   void setPasswordGenerator() {
     target.setPasswordGenerator(() -> UUID.randomUUID().toString());
   }
 
+  /**
+   * Clone template.
+   */
   @Test
   void cloneTemplate() {
     assertThat(target.clone())
         .isNotNull();
   }
 
+  /**
+   * Generate user password.
+   */
   @Test
   void generateUserPassword() {
     configureClonedLdaptiveSambaTemplate();
@@ -39,6 +57,9 @@ class LdaptiveSambaTemplateTest {
         .isNotEmpty();
   }
 
+  /**
+   * Modify user password.
+   */
   @Test
   void modifyUserPassword() {
     configureClonedLdaptiveSambaTemplate();
@@ -46,6 +67,9 @@ class LdaptiveSambaTemplateTest {
     target.modifyUserPassword("cn=foobar,cn=users,dc=example,dc=org", "old", "new");
   }
 
+  /**
+   * Modify user password with invalid old password.
+   */
   @Test
   void modifyUserPasswordWithInvalidOldPassword() {
     doReturn(false).when(target).bind(any(BindRequest.class));

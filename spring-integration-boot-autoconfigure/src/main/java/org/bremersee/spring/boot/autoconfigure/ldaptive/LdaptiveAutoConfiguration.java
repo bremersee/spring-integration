@@ -67,8 +67,12 @@ public class LdaptiveAutoConfiguration {
    * @param properties the ldaptive connection properties
    */
   public LdaptiveAutoConfiguration(LdaptiveConnectionProperties properties) {
-    this.ldaptiveTemplateClass = Objects
+    Class<?> cls = Objects
         .requireNonNullElse(properties.getLdaptiveTemplateClass(), LdaptiveTemplate.class);
+    //noinspection unchecked
+    this.ldaptiveTemplateClass = LdaptiveTemplate.class.isAssignableFrom(cls)
+        ? (Class<? extends LdaptiveTemplate>) cls
+        : LdaptiveTemplate.class;
     this.properties = PropertiesMapper.INSTANCE.map(properties);
   }
 
@@ -88,6 +92,11 @@ public class LdaptiveAutoConfiguration {
   }
 
 
+  /**
+   * Creates connection config.
+   *
+   * @return the connection config
+   */
   @ConditionalOnMissingBean(ConnectionConfig.class)
   @Bean
   public ConnectionConfig connectionConfig() {
@@ -97,6 +106,7 @@ public class LdaptiveAutoConfiguration {
   /**
    * Creates connection factory bean.
    *
+   * @param connectionConfig the connection config
    * @return the connection factory bean
    */
   @ConditionalOnMissingBean(ConnectionFactory.class)
@@ -158,11 +168,23 @@ public class LdaptiveAutoConfiguration {
     return new ReactiveLdaptiveTemplate(connectionFactory);
   }
 
+  /**
+   * The interface Properties mapper.
+   */
   @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
   interface PropertiesMapper {
 
+    /**
+     * The constant INSTANCE.
+     */
     PropertiesMapper INSTANCE = Mappers.getMapper(PropertiesMapper.class);
 
+    /**
+     * Map ldaptive properties.
+     *
+     * @param properties the properties
+     * @return the ldaptive properties
+     */
     LdaptiveProperties map(LdaptiveConnectionProperties properties);
   }
 
