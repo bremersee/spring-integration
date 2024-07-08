@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DefaultMinioErrorHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Integration Minio</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.minio</a> &gt; <span class="el_source">DefaultMinioErrorHandler.java</span></div><h1>DefaultMinioErrorHandler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.minio;
+
+import io.minio.errors.BucketPolicyTooLargeException;
+import io.minio.errors.ErrorResponseException;
+import io.minio.errors.InsufficientDataException;
+import io.minio.errors.InternalException;
+import io.minio.errors.InvalidResponseException;
+import io.minio.errors.ServerException;
+import io.minio.errors.XmlParserException;
+import io.minio.messages.ErrorResponse;
+import java.io.IOException;
+import java.util.Optional;
+import okhttp3.Response;
+import org.springframework.util.StringUtils;
+
+/**
+ * The default minio error handler.
+ *
+ * @author Christian Bremer
+ */
+<span class="fc" id="L37">public class DefaultMinioErrorHandler extends AbstractMinioErrorHandler {</span>
+
+  /**
+   * The error code prefix.
+   */
+  static final String ERROR_CODE_PREFIX = &quot;MINIO_&quot;;
+
+  @Override
+  public MinioException map(Throwable t) {
+<span class="fc bfc" id="L46" title="All 2 branches covered.">    if (t instanceof IllegalArgumentException) {</span>
+<span class="fc" id="L47">      return new MinioException(</span>
+          400,
+          ERROR_CODE_PREFIX + &quot;BAD_REQUEST&quot;,
+<span class="fc bfc" id="L50" title="All 2 branches covered.">          StringUtils.hasText(t.getMessage()) ? t.getMessage() : &quot;Bad request.&quot;,</span>
+          t);
+    }
+<span class="fc bfc" id="L53" title="All 2 branches covered.">    if (t instanceof IOException) {</span>
+<span class="fc" id="L54">      return new MinioException(</span>
+          500,
+          ERROR_CODE_PREFIX + &quot;IO_ERROR&quot;,
+<span class="fc bfc" id="L57" title="All 2 branches covered.">          StringUtils.hasText(t.getMessage()) ? t.getMessage() : &quot;IO operation failed.&quot;,</span>
+          t);
+    }
+<span class="fc bfc" id="L60" title="All 2 branches covered.">    if (t instanceof io.minio.errors.MinioException) {</span>
+<span class="fc" id="L61">      return mapMinioException((io.minio.errors.MinioException) t);</span>
+    }
+<span class="fc" id="L63">    return new MinioException(</span>
+        500,
+        ERROR_CODE_PREFIX + &quot;UNSPECIFIED&quot;,
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        StringUtils.hasText(t.getMessage()) ? t.getMessage() : &quot;Unmapped minio error.&quot;,</span>
+        t);
+  }
+
+  private MinioException mapMinioException(io.minio.errors.MinioException e) {
+<span class="fc" id="L71">    int status = 500;</span>
+<span class="fc" id="L72">    String errorCode = ERROR_CODE_PREFIX + &quot;UNSPECIFIED&quot;;</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">    String message = StringUtils.hasText(e.getMessage())</span>
+<span class="fc" id="L74">        ? e.getMessage()</span>
+<span class="fc" id="L75">        : &quot;Unspecified minio error.&quot;;</span>
+
+<span class="fc bfc" id="L77" title="All 2 branches covered.">    if (e instanceof BucketPolicyTooLargeException) {</span>
+<span class="fc" id="L78">      status = 400;</span>
+<span class="fc" id="L79">      errorCode = ERROR_CODE_PREFIX + &quot;BUCKET_POLICY_TOO_LARGE&quot;;</span>
+<span class="fc" id="L80">      message = e.toString();</span>
+
+<span class="fc bfc" id="L82" title="All 2 branches covered.">    } else if (e instanceof ErrorResponseException responseException) {</span>
+<span class="fc" id="L83">      status = getStatus(responseException);</span>
+<span class="fc" id="L84">      errorCode = getErrorCode(responseException);</span>
+<span class="fc" id="L85">      message = getMessage(responseException);</span>
+
+<span class="fc bfc" id="L87" title="All 2 branches covered.">    } else if (e instanceof InsufficientDataException) {</span>
+<span class="fc" id="L88">      status = 400;</span>
+<span class="fc" id="L89">      errorCode = ERROR_CODE_PREFIX + &quot;INSUFFICIENT_DATA&quot;;</span>
+
+<span class="fc bfc" id="L91" title="All 2 branches covered.">    } else if (e instanceof InternalException) {</span>
+<span class="fc" id="L92">      errorCode = ERROR_CODE_PREFIX + &quot;INTERNAL_ERROR&quot;;</span>
+
+<span class="fc bfc" id="L94" title="All 2 branches covered.">    } else if (e instanceof InvalidResponseException) {</span>
+<span class="fc" id="L95">      errorCode = ERROR_CODE_PREFIX + &quot;INVALID_RESPONSE&quot;;</span>
+
+<span class="fc bfc" id="L97" title="All 2 branches covered.">    } else if (e instanceof ServerException) {</span>
+<span class="fc" id="L98">      errorCode = ERROR_CODE_PREFIX + &quot;SERVER_EXCEPTION&quot;;</span>
+
+<span class="fc bfc" id="L100" title="All 2 branches covered.">    } else if (e instanceof XmlParserException) {</span>
+<span class="fc" id="L101">      errorCode = ERROR_CODE_PREFIX + &quot;XML_PARSER_ERROR&quot;;</span>
+    }
+<span class="fc" id="L103">    return new MinioException(status, errorCode, message, e);</span>
+  }
+
+  private int getStatus(ErrorResponseException e) {
+<span class="fc" id="L107">    return Optional.of(e)</span>
+<span class="fc" id="L108">        .map(ErrorResponseException::errorResponse)</span>
+<span class="fc" id="L109">        .map(ErrorResponse::code)</span>
+<span class="fc" id="L110">        .map(code -&gt; getStatus(code, e.response()))</span>
+<span class="fc" id="L111">        .orElse(500);</span>
+  }
+
+  private int getStatus(String errorCode, Response response) {
+    // see https://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html#ErrorCodeList
+<span class="pc bpc" id="L116" title="9 of 13 branches missed.">    return switch (errorCode) {</span>
+      case &quot;AmbiguousGrantByEmailAddress&quot;,
+          &quot;AuthorizationHeaderMalformed&quot;,
+          &quot;BadDigest&quot;,
+          &quot;CredentialsNotSupported&quot;,
+          &quot;EntityTooSmall&quot;,
+          &quot;EntityTooLarge&quot;,
+          &quot;ExpiredToken&quot;,
+          &quot;IllegalLocationConstraintException&quot;,
+          &quot;IllegalVersioningConfigurationException&quot;,
+          &quot;IncompleteBody&quot;,
+          &quot;IncorrectNumberOfFilesInPostRequest&quot;,
+          &quot;InlineDataTooLarge&quot;,
+          &quot;InvalidAccessPoint&quot;,
+          &quot;InvalidArgument&quot;,
+          &quot;InvalidBucketName&quot;,
+          &quot;InvalidDigest&quot;,
+          &quot;InvalidEncryptionAlgorithmError&quot;,
+          &quot;InvalidLocationConstraint&quot;,
+          &quot;InvalidPart&quot;,
+          &quot;InvalidPartOrder&quot;,
+          &quot;InvalidPolicyDocument&quot;,
+          &quot;InvalidRequest&quot;,
+          &quot;InvalidSOAPRequest&quot;,
+          &quot;InvalidStorageClass&quot;,
+          &quot;InvalidTargetBucketForLogging&quot;,
+          &quot;InvalidToken&quot;,
+          &quot;InvalidURI&quot;,
+          &quot;KeyTooLongError&quot;,
+          &quot;MalformedACLError&quot;,
+          &quot;MalformedPOSTRequest&quot;,
+          &quot;MalformedXML&quot;,
+          &quot;MaxMessageLengthExceeded&quot;,
+          &quot;MaxPostPreDataLengthExceededError&quot;,
+          &quot;MetadataTooLarge&quot;,
+          &quot;MissingRequestBodyError&quot;,
+          &quot;MissingSecurityElement&quot;,
+          &quot;MissingSecurityHeader&quot;,
+          &quot;NoLoggingStatusForKey&quot;,
+          &quot;RequestIsNotMultiPartContent&quot;,
+          &quot;RequestTimeout&quot;,
+          &quot;RequestTorrentOfBucketError&quot;,
+          &quot;ServerSideEncryptionConfigurationNotFoundError&quot;,
+          &quot;TokenRefreshRequired&quot;,
+          &quot;TooManyAccessPoints&quot;,
+          &quot;TooManyBuckets&quot;,
+          &quot;UnexpectedContent&quot;,
+          &quot;UnresolvableGrantByEmailAddress&quot;,
+          &quot;UserKeyMustBeSpecified&quot;,
+          &quot;InvalidTag&quot;,
+<span class="fc" id="L166">          &quot;MalformedPolicy&quot; -&gt; 400;</span>
+<span class="nc" id="L167">      case &quot;UnauthorizedAccess&quot; -&gt; 401;</span>
+      case &quot;AccessDenied&quot;,
+          &quot;AccountProblem&quot;,
+          &quot;AllAccessDisabled&quot;,
+          &quot;CrossLocationLoggingProhibited&quot;,
+          &quot;InvalidAccessKeyId&quot;,
+          &quot;InvalidObjectState&quot;,
+          &quot;InvalidPayer&quot;,
+          &quot;InvalidSecurity&quot;,
+          &quot;NotSignedUp&quot;,
+          &quot;RequestTimeTooSkewed&quot;,
+<span class="nc" id="L178">          &quot;SignatureDoesNotMatch&quot; -&gt; 403;</span>
+      case &quot;ResourceNotFound&quot;,
+          &quot;NoSuchAccessPoint&quot;,
+          &quot;NoSuchBucket&quot;,
+          &quot;NoSuchKey&quot;,
+          &quot;NoSuchObject&quot;,
+          &quot;NoSuchUpload&quot;,
+          &quot;NoSuchVersion&quot;,
+          &quot;NoSuchLifecycleConfiguration&quot;,
+          &quot;NoSuchBucketPolicy&quot;,
+          &quot;NoSuchObjectLockConfiguration&quot;,
+          &quot;NoSuchOutpost&quot;,
+          &quot;NoSuchTagSet&quot;,
+<span class="fc" id="L191">          &quot;UnsupportedOperation&quot; -&gt; 404;</span>
+<span class="nc" id="L192">      case &quot;MethodNotAllowed&quot; -&gt; 405;</span>
+      case &quot;BucketAlreadyExists&quot;,
+          &quot;BucketAlreadyOwnedByYou&quot;,
+          &quot;BucketNotEmpty&quot;,
+          &quot;InvalidBucketState&quot;,
+          &quot;OperationAborted&quot;,
+<span class="fc" id="L198">          &quot;InvalidOutpostState&quot; -&gt; 409;</span>
+<span class="nc" id="L199">      case &quot;MissingContentLength&quot; -&gt; 411;</span>
+<span class="nc" id="L200">      case &quot;PreconditionFailed&quot; -&gt; 412;</span>
+<span class="nc" id="L201">      case &quot;InvalidRange&quot; -&gt; 416;</span>
+<span class="nc" id="L202">      case &quot;InternalError&quot; -&gt; 500;</span>
+<span class="nc" id="L203">      case &quot;NotImplemented&quot; -&gt; 501;</span>
+<span class="nc" id="L204">      case &quot;ServiceUnavailable&quot;, &quot;SlowDown&quot; -&gt; 503;</span>
+<span class="fc" id="L205">      default -&gt; Optional.ofNullable(response)</span>
+<span class="fc" id="L206">          .map(Response::code)</span>
+<span class="pc bpc" id="L207" title="1 of 2 branches missed.">          .filter(code -&gt; code &gt;= 400)</span>
+<span class="fc" id="L208">          .orElse(400);</span>
+    };
+  }
+
+  private String getErrorCode(ErrorResponseException e) {
+<span class="fc" id="L213">    return Optional.of(e)</span>
+<span class="fc" id="L214">        .map(ErrorResponseException::errorResponse)</span>
+<span class="fc" id="L215">        .map(ErrorResponse::code)</span>
+<span class="fc" id="L216">        .orElse(ERROR_CODE_PREFIX + &quot;UNSPECIFIED_ERROR_RESPONSE&quot;);</span>
+  }
+
+  private String getMessage(ErrorResponseException e) {
+<span class="fc" id="L220">    return Optional.of(e)</span>
+<span class="fc" id="L221">        .map(ErrorResponseException::errorResponse)</span>
+<span class="fc" id="L222">        .map(ErrorResponse::message)</span>
+<span class="pc bnc" id="L223" title="All 2 branches missed.">        .orElseGet(() -&gt; StringUtils.hasText(e.getMessage())</span>
+<span class="nc" id="L224">            ? e.getMessage()</span>
+<span class="nc" id="L225">            : &quot;Unspecified error response.&quot;);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

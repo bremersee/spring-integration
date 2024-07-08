@@ -1,0 +1,24 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Spring Integration Ldaptive,org.bremersee.ldaptive.transcoder,UserAccountControlValueTranscoder,0,109,2,16,0,24,2,16,0,9
+Spring Integration Ldaptive,org.bremersee.ldaptive,DefaultLdaptiveErrorHandler,2,65,1,3,1,22,1,7,0,5
+Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveEntryMapper,11,419,11,47,4,92,11,35,0,17
+Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveProperties.ConnectionValidatorProperties,0,18,0,2,0,4,0,2,0,1
+Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveOperations,0,117,0,0,0,27,0,13,0,13
+Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveSambaTemplate,0,189,1,5,0,42,1,10,0,8
+Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveProperties.SslProperties,37,14,9,3,10,4,6,1,0,1
+Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveProperties.ConnectionStrategy,0,50,0,0,0,9,0,3,0,3
+Spring Integration Ldaptive,org.bremersee.ldaptive,AbstractLdaptiveErrorHandler,0,48,0,4,0,15,0,6,0,4
+Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveProperties.ConnectionValidatorProperties.SearchRequestProperties,0,66,3,7,0,14,3,4,0,2
+Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveSambaTemplate.new CharacterData() {...},2,5,0,0,1,2,1,2,1,2
+Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveSambaTemplate.new AbstractLdaptiveErrorHandler() {...},45,6,6,0,18,1,4,1,1,1
+Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveTemplate,32,330,8,18,9,96,8,27,0,22
+Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveProperties.ReconnectStrategy,0,35,0,0,0,8,0,3,0,3
+Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveProperties,0,159,2,12,0,47,2,8,0,3
+Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveException,0,31,0,4,0,6,0,6,0,4
+Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveException.new AbstractServiceExceptionBuilder() {...},0,11,0,0,0,2,0,2,0,2
+Spring Integration Ldaptive,org.bremersee.ldaptive.serializable,SerLdapAttr,11,198,8,18,5,35,8,19,0,14
+Spring Integration Ldaptive,org.bremersee.ldaptive.serializable,SerLdapEntry,0,27,0,0,0,11,0,1,0,1
+Spring Integration Ldaptive,org.bremersee.ldaptive.reactive,ReactiveLdaptiveTemplate.FluxSinkAwareResultHandler,11,24,2,2,1,8,2,2,0,2
+Spring Integration Ldaptive,org.bremersee.ldaptive.reactive,ReactiveLdaptiveTemplate,146,552,6,10,26,124,15,31,9,29
+Spring Integration Ldaptive,org.bremersee.ldaptive.reactive,ReactiveLdaptiveOperations,4,122,1,1,1,20,1,14,0,14
+Spring Integration Ldaptive,org.bremersee.ldaptive.reactive,ReactiveLdaptiveTemplate.FutureAwareResultHandler,0,53,1,7,0,11,1,5,0,2

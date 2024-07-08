@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthenticationProperties.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Integration Boot Autoconfiguration</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.spring.boot.autoconfigure.security.authentication</a> &gt; <span class="el_source">AuthenticationProperties.java</span></div><h1>AuthenticationProperties.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.spring.boot.autoconfigure.security.authentication;
+
+import java.util.ArrayList;
+import java.util.List;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+/**
+ * The authentication properties.
+ *
+ * @author Christian Bremer
+ */
+@ConfigurationProperties(prefix = &quot;bremersee.authentication&quot;)
+@Data
+public class AuthenticationProperties {
+
+  /**
+   * The jwt converter properties.
+   */
+  private JwtConverterProperties jwtConverter = new JwtConverterProperties();
+
+  /**
+   * The ldaptive properties.
+   */
+  private LdaptiveProperties ldaptive = new LdaptiveProperties();
+
+  /**
+   * The jwt converter properties.
+   */
+  @Data
+  public static class JwtConverterProperties {
+
+    /**
+     * The json path to the username.
+     */
+    private String nameJsonPath = &quot;$.sub&quot;; // keycloak: $.preferred_username
+
+    /**
+     * The json path to the first name.
+     */
+    private String firstNameJsonPath = &quot;$.given_name&quot;;
+
+    /**
+     * The json path to the last name.
+     */
+    private String lastNameJsonPath = &quot;$.family_name&quot;;
+
+    /**
+     * The json path to the email.
+     */
+    private String emailJsonPath = &quot;$.email&quot;;
+
+    /**
+     * The json path to the roles.
+     */
+    private String rolesJsonPath = &quot;$.scope&quot;; // keycloak: $.realm_access.roles
+
+    /**
+     * Specifies whether the roles are represented as a json array or as a list separated by
+     * {@link #getRolesValueSeparator()}.
+     */
+    private boolean rolesValueList = false; // keycloak: true
+
+    /**
+     * The roles separator to use if {@link #isRolesValueList()} is set to {@code false}.
+     */
+    private String rolesValueSeparator = &quot; &quot;;
+
+    /**
+     * The default roles.
+     */
+    private List&lt;String&gt; defaultRoles = new ArrayList&lt;&gt;();
+
+    /**
+     * The role mappings.
+     */
+    private List&lt;RoleMapping&gt; roleMapping = new ArrayList&lt;&gt;();
+
+    /**
+     * The role prefix (like 'ROLE_' or 'SCOPE_').
+     */
+    private String rolePrefix = &quot;SCOPE_&quot;; // keycloak: ROLE_
+
+    /**
+     * The role case transformation.
+     */
+    private CaseTransformation roleCaseTransformation;
+
+    /**
+     * The string replacements for roles.
+     */
+    private List&lt;StringReplacement&gt; roleStringReplacements;
+
+  }
+
+  /**
+   * The ldaptive properties.
+   */
+  @Data
+  public static class LdaptiveProperties {
+
+    /**
+     * The ldap template with default configuration properties.
+     */
+    private Template template = Template.ACTIVE_DIRECTORY;
+
+    /**
+     * The username to bind dn converter property.
+     */
+    private UsernameToBindDnConverterProperty usernameToBindDnConverter;
+
+    /**
+     * The user base dn (like 'ou=people,dc=example,dc=org'). This value is always required.
+     */
+    private String userBaseDn;
+
+    /**
+     * The object class of the user (like 'inetOrgPerson'). The selected template contains a
+     * default.
+     */
+    private String userObjectClass;
+
+    /**
+     * The username attribute of the user (like 'uid' or 'sAMAccountName'). The selected template
+     * contains a default.
+     */
+    private String usernameAttribute;
+
+    /**
+     * Applies only for simple bind. The rdn attribute of the user. This is normally the same as the
+     * username attribute.
+     */
+    private String userRdnAttribute;
+
+    /**
+     * The password attribute of the user (like 'userPassword'). If it is empty, a simple user bind
+     * will be done with the credentials of the user for authentication. If it is present, the
+     * connection to the ldap server must be done by a 'global' user and a password encoder that
+     * fits your requirements must be present. The default password encoder only supports SHA, that
+     * is insecure.
+     */
+    private String passwordAttribute;
+
+    /**
+     * The filter to find the user. If it is empty, it will be generated from 'userObjectClass' and
+     * 'usernameAttribute' like this '(&amp;(objectClass=inetOrgPerson)(uid={0}))'.
+     */
+    private String userFindOneFilter;
+
+    /**
+     * The scope to find a user. Default is 'one level'.
+     */
+    private SearchScope userFindOneSearchScope;
+
+    /**
+     * The first name attribute of the user. Default is 'givenName'.
+     */
+    protected String firstNameAttribute;
+
+    /**
+     * The last name attribute of the user. Default is 'sn'.
+     */
+    protected String lastNameAttribute;
+
+    /**
+     * The email attribute of the user. Default is 'mail';
+     */
+    private String emailAttribute;
+
+    /**
+     * The account control evaluator.
+     */
+    private AccountControlEvaluatorProperty accountControlEvaluator;
+
+    /**
+     * The group fetch strategy.
+     */
+    private GroupFetchStrategy groupFetchStrategy;
+
+    /**
+     * The member attribute.
+     */
+    private String memberAttribute;
+
+    /**
+     * The group base dn (like 'ou=groups,dc=example,dc=org'). It's only required, if
+     * {@code groupFetchStrategy} is set to {@code GROUP_CONTAINS_USERS}.
+     */
+    private String groupBaseDn;
+
+    /**
+     * The group search scope. It's only required, if {@code groupFetchStrategy} is set to
+     * {@code GROUP_CONTAINS_USERS},
+     */
+    private SearchScope groupSearchScope;
+
+    /**
+     * The group object class. It's only required, if {@code groupFetchStrategy} is set to
+     * {@code GROUP_CONTAINS_USERS}
+     */
+    private String groupObjectClass;
+
+    /**
+     * The group id attribute. It's only required, if {@code groupFetchStrategy} is set to
+     * {@code GROUP_CONTAINS_USERS}
+     */
+    private String groupIdAttribute;
+
+    /**
+     * The group member attribute. It's only required, if {@code groupFetchStrategy} is set to
+     * {@code GROUP_CONTAINS_USERS}
+     */
+    private String groupMemberAttribute;
+
+    /**
+     * The group member format. It's only required, if {@code groupFetchStrategy} is set to
+     * {@code GROUP_CONTAINS_USERS}
+     */
+    private String groupMemberFormat;
+
+    /**
+     * The role mappings.
+     */
+    private List&lt;RoleMapping&gt; roleMapping;
+
+    /**
+     * The default roles.
+     */
+    private List&lt;String&gt; defaultRoles;
+
+    /**
+     * The role prefix (like 'ROLE_').
+     */
+    private String rolePrefix;
+
+    /**
+     * The role case transformation.
+     */
+    private CaseTransformation roleCaseTransformation;
+
+    /**
+     * The string replacements for roles.
+     */
+    private List&lt;StringReplacement&gt; roleStringReplacements;
+
+    /**
+     * The search scope.
+     */
+<span class="nc" id="L265">    public enum SearchScope {</span>
+
+      /**
+       * Base object search.
+       */
+<span class="nc" id="L270">      OBJECT,</span>
+
+      /**
+       * Single level search.
+       */
+<span class="nc" id="L275">      ONELEVEL,</span>
+
+      /**
+       * Whole subtree search.
+       */
+<span class="nc" id="L280">      SUBTREE,</span>
+
+      /**
+       * Subordinate subtree search. See draft-sermersheim-ldap-subordinate-scope.
+       */
+<span class="nc" id="L285">      SUBORDINATE</span>
+    }
+
+    /**
+     * The username to bind dn converter property.
+     */
+<span class="nc" id="L291">    public enum UsernameToBindDnConverterProperty {</span>
+
+      /**
+       * By user rdn attribute username to bind dn converter property.
+       */
+<span class="nc" id="L296">      BY_USER_RDN_ATTRIBUTE,</span>
+
+      /**
+       * By domain email username to bind dn converter property.
+       */
+<span class="nc" id="L301">      BY_DOMAIN_EMAIL</span>
+    }
+
+    /**
+     * The account control evaluator property.
+     */
+<span class="nc" id="L307">    public enum AccountControlEvaluatorProperty {</span>
+
+      /**
+       * The None.
+       */
+<span class="nc" id="L312">      NONE,</span>
+
+      /**
+       * The Active directory.
+       */
+<span class="nc" id="L317">      ACTIVE_DIRECTORY</span>
+    }
+
+    /**
+     * The group fetch strategy.
+     */
+<span class="nc" id="L323">    public enum GroupFetchStrategy {</span>
+
+      /**
+       * Groups will not be fetched.
+       */
+<span class="nc" id="L328">      NONE,</span>
+
+      /**
+       * User contains groups group-fetch strategy.
+       */
+<span class="nc" id="L333">      USER_CONTAINS_GROUPS,</span>
+
+      /**
+       * Group contains users group-fetch strategy.
+       */
+<span class="nc" id="L338">      GROUP_CONTAINS_USERS</span>
+    }
+
+    /**
+     * The templates for ldap authentication.
+     *
+     * @author Christian Bremer
+     */
+<span class="fc" id="L346">    public enum Template {</span>
+
+      /**
+       * Active directory template.
+       */
+<span class="fc" id="L351">      ACTIVE_DIRECTORY,</span>
+
+      /**
+       * Open ldap template.
+       */
+<span class="fc" id="L356">      OPEN_LDAP,</span>
+
+      /**
+       * User contains groups template.
+       */
+<span class="fc" id="L361">      USER_CONTAINS_GROUPS,</span>
+
+      /**
+       * Group contains users template.
+       */
+<span class="fc" id="L366">      GROUP_CONTAINS_USERS</span>
+    }
+  }
+
+  /**
+   * The role mapping.
+   */
+  @Data
+  public static class RoleMapping {
+
+    private String source;
+
+    private String target;
+  }
+
+  /**
+   * The case transformation.
+   */
+<span class="nc" id="L384">  public enum CaseTransformation {</span>
+
+    /**
+     * None case transformation.
+     */
+<span class="nc" id="L389">    NONE,</span>
+
+    /**
+     * To upper case transformation.
+     */
+<span class="nc" id="L394">    TO_UPPER_CASE,</span>
+
+    /**
+     * To lower case transformation.
+     */
+<span class="nc" id="L399">    TO_LOWER_CASE</span>
+  }
+
+  /**
+   * The string replacement.
+   */
+  @Data
+  public static class StringReplacement {
+
+    /**
+     * The regular expression to which the string is to be matched. '{@code [- ]}' for example would
+     * replace every '-' and every space.
+     */
+    private String regex;
+
+    /**
+     * The string to be substituted for each match.
+     */
+    private String replacement;
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

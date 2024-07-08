@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"org.bremersee.spring.thymeleaf","l":"TemplateResolver"},{"p":"org.bremersee.spring.thymeleaf","l":"TemplateResource"}];updateSearchResults();

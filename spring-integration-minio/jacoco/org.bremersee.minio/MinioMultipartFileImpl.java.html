@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MinioMultipartFileImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Integration Minio</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.minio</a> &gt; <span class="el_source">MinioMultipartFileImpl.java</span></div><h1>MinioMultipartFileImpl.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.minio;
+
+import io.minio.GetObjectArgs;
+import io.minio.StatObjectArgs;
+import io.minio.StatObjectResponse;
+import io.minio.messages.Item;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.Optional;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
+import org.springframework.util.FileCopyUtils;
+
+/**
+ * The minio multipart file implementation.
+ *
+ * @author Christian Bremer
+ */
+@ToString(
+    exclude = {&quot;minioOperations&quot;, &quot;etag&quot;, &quot;size&quot;, &quot;objectStatus&quot;},
+    doNotUseGetters = true)
+@EqualsAndHashCode(
+    exclude = {&quot;minioOperations&quot;, &quot;etag&quot;, &quot;size&quot;, &quot;objectStatus&quot;},
+    doNotUseGetters = true)
+public class MinioMultipartFileImpl implements MinioMultipartFile {
+
+  private final MinioOperations minioOperations;
+
+  /**
+   * The region.
+   */
+  @Getter
+  private final String region;
+
+  /**
+   * The bucket.
+   */
+  @Getter
+  private final String bucket;
+
+  private final String name;
+
+  /**
+   * The version id.
+   */
+  @Getter
+  private final String versionId;
+
+  private String etag;
+
+  private Long size;
+
+  private StatObjectResponse objectStatus;
+
+  /**
+   * Instantiates a new minio multipart file.
+   *
+   * @param minioOperations the minio operations
+   * @param minioObjectInfo the minio object info
+   */
+  public MinioMultipartFileImpl(
+      MinioOperations minioOperations,
+<span class="fc" id="L87">      MinioObjectInfo minioObjectInfo) {</span>
+
+<span class="fc" id="L89">    Assert.notNull(minioOperations, &quot;Minio operations must not be null.&quot;);</span>
+<span class="fc" id="L90">    Assert.notNull(minioObjectInfo, &quot;Object info must not be null.&quot;);</span>
+<span class="fc" id="L91">    Assert.hasText(minioObjectInfo.getBucket(), &quot;Bucket must not be null.&quot;);</span>
+<span class="fc" id="L92">    this.minioOperations = minioOperations;</span>
+<span class="fc" id="L93">    this.region = minioObjectInfo.getRegion();</span>
+<span class="fc" id="L94">    this.bucket = minioObjectInfo.getBucket();</span>
+<span class="fc" id="L95">    this.name = minioObjectInfo.getName();</span>
+<span class="fc" id="L96">    this.versionId = minioObjectInfo.getVersionId();</span>
+<span class="fc" id="L97">  }</span>
+
+  /**
+   * Instantiates a new minio multipart file.
+   *
+   * @param minioOperations the minio operations
+   * @param region the region
+   * @param objectStatus the object status
+   */
+  public MinioMultipartFileImpl(
+      MinioOperations minioOperations,
+      String region,
+<span class="fc" id="L109">      StatObjectResponse objectStatus) {</span>
+
+<span class="fc" id="L111">    Assert.notNull(minioOperations, &quot;Minio operations must not be null.&quot;);</span>
+<span class="fc" id="L112">    Assert.notNull(objectStatus, &quot;Object status must not be null.&quot;);</span>
+<span class="fc" id="L113">    this.minioOperations = minioOperations;</span>
+<span class="fc" id="L114">    this.region = region;</span>
+<span class="fc" id="L115">    this.bucket = objectStatus.bucket();</span>
+<span class="fc" id="L116">    this.name = objectStatus.object();</span>
+<span class="fc" id="L117">    this.versionId = objectStatus.versionId();</span>
+<span class="fc" id="L118">    this.etag = objectStatus.etag();</span>
+<span class="fc" id="L119">    this.size = objectStatus.size();</span>
+<span class="fc" id="L120">    this.objectStatus = objectStatus;</span>
+<span class="fc" id="L121">  }</span>
+
+  /**
+   * Instantiates a new minio multipart file.
+   *
+   * @param minioOperations the minio operations
+   * @param region the region
+   * @param bucket the bucket
+   * @param item the item
+   */
+  public MinioMultipartFileImpl(
+      MinioOperations minioOperations,
+      String region,
+      String bucket,
+<span class="fc" id="L135">      Item item) {</span>
+
+<span class="fc" id="L137">    Assert.notNull(minioOperations, &quot;Minio operations must not be null.&quot;);</span>
+<span class="fc" id="L138">    Assert.hasText(bucket, &quot;Bucket must be present.&quot;);</span>
+<span class="fc" id="L139">    Assert.notNull(item, &quot;Item must not be null.&quot;);</span>
+<span class="fc" id="L140">    this.minioOperations = minioOperations;</span>
+<span class="fc" id="L141">    this.region = region;</span>
+<span class="fc" id="L142">    this.bucket = bucket;</span>
+<span class="fc" id="L143">    this.name = item.objectName();</span>
+<span class="fc" id="L144">    this.versionId = item.versionId();</span>
+<span class="fc" id="L145">    this.etag = item.etag();</span>
+<span class="fc" id="L146">    this.size = item.size();</span>
+<span class="fc" id="L147">  }</span>
+
+  /**
+   * Gets object status.
+   *
+   * @return the object status
+   */
+  protected StatObjectResponse getObjectStatus() {
+<span class="fc bfc" id="L155" title="All 2 branches covered.">    if (objectStatus == null) {</span>
+<span class="fc" id="L156">      objectStatus = minioOperations.statObject(StatObjectArgs.builder()</span>
+<span class="fc" id="L157">          .region(region)</span>
+<span class="fc" id="L158">          .bucket(bucket)</span>
+<span class="fc" id="L159">          .object(name)</span>
+<span class="fc" id="L160">          .versionId(versionId)</span>
+<span class="fc" id="L161">          .build());</span>
+    }
+<span class="fc" id="L163">    return objectStatus;</span>
+  }
+
+  @NonNull
+  @Override
+  public String getName() {
+<span class="fc" id="L169">    return name;</span>
+  }
+
+  @Override
+  public String getOriginalFilename() {
+<span class="fc" id="L174">    return name;</span>
+  }
+
+  @Override
+  public String getContentType() {
+<span class="fc" id="L179">    return getObjectStatus().contentType();</span>
+  }
+
+  @Override
+  public boolean isEmpty() {
+<span class="fc bfc" id="L184" title="All 2 branches covered.">    return getSize() &lt;= 0;</span>
+  }
+
+  @Override
+  public long getSize() {
+<span class="fc bfc" id="L189" title="All 2 branches covered.">    if (size == null) {</span>
+<span class="fc" id="L190">      size = getObjectStatus().size();</span>
+    }
+<span class="fc" id="L192">    return size;</span>
+  }
+
+  @NonNull
+  @Override
+  public byte[] getBytes() throws IOException {
+<span class="fc bfc" id="L198" title="All 2 branches covered.">    if (isEmpty()) {</span>
+<span class="fc" id="L199">      return new byte[0];</span>
+    }
+<span class="fc" id="L201">    return FileCopyUtils.copyToByteArray(getInputStream());</span>
+  }
+
+  @NonNull
+  @Override
+  public InputStream getInputStream() {
+<span class="fc bfc" id="L207" title="All 2 branches covered.">    if (isEmpty()) {</span>
+<span class="fc" id="L208">      return new ByteArrayInputStream(new byte[0]);</span>
+    }
+<span class="fc" id="L210">    return minioOperations.getObject(GetObjectArgs.builder()</span>
+<span class="fc" id="L211">        .region(region)</span>
+<span class="fc" id="L212">        .bucket(bucket)</span>
+<span class="fc" id="L213">        .object(name)</span>
+<span class="fc" id="L214">        .versionId(versionId)</span>
+<span class="fc" id="L215">        .build());</span>
+  }
+
+  @Override
+  public void transferTo(@NonNull File dest) throws IOException, IllegalStateException {
+<span class="fc" id="L220">    FileCopyUtils.copy(getInputStream(), Files.newOutputStream(dest.toPath()));</span>
+<span class="fc" id="L221">  }</span>
+
+  @Override
+  public String getEtag() {
+<span class="fc bfc" id="L225" title="All 2 branches covered.">    if (etag == null) {</span>
+<span class="fc" id="L226">      etag = getObjectStatus().etag();</span>
+    }
+<span class="fc" id="L228">    return etag;</span>
+  }
+
+  @Override
+  public OffsetDateTime getLastModified() {
+<span class="fc" id="L233">    return Optional.ofNullable(getObjectStatus().lastModified())</span>
+<span class="fc" id="L234">        .map(time -&gt; OffsetDateTime.ofInstant(time.toInstant(), ZoneOffset.UTC))</span>
+<span class="fc" id="L235">        .orElse(null);</span>
+
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

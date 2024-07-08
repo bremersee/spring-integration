@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LdaptiveSambaTemplate.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Integration Ldaptive</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.ldaptive</a> &gt; <span class="el_source">LdaptiveSambaTemplate.java</span></div><h1>LdaptiveSambaTemplate.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.ldaptive;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
+import org.ldaptive.AttributeModification;
+import org.ldaptive.AttributeModification.Type;
+import org.ldaptive.ConnectionFactory;
+import org.ldaptive.LdapAttribute;
+import org.ldaptive.LdapException;
+import org.ldaptive.ModifyRequest;
+import org.ldaptive.ResultCode;
+import org.ldaptive.SimpleBindRequest;
+import org.passay.CharacterData;
+import org.passay.CharacterRule;
+import org.passay.EnglishCharacterData;
+import org.passay.PasswordGenerator;
+
+/**
+ * The ldaptive samba template.
+ *
+ * @author Christian Bremer
+ */
+public class LdaptiveSambaTemplate extends LdaptiveTemplate {
+
+  private Supplier&lt;String&gt; passwordGenerator;
+
+  /**
+   * Instantiates a new ldaptive samba template.
+   *
+   * @param connectionFactory the connection factory
+   */
+  public LdaptiveSambaTemplate(ConnectionFactory connectionFactory) {
+<span class="fc" id="L50">    super(connectionFactory);</span>
+<span class="fc" id="L51">    this.passwordGenerator = getDefaultPasswordGenerator();</span>
+<span class="fc" id="L52">  }</span>
+
+  /**
+   * Sets password generator.
+   *
+   * @param passwordGenerator the password generator
+   */
+  public void setPasswordGenerator(Supplier&lt;String&gt; passwordGenerator) {
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">    if (Objects.nonNull(passwordGenerator)) {</span>
+<span class="fc" id="L61">      this.passwordGenerator = passwordGenerator;</span>
+    }
+<span class="fc" id="L63">  }</span>
+
+  @Override
+  public LdaptiveSambaTemplate clone(LdaptiveErrorHandler errorHandler) {
+<span class="fc" id="L67">    LdaptiveSambaTemplate template = new LdaptiveSambaTemplate(getConnectionFactory());</span>
+<span class="fc" id="L68">    template.setErrorHandler(errorHandler);</span>
+<span class="fc" id="L69">    return template;</span>
+  }
+
+  @Override
+  public String generateUserPassword(String dn) {
+<span class="fc" id="L74">    String newPassword = passwordGenerator.get();</span>
+<span class="fc" id="L75">    setUserPassword(dn, newPassword);</span>
+<span class="fc" id="L76">    return newPassword;</span>
+  }
+
+  private void setUserPassword(String dn, String newPassword) {
+<span class="fc" id="L80">    String quotedPassword = &quot;\&quot;&quot; + newPassword + &quot;\&quot;&quot;;</span>
+<span class="fc" id="L81">    char[] unicodePwd = quotedPassword.toCharArray();</span>
+<span class="fc" id="L82">    byte[] pwdArray = new byte[unicodePwd.length * 2];</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">    for (int i = 0; i &lt; unicodePwd.length; i++) {</span>
+<span class="fc" id="L84">      pwdArray[i * 2 + 1] = (byte) (unicodePwd[i] &gt;&gt;&gt; 8);</span>
+<span class="fc" id="L85">      pwdArray[i * 2] = (byte) (unicodePwd[i] &amp; 0xff);</span>
+    }
+<span class="fc" id="L87">    LdapAttribute ldapAttribute = new LdapAttribute();</span>
+<span class="fc" id="L88">    ldapAttribute.setName(&quot;unicodePwd&quot;);</span>
+<span class="fc" id="L89">    ldapAttribute.setBinary(true);</span>
+<span class="fc" id="L90">    ldapAttribute.addBinaryValues(pwdArray);</span>
+<span class="fc" id="L91">    AttributeModification attributeModification = new AttributeModification(</span>
+        Type.REPLACE, ldapAttribute);
+<span class="fc" id="L93">    ModifyRequest modifyRequest = ModifyRequest.builder()</span>
+<span class="fc" id="L94">        .dn(dn)</span>
+<span class="fc" id="L95">        .modifications(attributeModification)</span>
+<span class="fc" id="L96">        .build();</span>
+<span class="fc" id="L97">    this.clone(new AbstractLdaptiveErrorHandler() {</span>
+          @Override
+          public LdaptiveException map(LdapException ldapException) {
+            int httpStatus;
+            String errorCode;
+            String reason;
+<span class="nc bnc" id="L103" title="All 2 branches missed.">            if (ldapException.getResultCode() == ResultCode.CONSTRAINT_VIOLATION</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">                &amp;&amp; ldapException.getMessage().contains(&quot;check_password_restrictions&quot;)) {</span>
+<span class="nc" id="L105">              httpStatus = 400;</span>
+<span class="nc" id="L106">              errorCode = &quot;check_password_restrictions&quot;;</span>
+<span class="nc" id="L107">              reason = &quot;New password restrictions were violated.&quot;;</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">            } else if (ldapException.getResultCode() == ResultCode.NO_SUCH_OBJECT) {</span>
+<span class="nc" id="L109">              httpStatus = 404;</span>
+<span class="nc" id="L110">              reason = &quot;No such object found.&quot;;</span>
+<span class="nc" id="L111">              errorCode = &quot;org.bremersee.ldaptive:26cfda51-0fde-443c-87b1-502fc165bb94&quot;;</span>
+            } else {
+<span class="nc" id="L113">              httpStatus = 500;</span>
+<span class="nc" id="L114">              reason = &quot;Internal error.&quot;;</span>
+<span class="nc" id="L115">              errorCode = &quot;org.bremersee.ldaptive:a70939fb-2c94-412f-80c0-00a7d5dcf4a6&quot;;</span>
+            }
+<span class="nc" id="L117">            return LdaptiveException.builder()</span>
+<span class="nc" id="L118">                .httpStatus(httpStatus)</span>
+<span class="nc" id="L119">                .errorCode(errorCode)</span>
+<span class="nc" id="L120">                .reason(reason)</span>
+<span class="nc" id="L121">                .cause(ldapException)</span>
+<span class="nc" id="L122">                .build();</span>
+          }
+        })
+<span class="fc" id="L125">        .modify(modifyRequest);</span>
+<span class="fc" id="L126">  }</span>
+
+  @Override
+  public void modifyUserPassword(String dn, String oldPass, String newPass) {
+<span class="fc bfc" id="L130" title="All 2 branches covered.">    if (bind(new SimpleBindRequest(dn, oldPass))) {</span>
+<span class="fc" id="L131">      setUserPassword(dn, newPass);</span>
+    } else {
+<span class="fc" id="L133">      throw LdaptiveException.builder()</span>
+<span class="fc" id="L134">          .reason(&quot;Bind failed.&quot;)</span>
+<span class="fc" id="L135">          .errorCode(&quot;bind_failed&quot;)</span>
+<span class="fc" id="L136">          .httpStatus(400)</span>
+<span class="fc" id="L137">          .build();</span>
+    }
+<span class="fc" id="L139">  }</span>
+
+  private static Supplier&lt;String&gt; getDefaultPasswordGenerator() {
+<span class="fc" id="L142">    PasswordGenerator pwGen = new PasswordGenerator();</span>
+<span class="fc" id="L143">    CharacterData special = new CharacterData() {</span>
+      @Override
+      public String getErrorCode() {
+<span class="nc" id="L146">        return &quot;INSUFFICIENT_SPECIAL&quot;;</span>
+      }
+
+      @Override
+      public String getCharacters() {
+<span class="fc" id="L151">        return &quot;!#$%&amp;'()*+,-./:;&lt;=&gt;?@[]_{|}~&quot;;</span>
+      }
+    };
+<span class="fc" id="L154">    List&lt;CharacterRule&gt; rules = List.of(</span>
+        // at least five upper-case character
+        new CharacterRule(EnglishCharacterData.UpperCase, 5),
+
+        // at least five lower-case character
+        new CharacterRule(EnglishCharacterData.LowerCase, 5),
+
+        // at least three digit character
+        new CharacterRule(EnglishCharacterData.Digit, 3),
+
+        // at least one special character
+        new CharacterRule(special, 1));
+<span class="fc" id="L166">    return () -&gt; pwGen.generatePassword(16, rules);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

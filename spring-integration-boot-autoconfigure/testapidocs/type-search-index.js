@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"org.bremersee.spring.boot.autoconfigure.minio.app","l":"TestConfiguration"},{"p":"org.bremersee.spring.boot.autoconfigure.thymeleaf","l":"ThymeleafResolverPropertiesTest"}];updateSearchResults();

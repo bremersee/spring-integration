@@ -1,0 +1,4 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Spring Integration WebFlux,org.bremersee.spring.web.reactive.multipart,MultipartFileBuilderImpl,52,360,12,16,8,83,19,34,7,32
+Spring Integration WebFlux,org.bremersee.spring.web.reactive.multipart,MultipartFileBuilder,6,68,11,15,0,16,11,6,0,4
+Spring Integration WebFlux,org.bremersee.spring.web.reactive.multipart,MultipartFileBuilderImpl.EmptyPart,8,0,0,0,3,0,3,0,3,0

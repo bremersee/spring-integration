@@ -1,0 +1,3 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Spring Integration Web,org.bremersee.spring.web.multipart,FileAwareMultipartFile.EmptyResource,0,11,0,0,0,3,0,3,0,3
+Spring Integration Web,org.bremersee.spring.web.multipart,FileAwareMultipartFile,16,371,15,31,2,86,15,37,0,29

@@ -1,2 +1,0 @@
-# spring-integration
-Spring Integration

@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LdaptiveAutoConfiguration$PropertiesMapperImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Integration Boot Autoconfiguration</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.spring.boot.autoconfigure.ldaptive</a> &gt; <span class="el_source">LdaptiveAutoConfiguration$PropertiesMapperImpl.java</span></div><h1>LdaptiveAutoConfiguration$PropertiesMapperImpl.java</h1><pre class="source lang-java linenums">package org.bremersee.spring.boot.autoconfigure.ldaptive;
+
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.processing.Generated;
+import org.bremersee.ldaptive.LdaptiveProperties;
+import org.ldaptive.SearchScope;
+
+@Generated(
+    value = &quot;org.mapstruct.ap.MappingProcessor&quot;,
+    date = &quot;2024-07-08T21:16:54+0200&quot;,
+    comments = &quot;version: 1.5.5.Final, compiler: javac, environment: Java 17.0.11 (Debian)&quot;
+)
+<span class="fc" id="L14">class LdaptiveAutoConfiguration$PropertiesMapperImpl implements LdaptiveAutoConfiguration.PropertiesMapper {</span>
+
+    @Override
+    public LdaptiveProperties map(LdaptiveConnectionProperties properties) {
+<span class="pc bpc" id="L18" title="1 of 2 branches missed.">        if ( properties == null ) {</span>
+<span class="nc" id="L19">            return null;</span>
+        }
+
+<span class="fc" id="L22">        LdaptiveProperties ldaptiveProperties = new LdaptiveProperties();</span>
+
+<span class="fc" id="L24">        ldaptiveProperties.setImmutable( properties.isImmutable() );</span>
+<span class="pc bpc" id="L25" title="1 of 2 branches missed.">        if ( properties.getLdapUrl() != null ) {</span>
+<span class="fc" id="L26">            ldaptiveProperties.setLdapUrl( properties.getLdapUrl() );</span>
+        }
+<span class="pc bpc" id="L28" title="1 of 2 branches missed.">        if ( properties.getConnectTimeout() != null ) {</span>
+<span class="fc" id="L29">            ldaptiveProperties.setConnectTimeout( properties.getConnectTimeout() );</span>
+        }
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">        if ( properties.getStartTlsTimeout() != null ) {</span>
+<span class="fc" id="L32">            ldaptiveProperties.setStartTlsTimeout( properties.getStartTlsTimeout() );</span>
+        }
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">        if ( properties.getResponseTimeout() != null ) {</span>
+<span class="fc" id="L35">            ldaptiveProperties.setResponseTimeout( properties.getResponseTimeout() );</span>
+        }
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">        if ( properties.getReconnectTimeout() != null ) {</span>
+<span class="fc" id="L38">            ldaptiveProperties.setReconnectTimeout( properties.getReconnectTimeout() );</span>
+        }
+<span class="fc" id="L40">        ldaptiveProperties.setAutoReconnect( properties.isAutoReconnect() );</span>
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">        if ( properties.getReconnectStrategy() != null ) {</span>
+<span class="fc" id="L42">            ldaptiveProperties.setReconnectStrategy( reconnectStrategyToReconnectStrategy( properties.getReconnectStrategy() ) );</span>
+        }
+<span class="fc" id="L44">        ldaptiveProperties.setAutoReplay( properties.isAutoReplay() );</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if ( properties.getSslConfig() != null ) {</span>
+<span class="fc" id="L46">            ldaptiveProperties.setSslConfig( sslPropertiesToSslProperties( properties.getSslConfig() ) );</span>
+        }
+<span class="fc" id="L48">        ldaptiveProperties.setUseStartTls( properties.isUseStartTls() );</span>
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">        if ( properties.getBindDn() != null ) {</span>
+<span class="nc" id="L50">            ldaptiveProperties.setBindDn( properties.getBindDn() );</span>
+        }
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        if ( properties.getBindCredentials() != null ) {</span>
+<span class="nc" id="L53">            ldaptiveProperties.setBindCredentials( properties.getBindCredentials() );</span>
+        }
+<span class="fc" id="L55">        ldaptiveProperties.setFastBind( properties.isFastBind() );</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">        if ( properties.getConnectionStrategy() != null ) {</span>
+<span class="fc" id="L57">            ldaptiveProperties.setConnectionStrategy( connectionStrategyToConnectionStrategy( properties.getConnectionStrategy() ) );</span>
+        }
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">        if ( properties.getConnectionValidator() != null ) {</span>
+<span class="fc" id="L60">            ldaptiveProperties.setConnectionValidator( connectionValidatorPropertiesToConnectionValidatorProperties( properties.getConnectionValidator() ) );</span>
+        }
+<span class="fc" id="L62">        ldaptiveProperties.setPooled( properties.isPooled() );</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        if ( properties.getConnectionPool() != null ) {</span>
+<span class="fc" id="L64">            ldaptiveProperties.setConnectionPool( connectionPoolPropertiesToConnectionPoolProperties( properties.getConnectionPool() ) );</span>
+        }
+
+<span class="fc" id="L67">        return ldaptiveProperties;</span>
+    }
+
+    protected LdaptiveProperties.ReconnectStrategy reconnectStrategyToReconnectStrategy(LdaptiveConnectionProperties.ReconnectStrategy reconnectStrategy) {
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">        if ( reconnectStrategy == null ) {</span>
+<span class="nc" id="L72">            return null;</span>
+        }
+
+        LdaptiveProperties.ReconnectStrategy reconnectStrategy1;
+
+<span class="pc bpc" id="L77" title="3 of 4 branches missed.">        switch ( reconnectStrategy ) {</span>
+<span class="fc" id="L78">            case ONE_RECONNECT_ATTEMPT: reconnectStrategy1 = LdaptiveProperties.ReconnectStrategy.ONE_RECONNECT_ATTEMPT;</span>
+<span class="fc" id="L79">            break;</span>
+<span class="nc" id="L80">            case INFINITE_RECONNECT_ATTEMPTS: reconnectStrategy1 = LdaptiveProperties.ReconnectStrategy.INFINITE_RECONNECT_ATTEMPTS;</span>
+<span class="nc" id="L81">            break;</span>
+<span class="nc" id="L82">            case INFINITE_RECONNECT_ATTEMPTS_WITH_BACKOFF: reconnectStrategy1 = LdaptiveProperties.ReconnectStrategy.INFINITE_RECONNECT_ATTEMPTS_WITH_BACKOFF;</span>
+<span class="nc" id="L83">            break;</span>
+<span class="nc" id="L84">            default: throw new IllegalArgumentException( &quot;Unexpected enum constant: &quot; + reconnectStrategy );</span>
+        }
+
+<span class="fc" id="L87">        return reconnectStrategy1;</span>
+    }
+
+    protected LdaptiveProperties.SslProperties sslPropertiesToSslProperties(LdaptiveConnectionProperties.SslProperties sslProperties) {
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">        if ( sslProperties == null ) {</span>
+<span class="nc" id="L92">            return null;</span>
+        }
+
+<span class="fc" id="L95">        LdaptiveProperties.SslProperties sslProperties1 = new LdaptiveProperties.SslProperties();</span>
+
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">        if ( sslProperties.getTrustCertificates() != null ) {</span>
+<span class="nc" id="L98">            sslProperties1.setTrustCertificates( sslProperties.getTrustCertificates() );</span>
+        }
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">        if ( sslProperties.getAuthenticationCertificate() != null ) {</span>
+<span class="nc" id="L101">            sslProperties1.setAuthenticationCertificate( sslProperties.getAuthenticationCertificate() );</span>
+        }
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">        if ( sslProperties.getAuthenticationKey() != null ) {</span>
+<span class="nc" id="L104">            sslProperties1.setAuthenticationKey( sslProperties.getAuthenticationKey() );</span>
+        }
+
+<span class="fc" id="L107">        return sslProperties1;</span>
+    }
+
+    protected LdaptiveProperties.ConnectionStrategy connectionStrategyToConnectionStrategy(LdaptiveConnectionProperties.ConnectionStrategy connectionStrategy) {
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">        if ( connectionStrategy == null ) {</span>
+<span class="nc" id="L112">            return null;</span>
+        }
+
+        LdaptiveProperties.ConnectionStrategy connectionStrategy1;
+
+<span class="pc bpc" id="L117" title="4 of 5 branches missed.">        switch ( connectionStrategy ) {</span>
+<span class="fc" id="L118">            case ACTIVE_PASSIVE: connectionStrategy1 = LdaptiveProperties.ConnectionStrategy.ACTIVE_PASSIVE;</span>
+<span class="fc" id="L119">            break;</span>
+<span class="nc" id="L120">            case RANDOM: connectionStrategy1 = LdaptiveProperties.ConnectionStrategy.RANDOM;</span>
+<span class="nc" id="L121">            break;</span>
+<span class="nc" id="L122">            case ROUND_ROBIN: connectionStrategy1 = LdaptiveProperties.ConnectionStrategy.ROUND_ROBIN;</span>
+<span class="nc" id="L123">            break;</span>
+<span class="nc" id="L124">            case DNS: connectionStrategy1 = LdaptiveProperties.ConnectionStrategy.DNS;</span>
+<span class="nc" id="L125">            break;</span>
+<span class="nc" id="L126">            default: throw new IllegalArgumentException( &quot;Unexpected enum constant: &quot; + connectionStrategy );</span>
+        }
+
+<span class="fc" id="L129">        return connectionStrategy1;</span>
+    }
+
+    protected LdaptiveProperties.ConnectionValidatorProperties.SearchRequestProperties.SearchFilterProperties searchFilterPropertiesToSearchFilterProperties(LdaptiveConnectionProperties.ConnectionValidatorProperties.SearchRequestProperties.SearchFilterProperties searchFilterProperties) {
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">        if ( searchFilterProperties == null ) {</span>
+<span class="nc" id="L134">            return null;</span>
+        }
+
+<span class="fc" id="L137">        LdaptiveProperties.ConnectionValidatorProperties.SearchRequestProperties.SearchFilterProperties searchFilterProperties1 = new LdaptiveProperties.ConnectionValidatorProperties.SearchRequestProperties.SearchFilterProperties();</span>
+
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">        if ( searchFilterProperties.getFilter() != null ) {</span>
+<span class="nc" id="L140">            searchFilterProperties1.setFilter( searchFilterProperties.getFilter() );</span>
+        }
+
+<span class="fc" id="L143">        return searchFilterProperties1;</span>
+    }
+
+    protected SearchScope searchScopeToSearchScope(LdaptiveConnectionProperties.SearchScope searchScope) {
+<span class="nc bnc" id="L147" title="All 2 branches missed.">        if ( searchScope == null ) {</span>
+<span class="nc" id="L148">            return null;</span>
+        }
+
+        SearchScope searchScope1;
+
+<span class="nc bnc" id="L153" title="All 5 branches missed.">        switch ( searchScope ) {</span>
+<span class="nc" id="L154">            case OBJECT: searchScope1 = SearchScope.OBJECT;</span>
+<span class="nc" id="L155">            break;</span>
+<span class="nc" id="L156">            case ONELEVEL: searchScope1 = SearchScope.ONELEVEL;</span>
+<span class="nc" id="L157">            break;</span>
+<span class="nc" id="L158">            case SUBTREE: searchScope1 = SearchScope.SUBTREE;</span>
+<span class="nc" id="L159">            break;</span>
+<span class="nc" id="L160">            case SUBORDINATE: searchScope1 = SearchScope.SUBORDINATE;</span>
+<span class="nc" id="L161">            break;</span>
+<span class="nc" id="L162">            default: throw new IllegalArgumentException( &quot;Unexpected enum constant: &quot; + searchScope );</span>
+        }
+
+<span class="nc" id="L165">        return searchScope1;</span>
+    }
+
+    protected LdaptiveProperties.ConnectionValidatorProperties.SearchRequestProperties searchRequestPropertiesToSearchRequestProperties(LdaptiveConnectionProperties.ConnectionValidatorProperties.SearchRequestProperties searchRequestProperties) {
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">        if ( searchRequestProperties == null ) {</span>
+<span class="nc" id="L170">            return null;</span>
+        }
+
+<span class="fc" id="L173">        LdaptiveProperties.ConnectionValidatorProperties.SearchRequestProperties searchRequestProperties1 = new LdaptiveProperties.ConnectionValidatorProperties.SearchRequestProperties();</span>
+
+<span class="pc bpc" id="L175" title="1 of 2 branches missed.">        if ( searchRequestProperties.getBaseDn() != null ) {</span>
+<span class="nc" id="L176">            searchRequestProperties1.setBaseDn( searchRequestProperties.getBaseDn() );</span>
+        }
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">        if ( searchRequestProperties.getSearchFilter() != null ) {</span>
+<span class="fc" id="L179">            searchRequestProperties1.setSearchFilter( searchFilterPropertiesToSearchFilterProperties( searchRequestProperties.getSearchFilter() ) );</span>
+        }
+<span class="pc bpc" id="L181" title="1 of 2 branches missed.">        if ( searchRequestProperties.getSizeLimit() != null ) {</span>
+<span class="nc" id="L182">            searchRequestProperties1.setSizeLimit( searchRequestProperties.getSizeLimit() );</span>
+        }
+<span class="pc bpc" id="L184" title="1 of 2 branches missed.">        if ( searchRequestProperties.getSearchScope() != null ) {</span>
+<span class="nc" id="L185">            searchRequestProperties1.setSearchScope( searchScopeToSearchScope( searchRequestProperties.getSearchScope() ) );</span>
+        }
+<span class="fc" id="L187">        List&lt;String&gt; list = searchRequestProperties.getReturnAttributes();</span>
+<span class="pc bpc" id="L188" title="1 of 2 branches missed.">        if ( list != null ) {</span>
+<span class="fc" id="L189">            searchRequestProperties1.setReturnAttributes( new ArrayList&lt;String&gt;( list ) );</span>
+        }
+
+<span class="fc" id="L192">        return searchRequestProperties1;</span>
+    }
+
+    protected LdaptiveProperties.ConnectionValidatorProperties connectionValidatorPropertiesToConnectionValidatorProperties(LdaptiveConnectionProperties.ConnectionValidatorProperties connectionValidatorProperties) {
+<span class="pc bpc" id="L196" title="1 of 2 branches missed.">        if ( connectionValidatorProperties == null ) {</span>
+<span class="nc" id="L197">            return null;</span>
+        }
+
+<span class="fc" id="L200">        LdaptiveProperties.ConnectionValidatorProperties connectionValidatorProperties1 = new LdaptiveProperties.ConnectionValidatorProperties();</span>
+
+<span class="pc bpc" id="L202" title="1 of 2 branches missed.">        if ( connectionValidatorProperties.getValidatePeriod() != null ) {</span>
+<span class="fc" id="L203">            connectionValidatorProperties1.setValidatePeriod( connectionValidatorProperties.getValidatePeriod() );</span>
+        }
+<span class="pc bpc" id="L205" title="1 of 2 branches missed.">        if ( connectionValidatorProperties.getValidateTimeout() != null ) {</span>
+<span class="fc" id="L206">            connectionValidatorProperties1.setValidateTimeout( connectionValidatorProperties.getValidateTimeout() );</span>
+        }
+<span class="pc bpc" id="L208" title="1 of 2 branches missed.">        if ( connectionValidatorProperties.getSearchRequest() != null ) {</span>
+<span class="fc" id="L209">            connectionValidatorProperties1.setSearchRequest( searchRequestPropertiesToSearchRequestProperties( connectionValidatorProperties.getSearchRequest() ) );</span>
+        }
+
+<span class="fc" id="L212">        return connectionValidatorProperties1;</span>
+    }
+
+    protected LdaptiveProperties.ConnectionPoolProperties connectionPoolPropertiesToConnectionPoolProperties(LdaptiveConnectionProperties.ConnectionPoolProperties connectionPoolProperties) {
+<span class="pc bpc" id="L216" title="1 of 2 branches missed.">        if ( connectionPoolProperties == null ) {</span>
+<span class="nc" id="L217">            return null;</span>
+        }
+
+<span class="fc" id="L220">        LdaptiveProperties.ConnectionPoolProperties connectionPoolProperties1 = new LdaptiveProperties.ConnectionPoolProperties();</span>
+
+<span class="pc bpc" id="L222" title="1 of 2 branches missed.">        if ( connectionPoolProperties.getBlockWaitTime() != null ) {</span>
+<span class="fc" id="L223">            connectionPoolProperties1.setBlockWaitTime( connectionPoolProperties.getBlockWaitTime() );</span>
+        }
+<span class="fc" id="L225">        connectionPoolProperties1.setMinPoolSize( connectionPoolProperties.getMinPoolSize() );</span>
+<span class="fc" id="L226">        connectionPoolProperties1.setMaxPoolSize( connectionPoolProperties.getMaxPoolSize() );</span>
+<span class="fc" id="L227">        connectionPoolProperties1.setConnectOnCreate( connectionPoolProperties.isConnectOnCreate() );</span>
+<span class="fc" id="L228">        connectionPoolProperties1.setFailFastInitialize( connectionPoolProperties.isFailFastInitialize() );</span>
+<span class="fc" id="L229">        connectionPoolProperties1.setValidateOnCheckIn( connectionPoolProperties.isValidateOnCheckIn() );</span>
+<span class="fc" id="L230">        connectionPoolProperties1.setValidateOnCheckOut( connectionPoolProperties.isValidateOnCheckOut() );</span>
+<span class="fc" id="L231">        connectionPoolProperties1.setValidatePeriodically( connectionPoolProperties.isValidatePeriodically() );</span>
+<span class="pc bpc" id="L232" title="1 of 2 branches missed.">        if ( connectionPoolProperties.getValidator() != null ) {</span>
+<span class="fc" id="L233">            connectionPoolProperties1.setValidator( connectionValidatorPropertiesToConnectionValidatorProperties( connectionPoolProperties.getValidator() ) );</span>
+        }
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">        if ( connectionPoolProperties.getPrunePeriod() != null ) {</span>
+<span class="fc" id="L236">            connectionPoolProperties1.setPrunePeriod( connectionPoolProperties.getPrunePeriod() );</span>
+        }
+<span class="pc bpc" id="L238" title="1 of 2 branches missed.">        if ( connectionPoolProperties.getIdleTime() != null ) {</span>
+<span class="fc" id="L239">            connectionPoolProperties1.setIdleTime( connectionPoolProperties.getIdleTime() );</span>
+        }
+
+<span class="fc" id="L242">        return connectionPoolProperties1;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LdaptiveAutoConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Integration Boot Autoconfiguration</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.spring.boot.autoconfigure.ldaptive</a> &gt; <span class="el_source">LdaptiveAutoConfiguration.java</span></div><h1>LdaptiveAutoConfiguration.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.spring.boot.autoconfigure.ldaptive;
+
+import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.ldaptive.LdaptiveOperations;
+import org.bremersee.ldaptive.LdaptiveProperties;
+import org.bremersee.ldaptive.LdaptiveProperties.ConnectionPoolProperties;
+import org.bremersee.ldaptive.LdaptiveTemplate;
+import org.bremersee.ldaptive.reactive.ReactiveLdaptiveOperations;
+import org.bremersee.ldaptive.reactive.ReactiveLdaptiveTemplate;
+import org.ldaptive.ConnectionConfig;
+import org.ldaptive.ConnectionFactory;
+import org.ldaptive.DefaultConnectionFactory;
+import org.ldaptive.PooledConnectionFactory;
+import org.ldaptive.pool.IdlePruneStrategy;
+import org.mapstruct.Mapper;
+import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.factory.Mappers;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
+import org.springframework.util.ClassUtils;
+
+/**
+ * The ldaptive configuration.
+ *
+ * @author Christian Bremer
+ */
+@AutoConfiguration
+@ConditionalOnClass(name = {
+    &quot;org.ldaptive.ConnectionFactory&quot;,
+    &quot;org.bremersee.ldaptive.LdaptiveProperties&quot;
+})
+@ConditionalOnProperty(prefix = &quot;bremersee.ldaptive&quot;, name = &quot;ldap-url&quot;)
+@EnableConfigurationProperties(LdaptiveConnectionProperties.class)
+<span class="fc" id="L57">@Slf4j</span>
+public class LdaptiveAutoConfiguration {
+
+  private final Class&lt;? extends LdaptiveTemplate&gt; ldaptiveTemplateClass;
+
+  private final LdaptiveProperties properties;
+
+  /**
+   * Instantiates a new ldaptive configuration.
+   *
+   * @param properties the ldaptive connection properties
+   */
+<span class="fc" id="L69">  public LdaptiveAutoConfiguration(LdaptiveConnectionProperties properties) {</span>
+<span class="fc" id="L70">    Class&lt;?&gt; cls = Objects</span>
+<span class="fc" id="L71">        .requireNonNullElse(properties.getLdaptiveTemplateClass(), LdaptiveTemplate.class);</span>
+    //noinspection unchecked
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">    this.ldaptiveTemplateClass = LdaptiveTemplate.class.isAssignableFrom(cls)</span>
+<span class="fc" id="L74">        ? (Class&lt;? extends LdaptiveTemplate&gt;) cls</span>
+<span class="pc" id="L75">        : LdaptiveTemplate.class;</span>
+<span class="fc" id="L76">    this.properties = PropertiesMapper.INSTANCE.map(properties);</span>
+<span class="fc" id="L77">  }</span>
+
+  /**
+   * Init.
+   */
+  @EventListener(ApplicationReadyEvent.class)
+  public void init() {
+<span class="fc" id="L84">    log.info(&quot;&quot;&quot;</span>
+
+            *********************************************************************************
+            * {}
+            * properties = {}
+            *********************************************************************************&quot;&quot;&quot;,
+<span class="fc" id="L90">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
+        properties);
+<span class="fc" id="L92">  }</span>
+
+
+  /**
+   * Creates connection config.
+   *
+   * @return the connection config
+   */
+  @ConditionalOnMissingBean(ConnectionConfig.class)
+  @Bean
+  public ConnectionConfig connectionConfig() {
+<span class="fc" id="L103">    return properties.createConnectionConfig();</span>
+  }
+
+  /**
+   * Creates connection factory bean.
+   *
+   * @param connectionConfig the connection config
+   * @return the connection factory bean
+   */
+  @ConditionalOnMissingBean(ConnectionFactory.class)
+  @Bean(destroyMethod = &quot;close&quot;)
+  public ConnectionFactory connectionFactory(ConnectionConfig connectionConfig) {
+
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">    if (properties.isPooled()) {</span>
+<span class="nc" id="L117">      ConnectionPoolProperties properties = this.properties.getConnectionPool();</span>
+<span class="nc" id="L118">      PooledConnectionFactory factory = PooledConnectionFactory.builder()</span>
+<span class="nc" id="L119">          .config(connectionConfig)</span>
+<span class="nc" id="L120">          .blockWaitTime(properties.getBlockWaitTime())</span>
+<span class="nc" id="L121">          .connectOnCreate(properties.isConnectOnCreate())</span>
+<span class="nc" id="L122">          .failFastInitialize(properties.isFailFastInitialize())</span>
+<span class="nc" id="L123">          .max(properties.getMaxPoolSize())</span>
+<span class="nc" id="L124">          .min(properties.getMinPoolSize())</span>
+<span class="nc" id="L125">          .pruneStrategy(</span>
+<span class="nc" id="L126">              new IdlePruneStrategy(properties.getPrunePeriod(), properties.getIdleTime()))</span>
+<span class="nc" id="L127">          .validateOnCheckIn(properties.isValidateOnCheckIn())</span>
+<span class="nc" id="L128">          .validateOnCheckOut(properties.isValidateOnCheckOut())</span>
+<span class="nc" id="L129">          .validatePeriodically(properties.isValidatePeriodically())</span>
+<span class="nc" id="L130">          .validator(properties.getValidator().createConnectionValidator())</span>
+<span class="nc" id="L131">          .build();</span>
+<span class="nc" id="L132">      factory.initialize();</span>
+<span class="nc" id="L133">      return factory;</span>
+    }
+<span class="fc" id="L135">    return new DefaultConnectionFactory(connectionConfig);</span>
+  }
+
+  /**
+   * Builds ldaptive template.
+   *
+   * @param connectionFactory the connection factory
+   * @return the ldaptive template
+   */
+  @ConditionalOnMissingBean(LdaptiveOperations.class)
+  @Bean
+  public LdaptiveTemplate ldaptiveTemplate(ConnectionFactory connectionFactory) {
+    try {
+<span class="fc" id="L148">      return ldaptiveTemplateClass</span>
+<span class="fc" id="L149">          .getConstructor(ConnectionFactory.class)</span>
+<span class="fc" id="L150">          .newInstance(connectionFactory);</span>
+<span class="nc" id="L151">    } catch (Exception e) {</span>
+<span class="nc" id="L152">      log.warn(&quot;Could not instantiate LdaptiveTemplate {}. Instantiate default template.&quot;,</span>
+<span class="nc" id="L153">          ldaptiveTemplateClass.getName(), e);</span>
+<span class="nc" id="L154">      return new LdaptiveTemplate(connectionFactory);</span>
+    }
+  }
+
+  /**
+   * Builds reactive ldaptive template.
+   *
+   * @param connectionFactory the connection factory
+   * @return the reactive ldaptive template
+   */
+  @ConditionalOnClass(name = {&quot;reactor.core.publisher.Mono&quot;})
+  @ConditionalOnMissingBean(ReactiveLdaptiveOperations.class)
+  @Bean
+  public ReactiveLdaptiveTemplate reactiveLdaptiveTemplate(ConnectionFactory connectionFactory) {
+<span class="fc" id="L168">    return new ReactiveLdaptiveTemplate(connectionFactory);</span>
+  }
+
+  /**
+   * The interface Properties mapper.
+   */
+  @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
+  interface PropertiesMapper {
+
+    /**
+     * The constant INSTANCE.
+     */
+<span class="fc" id="L180">    PropertiesMapper INSTANCE = Mappers.getMapper(PropertiesMapper.class);</span>
+
+    /**
+     * Map ldaptive properties.
+     *
+     * @param properties the properties
+     * @return the ldaptive properties
+     */
+    LdaptiveProperties map(LdaptiveConnectionProperties properties);
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

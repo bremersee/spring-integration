@@ -1,0 +1,14 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Spring Integration Minio,org.bremersee.minio,MinioRepository,0,10,0,0,0,2,0,2,0,2
+Spring Integration Minio,org.bremersee.minio,MinioObjectId,0,10,0,0,0,2,0,2,0,2
+Spring Integration Minio,org.bremersee.minio,MinioClientCallbackWithoutResult,0,5,0,0,0,2,0,1,0,1
+Spring Integration Minio,org.bremersee.minio,MinioTemplate,6,38,0,2,2,13,0,6,0,5
+Spring Integration Minio,org.bremersee.minio,DefaultMinioErrorHandler,28,221,12,33,11,57,12,26,1,9
+Spring Integration Minio,org.bremersee.minio,DefaultMinioObjectId,0,21,0,0,0,8,0,3,0,3
+Spring Integration Minio,org.bremersee.minio,MinioException.new AbstractServiceExceptionBuilder() {...},0,11,0,0,0,2,0,2,0,2
+Spring Integration Minio,org.bremersee.minio,MinioOperations,5,541,4,4,2,108,4,101,0,101
+Spring Integration Minio,org.bremersee.minio,DeleteMode,0,21,0,0,0,4,0,1,0,1
+Spring Integration Minio,org.bremersee.minio,MinioRepositoryImpl,55,447,20,23,18,114,19,22,1,18
+Spring Integration Minio,org.bremersee.minio,MinioException,0,11,0,0,0,3,0,2,0,2
+Spring Integration Minio,org.bremersee.minio,MinioMultipartFileImpl,0,249,0,12,0,68,0,21,0,15
+Spring Integration Minio,org.bremersee.minio,AbstractMinioErrorHandler,0,17,0,0,0,5,0,3,0,3

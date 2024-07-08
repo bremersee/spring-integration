@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LdaptiveProperties.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Integration Ldaptive</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.ldaptive</a> &gt; <span class="el_source">LdaptiveProperties.java</span></div><h1>LdaptiveProperties.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.ldaptive;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.ldaptive.ActivePassiveConnectionStrategy;
+import org.ldaptive.BindConnectionInitializer;
+import org.ldaptive.ConnectionConfig;
+import org.ldaptive.ConnectionFactory;
+import org.ldaptive.ConnectionInitializer;
+import org.ldaptive.ConnectionValidator;
+import org.ldaptive.DefaultConnectionFactory;
+import org.ldaptive.DnsSrvConnectionStrategy;
+import org.ldaptive.PooledConnectionFactory;
+import org.ldaptive.RandomConnectionStrategy;
+import org.ldaptive.RetryMetadata;
+import org.ldaptive.ReturnAttributes;
+import org.ldaptive.RoundRobinConnectionStrategy;
+import org.ldaptive.SearchConnectionValidator;
+import org.ldaptive.SearchRequest;
+import org.ldaptive.SearchScope;
+import org.ldaptive.ad.extended.FastBindConnectionInitializer;
+import org.ldaptive.pool.IdlePruneStrategy;
+import org.ldaptive.ssl.SslConfig;
+import org.ldaptive.ssl.X509CredentialConfig;
+
+/**
+ * The ldap properties.
+ *
+ * @author Christian Bremer
+ */
+@Getter
+@Setter
+@ToString(exclude = {&quot;bindCredentials&quot;})
+@EqualsAndHashCode(exclude = {&quot;bindCredentials&quot;})
+@NoArgsConstructor
+public class LdaptiveProperties {
+
+  /**
+   * Specifies whether the connection configuration is immutable or not.
+   */
+  private boolean immutable;
+
+  /**
+   * URL of the LDAP server(s) separated by space. For example
+   * {@code ldaps://ldap1.example.org:636 ldaps://ldap2.example.org:636}
+   */
+  private String ldapUrl;
+
+  /**
+   * Duration of time that connects will block.
+   */
+  private Duration connectTimeout = Duration.ofMinutes(1);
+
+  /**
+   * Duration of time to wait for startTLS responses.
+   */
+  private Duration startTlsTimeout = Duration.ofMinutes(1);
+
+  /**
+   * Duration of time to wait for responses.
+   */
+  private Duration responseTimeout = Duration.ofMinutes(1);
+
+  /**
+   * Duration of time that operations will block on reconnects, should generally be longer than
+   * connect timeout.
+   */
+  private Duration reconnectTimeout = Duration.ofMinutes(2);
+
+  /**
+   * Whether to automatically reconnect to the server when a connection is lost. Default is true.
+   */
+  private boolean autoReconnect = true;
+
+  /**
+   * The reconnect strategy.
+   */
+  private ReconnectStrategy reconnectStrategy = ReconnectStrategy.ONE_RECONNECT_ATTEMPT;
+
+  /**
+   * Whether pending operations should be replayed after a reconnect. Default is true.
+   */
+  private boolean autoReplay = true;
+
+  /**
+   * The ssl configuration.
+   */
+  private SslProperties sslConfig = new SslProperties();
+
+  /**
+   * Connect to LDAP using startTLS.
+   */
+  private boolean useStartTls;
+
+  /**
+   * DN to bind as before performing operations.
+   */
+  private String bindDn;
+
+  /**
+   * Credential for the bind DN.
+   */
+  private String bindCredentials;
+
+  /**
+   * Perform a fast bind, if no credentials are present.
+   */
+  private boolean fastBind = false;
+
+  /**
+   * The connection strategy.
+   */
+  private ConnectionStrategy connectionStrategy = ConnectionStrategy.ACTIVE_PASSIVE;
+
+  /**
+   * The connection validator.
+   */
+  private ConnectionValidatorProperties connectionValidator = new ConnectionValidatorProperties();
+
+  /**
+   * Specifies whether the connection should be pooled or not. Default is {@code false}.
+   */
+  private boolean pooled = false;
+
+  /**
+   * The connection pool configuration.
+   */
+  private ConnectionPoolProperties connectionPool = new ConnectionPoolProperties();
+
+  /**
+   * Creates the connection config.
+   *
+   * @return the connection config
+   */
+  public ConnectionConfig createConnectionConfig() {
+    ConnectionInitializer[] connectionInitializers;
+<span class="pc bpc" id="L163" title="1 of 4 branches missed.">    if (hasText(getBindDn()) &amp;&amp; hasText(getBindCredentials())) {</span>
+<span class="fc" id="L164">      connectionInitializers = new ConnectionInitializer[]{</span>
+<span class="fc" id="L165">          BindConnectionInitializer.builder()</span>
+<span class="fc" id="L166">              .dn(getBindDn())</span>
+<span class="fc" id="L167">              .credential(getBindCredentials())</span>
+<span class="fc" id="L168">              .build()</span>
+      };
+<span class="fc bfc" id="L170" title="All 2 branches covered.">    } else if (isFastBind()) {</span>
+<span class="fc" id="L171">      connectionInitializers = new ConnectionInitializer[]{</span>
+          new FastBindConnectionInitializer()
+      };
+    } else {
+<span class="fc" id="L175">      connectionInitializers = new ConnectionInitializer[]{};</span>
+    }
+<span class="fc" id="L177">    ConnectionConfig connectionConfig = ConnectionConfig.builder()</span>
+<span class="fc" id="L178">        .connectTimeout(getConnectTimeout())</span>
+<span class="fc" id="L179">        .startTLSTimeout(getStartTlsTimeout())</span>
+<span class="fc" id="L180">        .responseTimeout(getResponseTimeout())</span>
+<span class="fc" id="L181">        .reconnectTimeout(getReconnectTimeout())</span>
+<span class="fc" id="L182">        .autoReconnect(isAutoReconnect())</span>
+<span class="fc" id="L183">        .autoReconnectCondition(getReconnectStrategy().get())</span>
+<span class="fc" id="L184">        .autoReplay(isAutoReplay())</span>
+<span class="fc" id="L185">        .sslConfig(getSslConfig().createSslConfig())</span>
+<span class="fc" id="L186">        .useStartTLS(isUseStartTls())</span>
+<span class="fc" id="L187">        .connectionInitializers(connectionInitializers)</span>
+<span class="fc" id="L188">        .connectionStrategy(getConnectionStrategy().get())</span>
+<span class="fc" id="L189">        .connectionValidator(getConnectionValidator().createConnectionValidator())</span>
+<span class="fc" id="L190">        .url(getLdapUrl())</span>
+<span class="fc" id="L191">        .build();</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">    if (isImmutable()) {</span>
+<span class="fc" id="L193">      connectionConfig.makeImmutable();</span>
+    }
+<span class="fc" id="L195">    return connectionConfig;</span>
+  }
+
+  /**
+   * Create then connection factory.
+   *
+   * @return the connection factory
+   */
+  public ConnectionFactory createConnectionFactory() {
+<span class="fc bfc" id="L204" title="All 2 branches covered.">    if (isPooled()) {</span>
+<span class="fc" id="L205">      ConnectionPoolProperties properties = getConnectionPool();</span>
+<span class="fc" id="L206">      PooledConnectionFactory factory = PooledConnectionFactory.builder()</span>
+<span class="fc" id="L207">          .config(createConnectionConfig())</span>
+<span class="fc" id="L208">          .blockWaitTime(properties.getBlockWaitTime())</span>
+<span class="fc" id="L209">          .connectOnCreate(properties.isConnectOnCreate())</span>
+<span class="fc" id="L210">          .failFastInitialize(properties.isFailFastInitialize())</span>
+<span class="fc" id="L211">          .max(properties.getMaxPoolSize())</span>
+<span class="fc" id="L212">          .min(properties.getMinPoolSize())</span>
+<span class="fc" id="L213">          .pruneStrategy(</span>
+<span class="fc" id="L214">              new IdlePruneStrategy(properties.getPrunePeriod(), properties.getIdleTime()))</span>
+<span class="fc" id="L215">          .validateOnCheckIn(properties.isValidateOnCheckIn())</span>
+<span class="fc" id="L216">          .validateOnCheckOut(properties.isValidateOnCheckOut())</span>
+<span class="fc" id="L217">          .validatePeriodically(properties.isValidatePeriodically())</span>
+<span class="fc" id="L218">          .validator(properties.getValidator().createConnectionValidator())</span>
+<span class="fc" id="L219">          .build();</span>
+<span class="fc" id="L220">      factory.initialize();</span>
+<span class="fc" id="L221">      return factory;</span>
+    }
+<span class="fc" id="L223">    return new DefaultConnectionFactory(createConnectionConfig());</span>
+  }
+
+
+  /**
+   * The reconnection strategy.
+   */
+<span class="fc" id="L230">  public enum ReconnectStrategy implements Supplier&lt;Predicate&lt;RetryMetadata&gt;&gt; {</span>
+
+    /**
+     * One reconnect attempt strategy.
+     */
+<span class="fc" id="L235">    ONE_RECONNECT_ATTEMPT(ConnectionConfig.ONE_RECONNECT_ATTEMPT),</span>
+
+    /**
+     * Infinite reconnect attempts strategy.
+     */
+<span class="fc" id="L240">    INFINITE_RECONNECT_ATTEMPTS(ConnectionConfig.INFINITE_RECONNECT_ATTEMPTS),</span>
+
+    /**
+     * Infinite reconnect attempts with backoff strategy.
+     */
+<span class="fc" id="L245">    INFINITE_RECONNECT_ATTEMPTS_WITH_BACKOFF(</span>
+        ConnectionConfig.INFINITE_RECONNECT_ATTEMPTS_WITH_BACKOFF);
+
+    private final Predicate&lt;RetryMetadata&gt; condition;
+
+<span class="fc" id="L250">    ReconnectStrategy(Predicate&lt;RetryMetadata&gt; condition) {</span>
+<span class="fc" id="L251">      this.condition = condition;</span>
+<span class="fc" id="L252">    }</span>
+
+    @Override
+    public Predicate&lt;RetryMetadata&gt; get() {
+<span class="fc" id="L256">      return condition;</span>
+    }
+  }
+
+  /**
+   * The ssl configuration.
+   */
+  @Data
+  @NoArgsConstructor
+  public static class SslProperties {
+
+    /**
+     * Path of the trust certificates to use for the SSL connection.
+     */
+    private String trustCertificates;
+
+    /**
+     * Path of the authentication certificate to use for the SSL connection.
+     */
+    private String authenticationCertificate;
+
+    /**
+     * Path of the key to use for the SSL connection.
+     */
+    private String authenticationKey;
+
+    /**
+     * Create ssl config.
+     *
+     * @return the ssl config
+     */
+    public SslConfig createSslConfig() {
+<span class="pc bpc" id="L288" title="1 of 2 branches missed.">      if (hasText(getTrustCertificates())</span>
+<span class="pc bpc" id="L289" title="1 of 2 branches missed.">          || hasText(getAuthenticationCertificate())</span>
+<span class="pc bpc" id="L290" title="1 of 2 branches missed.">          || hasText(getAuthenticationKey())) {</span>
+
+<span class="nc" id="L292">        X509CredentialConfig x509 = new X509CredentialConfig();</span>
+<span class="nc bnc" id="L293" title="All 2 branches missed.">        if (hasText(getAuthenticationCertificate())) {</span>
+<span class="nc" id="L294">          x509.setAuthenticationCertificate(getAuthenticationCertificate());</span>
+        }
+<span class="nc bnc" id="L296" title="All 2 branches missed.">        if (hasText(getAuthenticationKey())) {</span>
+<span class="nc" id="L297">          x509.setAuthenticationKey(getAuthenticationKey());</span>
+        }
+<span class="nc bnc" id="L299" title="All 2 branches missed.">        if (hasText(getTrustCertificates())) {</span>
+<span class="nc" id="L300">          x509.setTrustCertificates(getTrustCertificates());</span>
+        }
+<span class="nc" id="L302">        SslConfig sc = new SslConfig();</span>
+<span class="nc" id="L303">        sc.setCredentialConfig(x509);</span>
+<span class="nc" id="L304">        return sc;</span>
+      }
+<span class="fc" id="L306">      return null;</span>
+    }
+  }
+
+  /**
+   * The connection strategy.
+   */
+<span class="fc" id="L313">  public enum ConnectionStrategy implements Supplier&lt;org.ldaptive.ConnectionStrategy&gt; {</span>
+
+    /**
+     * Attempt each URL in the order provided for each connection. The URLs are always tried in the
+     * order in which they were provided.
+     */
+<span class="fc" id="L319">    ACTIVE_PASSIVE(new ActivePassiveConnectionStrategy()),</span>
+
+    /**
+     * Attempt a random URL from a list of URLs.
+     */
+<span class="fc" id="L324">    RANDOM(new RandomConnectionStrategy()),</span>
+
+    /**
+     * Attempt the next URL in the order provided for each connection. URLs are rotated regardless
+     * of connection success or failure.
+     */
+<span class="fc" id="L330">    ROUND_ROBIN(new RoundRobinConnectionStrategy()),</span>
+
+    /**
+     * Queries a DNS server for SRV records and uses those records to construct a list of URLs. When
+     * configuring this strategy you must use your DNS server for {@code ldapUrl} in the form
+     * {@code dns://my.server.com}.
+     */
+<span class="fc" id="L337">    DNS(new DnsSrvConnectionStrategy());</span>
+
+    private final org.ldaptive.ConnectionStrategy connectionStrategy;
+
+<span class="fc" id="L341">    ConnectionStrategy(org.ldaptive.ConnectionStrategy connectionStrategy) {</span>
+<span class="fc" id="L342">      this.connectionStrategy = connectionStrategy;</span>
+<span class="fc" id="L343">    }</span>
+
+    @Override
+    public org.ldaptive.ConnectionStrategy get() {
+<span class="fc" id="L347">      return connectionStrategy;</span>
+    }
+  }
+
+  /**
+   * The search validator properties.
+   */
+  @Data
+  @NoArgsConstructor
+  public static class ConnectionValidatorProperties {
+
+    /**
+     * Validation period.
+     */
+    private Duration validatePeriod = Duration.ofMinutes(30);
+
+    /**
+     * Maximum length of time a connection validation should block.
+     */
+    private Duration validateTimeout = Duration.ofSeconds(5);
+
+    /**
+     * The search request.
+     */
+    private SearchRequestProperties searchRequest = new SearchRequestProperties();
+
+    /**
+     * Create connection validator.
+     *
+     * @return the connection validator
+     */
+    public ConnectionValidator createConnectionValidator() {
+<span class="fc bfc" id="L379" title="All 2 branches covered.">      if (hasText(getSearchRequest().getBaseDn())) {</span>
+<span class="fc" id="L380">        return new SearchConnectionValidator(</span>
+            validatePeriod,
+            validateTimeout,
+<span class="fc" id="L383">            getSearchRequest().createSearchRequest());</span>
+      }
+<span class="fc" id="L385">      return null;</span>
+    }
+
+    /**
+     * The search request properties.
+     */
+    @Data
+    @NoArgsConstructor
+    public static class SearchRequestProperties {
+
+      /**
+       * The base dn (like {@code ou=peoples,dc=example,dc=org}).
+       */
+      private String baseDn;
+
+      /**
+       * The search filter.
+       */
+      private SearchFilterProperties searchFilter = new SearchFilterProperties();
+
+      /**
+       * The size limit.
+       */
+      private Integer sizeLimit;
+
+      /**
+       * The search scope.
+       */
+      private SearchScope searchScope;
+
+      /**
+       * The return attributes.
+       */
+      private List&lt;String&gt; returnAttributes = new ArrayList&lt;&gt;();
+
+      /**
+       * Gets the return attributes as array.
+       *
+       * @return the return attributes as array
+       */
+      public String[] returnAttributesAsArray() {
+<span class="fc bfc" id="L426" title="All 2 branches covered.">        if (returnAttributes.isEmpty()) {</span>
+<span class="fc" id="L427">          return ReturnAttributes.NONE.value();</span>
+        }
+<span class="fc" id="L429">        return returnAttributes.toArray(new String[0]);</span>
+      }
+
+      /**
+       * Create search request.
+       *
+       * @return the search request
+       */
+      public SearchRequest createSearchRequest() {
+<span class="fc" id="L438">        String baseDn = Objects.requireNonNullElse(getBaseDn(), &quot;&quot;);</span>
+        SearchRequest searchRequest;
+<span class="pc bpc" id="L440" title="1 of 4 branches missed.">        if (Objects.nonNull(getSearchFilter()) &amp;&amp; hasText(getSearchFilter().getFilter())) {</span>
+<span class="fc" id="L441">          searchRequest = new SearchRequest(baseDn);</span>
+<span class="fc" id="L442">          searchRequest.setFilter(getSearchFilter().getFilter());</span>
+<span class="fc" id="L443">          searchRequest.setReturnAttributes(returnAttributesAsArray());</span>
+<span class="pc bpc" id="L444" title="1 of 2 branches missed.">          if (getSearchScope() != null) {</span>
+<span class="fc" id="L445">            searchRequest.setSearchScope(getSearchScope());</span>
+          }
+<span class="pc bpc" id="L447" title="1 of 2 branches missed.">          if (getSizeLimit() != null) {</span>
+<span class="fc" id="L448">            searchRequest.setSizeLimit(getSizeLimit());</span>
+          }
+        } else {
+<span class="fc" id="L451">          searchRequest = SearchRequest.objectScopeSearchRequest(baseDn, returnAttributesAsArray());</span>
+        }
+<span class="fc" id="L453">        return searchRequest;</span>
+      }
+
+      /**
+       * The search filter properties.
+       */
+      @Data
+      @NoArgsConstructor
+      public static class SearchFilterProperties {
+
+        /**
+         * The search filter (like {@code (&amp;(objectClass=inetOrgPerson)(uid=administrator))}).
+         */
+        private String filter;
+
+      }
+    }
+  }
+
+  /**
+   * The connection pool properties.
+   */
+  @Data
+  @NoArgsConstructor
+  public static class ConnectionPoolProperties {
+
+    /**
+     * Duration to wait for an available connection.
+     */
+    private Duration blockWaitTime = Duration.ofMinutes(1);
+
+    /**
+     * Minimum pool size.
+     */
+    private int minPoolSize = 3;
+
+    /**
+     * Maximum pool size.
+     */
+    private int maxPoolSize = 10;
+
+    /**
+     * Whether to connect to the ldap on connection creation.
+     */
+    private boolean connectOnCreate = true;
+
+    /**
+     * Whether initialize should throw if pooling configuration requirements are not met.
+     */
+    private boolean failFastInitialize = true;
+
+    /**
+     * Whether the ldap object should be validated when returned to the pool.
+     */
+    private boolean validateOnCheckIn = false;
+
+    /**
+     * Whether the ldap object should be validated when given from the pool.
+     */
+    private boolean validateOnCheckOut = false;
+
+    /**
+     * Whether the pool should be validated periodically.
+     */
+    private boolean validatePeriodically = false;
+
+    /**
+     * The validator for the connections in the pool.
+     */
+    private ConnectionValidatorProperties validator = new ConnectionValidatorProperties();
+
+    /**
+     * Prune period.
+     */
+    private Duration prunePeriod = Duration.ofMinutes(5);
+
+    /**
+     * Idle time.
+     */
+    private Duration idleTime = Duration.ofMinutes(10);
+  }
+
+  /**
+   * Determines whether the given value has text or not.
+   *
+   * @param value the value (can be null)
+   * @return the {@code true}, if the value has text, otherwise {@code false}
+   */
+  protected static boolean hasText(String value) {
+<span class="pc bpc" id="L542" title="1 of 4 branches missed.">    return Objects.nonNull(value) &amp;&amp; !value.isBlank();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

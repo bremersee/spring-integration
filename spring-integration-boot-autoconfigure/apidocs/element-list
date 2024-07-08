@@ -1,0 +1,10 @@
+org.bremersee.spring.boot.autoconfigure
+org.bremersee.spring.boot.autoconfigure.data
+org.bremersee.spring.boot.autoconfigure.data.mongo
+org.bremersee.spring.boot.autoconfigure.ldaptive
+org.bremersee.spring.boot.autoconfigure.minio
+org.bremersee.spring.boot.autoconfigure.security
+org.bremersee.spring.boot.autoconfigure.security.authentication
+org.bremersee.spring.boot.autoconfigure.thymeleaf
+org.bremersee.spring.boot.autoconfigure.web
+org.bremersee.spring.boot.autoconfigure.web.reactive

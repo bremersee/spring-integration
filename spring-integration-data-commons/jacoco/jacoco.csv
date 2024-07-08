@@ -1,0 +1,11 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Spring Integration Data Commons,org.bremersee.spring.data.convert,InstantToOffsetDateTimeReadConverter,20,7,6,0,4,2,5,2,2,2
+Spring Integration Data Commons,org.bremersee.spring.data.convert,OffsetDateTimeToInstantWriteConverter,20,6,6,0,4,2,5,2,2,2
+Spring Integration Data Commons,org.bremersee.spring.data.convert,TimeZoneWriteConverter,0,3,0,0,0,1,0,1,0,1
+Spring Integration Data Commons,org.bremersee.spring.data.convert,OffsetDateTimeToDateWriteConverter,20,7,6,0,4,2,5,2,2,2
+Spring Integration Data Commons,org.bremersee.spring.data.convert,LocaleWriteConverter,20,6,6,0,4,2,5,2,2,2
+Spring Integration Data Commons,org.bremersee.spring.data.convert,LocaleReadConverter,20,10,6,0,4,3,5,2,2,2
+Spring Integration Data Commons,org.bremersee.spring.data.convert,DateToOffsetDateTimeReadConverter,20,8,6,0,4,2,5,2,2,2
+Spring Integration Data Commons,org.bremersee.spring.data.convert,TimeZoneReadConverter,0,3,0,0,0,1,0,1,0,1
+Spring Integration Data Commons,org.bremersee.spring.data.convert,DateToInstantReadConverter,20,6,6,0,4,2,5,2,2,2
+Spring Integration Data Commons,org.bremersee.spring.data.convert,InstantToDateWriteConverter,20,6,6,0,4,2,5,2,2,2

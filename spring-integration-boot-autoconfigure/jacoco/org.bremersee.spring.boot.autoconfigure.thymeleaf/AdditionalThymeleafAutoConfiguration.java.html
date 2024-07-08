@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdditionalThymeleafAutoConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Integration Boot Autoconfiguration</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.spring.boot.autoconfigure.thymeleaf</a> &gt; <span class="el_source">AdditionalThymeleafAutoConfiguration.java</span></div><h1>AdditionalThymeleafAutoConfiguration.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019-2022 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.spring.boot.autoconfigure.thymeleaf;
+
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.spring.boot.autoconfigure.thymeleaf.AdditionalThymeleafProperties.ResolverProperties;
+import org.bremersee.spring.thymeleaf.TemplateResolver;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.templateresolver.ITemplateResolver;
+
+/**
+ * The additional thymeleaf autoconfiguration.
+ *
+ * @author Christian Bremer
+ */
+@ConditionalOnClass({
+    TemplateResolver.class,
+    TemplateEngine.class
+})
+@ConditionalOnBean({
+    TemplateEngine.class
+})
+@AutoConfigureAfter(ThymeleafAutoConfiguration.class)
+@AutoConfiguration
+@EnableConfigurationProperties({
+    AdditionalThymeleafProperties.class
+})
+<span class="fc" id="L56">@Slf4j</span>
+public class AdditionalThymeleafAutoConfiguration {
+
+<span class="fc" id="L59">  private ResourceLoader resourceLoader = new DefaultResourceLoader();</span>
+
+  private final AdditionalThymeleafProperties properties;
+
+  private final TemplateEngine templateEngine;
+
+  /**
+   * Instantiates a new additional thymeleaf autoconfiguration.
+   *
+   * @param properties the properties
+   * @param templateEngine the template engine
+   */
+  public AdditionalThymeleafAutoConfiguration(
+      AdditionalThymeleafProperties properties,
+<span class="fc" id="L73">      ObjectProvider&lt;TemplateEngine&gt; templateEngine) {</span>
+<span class="fc" id="L74">    this.properties = properties;</span>
+<span class="fc" id="L75">    this.templateEngine = templateEngine.getIfAvailable();</span>
+<span class="fc" id="L76">  }</span>
+
+  /**
+   * Sets resource loader.
+   *
+   * @param resourceLoader the resource loader
+   */
+  @SuppressWarnings(&quot;unused&quot;)
+  public void setResourceLoader(ResourceLoader resourceLoader) {
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">    if (resourceLoader != null) {</span>
+<span class="fc" id="L86">      this.resourceLoader = resourceLoader;</span>
+    }
+<span class="fc" id="L88">  }</span>
+
+  /**
+   * Register template resolver.
+   */
+  @EventListener(ApplicationReadyEvent.class)
+  public void registerTemplateResolver() {
+<span class="fc" id="L95">    log.info(&quot;&quot;&quot;</span>
+
+            *********************************************************************************
+            * {}
+            *********************************************************************************
+            * resolvers size = {}
+            *********************************************************************************&quot;&quot;&quot;,
+<span class="fc" id="L102">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
+<span class="fc" id="L103">        properties.getResolvers().size());</span>
+
+<span class="fc" id="L105">    Assert.notNull(templateEngine, &quot;Template engine must be present.&quot;);</span>
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">    int index = templateEngine.getTemplateResolvers() != null</span>
+<span class="fc" id="L107">        ? templateEngine.getTemplateResolvers().size()</span>
+<span class="pc" id="L108">        : 0;</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">    for (ResolverProperties resolverProperties : properties.getResolvers()) {</span>
+<span class="fc" id="L110">      ITemplateResolver resolver = buildTemplateResolver(resolverProperties, index);</span>
+<span class="fc" id="L111">      templateEngine.addTemplateResolver(resolver);</span>
+<span class="fc" id="L112">      index++;</span>
+<span class="fc" id="L113">    }</span>
+<span class="fc" id="L114">  }</span>
+
+  /**
+   * Build template resolver.
+   *
+   * @param resolverProperties the resolver properties
+   * @param index the index
+   * @return the template resolver
+   */
+  protected ITemplateResolver buildTemplateResolver(
+      final ResolverProperties resolverProperties,
+      final int index) {
+
+<span class="fc" id="L127">    log.info(&quot;Building thymeleaf resolver template with index {} and properties {}&quot;,</span>
+<span class="fc" id="L128">        index, properties);</span>
+<span class="fc" id="L129">    final TemplateResolver templateResolver = new TemplateResolver(resourceLoader);</span>
+<span class="fc" id="L130">    templateResolver.setCacheable(resolverProperties.isCacheable());</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">    if (!resolverProperties.getCacheablePatterns().isEmpty()) {</span>
+<span class="fc" id="L132">      templateResolver.setCacheablePatterns(resolverProperties.getCacheablePatterns());</span>
+    }
+<span class="fc bfc" id="L134" title="All 2 branches covered.">    if (resolverProperties.getCacheTtlms() != null) {</span>
+<span class="fc" id="L135">      templateResolver.setCacheTTLMs(resolverProperties.getCacheTtlms());</span>
+    }
+<span class="fc" id="L137">    templateResolver.setCharacterEncoding(resolverProperties.getCharacterEncoding());</span>
+<span class="fc" id="L138">    templateResolver.setCheckExistence(resolverProperties.isCheckExistence());</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">    if (!resolverProperties.getCssTemplateModePatterns().isEmpty()) {</span>
+<span class="fc" id="L140">      templateResolver.setCSSTemplateModePatterns(resolverProperties.getCssTemplateModePatterns());</span>
+    }
+<span class="fc" id="L142">    templateResolver.setForceSuffix(resolverProperties.isForceSuffix());</span>
+<span class="fc" id="L143">    templateResolver.setForceTemplateMode(resolverProperties.isForceTemplateMode());</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">    if (!resolverProperties.getHtmlTemplateModePatterns().isEmpty()) {</span>
+<span class="fc" id="L145">      templateResolver.setHtmlTemplateModePatterns(</span>
+<span class="fc" id="L146">          resolverProperties.getHtmlTemplateModePatterns());</span>
+    }
+<span class="fc bfc" id="L148" title="All 2 branches covered.">    if (!resolverProperties.getJavaScriptTemplateModePatterns().isEmpty()) {</span>
+<span class="fc" id="L149">      templateResolver.setJavaScriptTemplateModePatterns(</span>
+<span class="fc" id="L150">          resolverProperties.getJavaScriptTemplateModePatterns());</span>
+    }
+<span class="fc bfc" id="L152" title="All 2 branches covered.">    if (StringUtils.hasText(resolverProperties.getName())) {</span>
+<span class="fc" id="L153">      templateResolver.setName(resolverProperties.getName());</span>
+    } else {
+<span class="fc" id="L155">      templateResolver.setName(&quot;AdditionalThymeleafTemplateResolverNo&quot; + index);</span>
+    }
+<span class="fc bfc" id="L157" title="All 2 branches covered.">    if (!resolverProperties.getNonCacheablePatterns().isEmpty()) {</span>
+<span class="fc" id="L158">      templateResolver.setNonCacheablePatterns(resolverProperties.getNonCacheablePatterns());</span>
+    }
+<span class="fc" id="L160">    templateResolver.setOrder(index);</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">    if (StringUtils.hasText(resolverProperties.getPrefix())) {</span>
+<span class="fc" id="L162">      templateResolver.setPrefix(resolverProperties.getPrefix());</span>
+    }
+<span class="fc bfc" id="L164" title="All 2 branches covered.">    if (!resolverProperties.getRawTemplateModePatterns().isEmpty()) {</span>
+<span class="fc" id="L165">      templateResolver.setRawTemplateModePatterns(resolverProperties.getRawTemplateModePatterns());</span>
+    }
+<span class="fc" id="L167">    templateResolver.setResolvablePatterns(resolverProperties.resolvablePatternsOrDefault());</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">    if (StringUtils.hasText(resolverProperties.getSuffix())) {</span>
+<span class="fc" id="L169">      templateResolver.setSuffix(resolverProperties.getSuffix());</span>
+    }
+<span class="fc bfc" id="L171" title="All 2 branches covered.">    if (!resolverProperties.getTemplateAliases().isEmpty()) {</span>
+<span class="fc" id="L172">      templateResolver.setTemplateAliases(resolverProperties.getTemplateAliases());</span>
+    }
+<span class="pc bpc" id="L174" title="1 of 2 branches missed.">    if (resolverProperties.getTemplateMode() != null) {</span>
+<span class="nc" id="L175">      templateResolver.setTemplateMode(resolverProperties.getTemplateMode());</span>
+    }
+<span class="fc bfc" id="L177" title="All 2 branches covered.">    if (!resolverProperties.getTextTemplateModePatterns().isEmpty()) {</span>
+<span class="fc" id="L178">      templateResolver.setTextTemplateModePatterns(</span>
+<span class="fc" id="L179">          resolverProperties.getTextTemplateModePatterns());</span>
+    }
+<span class="fc" id="L181">    templateResolver.setUseDecoupledLogic(resolverProperties.isUseDecoupledLogic());</span>
+<span class="fc bfc" id="L182" title="All 2 branches covered.">    if (!resolverProperties.getXmlTemplateModePatterns().isEmpty()) {</span>
+<span class="fc" id="L183">      templateResolver.setXmlTemplateModePatterns(resolverProperties.getXmlTemplateModePatterns());</span>
+    }
+<span class="fc" id="L185">    return templateResolver;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
