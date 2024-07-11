@@ -16,6 +16,8 @@
 
 package org.bremersee.spring.boot.autoconfigure.security.authentication;
 
+import static org.springframework.util.ObjectUtils.isEmpty;
+
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.ldaptive.LdaptiveTemplate;
@@ -28,6 +30,7 @@ import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticat
 import org.bremersee.spring.security.authentication.ldaptive.ReactiveLdaptiveAuthenticationManager;
 import org.bremersee.spring.security.authentication.ldaptive.UsernameToBindDnConverter;
 import org.bremersee.spring.security.core.authority.mapping.NormalizedGrantedAuthoritiesMapper;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveEvaluatedPasswordProvider;
 import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptivePasswordProvider;
 import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptivePwdLastSetPasswordProvider;
 import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetails;
@@ -53,7 +56,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.ObjectUtils;
 
 /**
  * The ldaptive authentication auto-configuration.
@@ -124,7 +126,7 @@ public class LdaptiveAuthenticationAutoConfiguration {
   }
 
   /**
-   * Ldaptive password provider ldaptive password provider.
+   * The ldaptive password provider.
    *
    * @param accountControlEvaluator the account control evaluator
    * @return the ldaptive password provider
@@ -133,13 +135,14 @@ public class LdaptiveAuthenticationAutoConfiguration {
   @Bean
   public LdaptivePasswordProvider ldaptivePasswordProvider(
       ObjectProvider<AccountControlEvaluator> accountControlEvaluator) {
-    if (!ObjectUtils.isEmpty(properties.getPasswordLastSetAttribute())) {
-      AccountControlEvaluator evaluator = accountControlEvaluator
-          .getIfAvailable(() -> properties.getAccountControlEvaluator().get());
+
+    AccountControlEvaluator evaluator = accountControlEvaluator
+        .getIfAvailable(() -> properties.getAccountControlEvaluator().get());
+    if (!isEmpty(properties.getPasswordLastSetAttribute())) {
       return new LdaptivePwdLastSetPasswordProvider(
           evaluator, properties.getPasswordLastSetAttribute());
     }
-    return LdaptivePasswordProvider.invalid();
+    return new LdaptiveEvaluatedPasswordProvider(evaluator);
   }
 
   /**

@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.ldaptive.LdapEntry;
 
 /**
- * The ldaptive in-memory password provider.
+ * The ldaptive in-memory password provider. Don't use it! It's insecure!
  *
  * @author Christian Bremer
  */

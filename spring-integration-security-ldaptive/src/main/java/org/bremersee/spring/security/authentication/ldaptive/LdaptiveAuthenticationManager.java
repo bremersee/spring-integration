@@ -240,11 +240,11 @@ public class LdaptiveAuthenticationManager
     if (isRememberMeAuthenticationToken(authentication)) {
       RememberMeAuthenticationToken auth = (RememberMeAuthenticationToken) authentication;
       LdaptiveUserDetails userDetails = (LdaptiveUserDetails) auth.getPrincipal();
-      logger.info("Authenticating remember me user '" + userDetails.getUsername() + "' ...");
+      logger.debug("Authenticating remember me user '" + userDetails.getUsername() + "' ...");
       return authenticate(userDetails);
 
     } else if (authentication instanceof UsernamePasswordAuthenticationToken) {
-      logger.info("Authenticating user '" + authentication.getName() + "' ...");
+      logger.debug("Authenticating user '" + authentication.getName() + "' ...");
       String username = getEmailToUsernameResolver()
           .getUsernameByEmail(authentication.getName())
           .orElseGet(authentication::getName);

@@ -47,7 +47,7 @@ class LdaptiveAutoConfigurationTest {
   }
 
   /**
-   * Ldaptive template.
+   * The ldaptive template.
    */
   @Test
   void ldaptiveTemplate() {

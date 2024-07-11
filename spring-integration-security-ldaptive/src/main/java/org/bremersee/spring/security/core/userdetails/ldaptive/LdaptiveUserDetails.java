@@ -32,7 +32,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  *
  * @author Christian Bremer
  */
-@ToString
+@ToString(exclude = {"password"})
 public class LdaptiveUserDetails extends SerLdapEntry implements UserDetails {
 
   @Serial

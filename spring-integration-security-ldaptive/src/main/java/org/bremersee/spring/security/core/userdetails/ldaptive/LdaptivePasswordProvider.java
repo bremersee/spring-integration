@@ -84,12 +84,12 @@ public interface LdaptivePasswordProvider {
     }
 
     @Override
-    public String getPassword(LdapEntry ldapEntry, String clearPassword) {
+    public final String getPassword(LdapEntry ldapEntry, String clearPassword) {
       return getPassword(ldapEntry);
     }
 
     @Override
-    public String getPassword(LdapEntry ldapEntry) {
+    public final String getPassword(LdapEntry ldapEntry) {
       return INVALID + UUID.randomUUID();
     }
   }

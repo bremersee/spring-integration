@@ -141,23 +141,7 @@ public class LdaptiveUserDetailsService implements UserDetailsService {
 
   @Override
   public LdaptiveUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    logger.info("Loading user '" + username + "' ...");
-    LdapEntry ldapEntry = findUser(username)
-        .orElseThrow(() -> new UsernameNotFoundException(String.format("%s not found.", username)));
-    Collection<? extends GrantedAuthority> authorities = getAuthorities(ldapEntry);
-    return new LdaptiveUserDetails(
-        ldapEntry,
-        Optional.ofNullable(getAuthenticationProperties().getUsernameAttribute())
-            .map(ldapEntry::getAttribute)
-            .map(LdapAttribute::getStringValue)
-            .orElse(username),
-        authorities,
-        getPasswordProvider().getPassword(ldapEntry),
-        getAccountControlEvaluator().isAccountNonExpired(ldapEntry),
-        getAccountControlEvaluator().isAccountNonLocked(ldapEntry),
-        getAccountControlEvaluator().isCredentialsNonExpired(ldapEntry),
-        getAccountControlEvaluator().isEnabled(ldapEntry)
-    );
+    return loadUserByUsername(username, null);
   }
 
   /**
@@ -171,10 +155,17 @@ public class LdaptiveUserDetailsService implements UserDetailsService {
   public LdaptiveUserDetails loadUserByUsername(String username, String password)
       throws UsernameNotFoundException {
 
-    logger.info("Loading user '" + username + "' with password ...");
+    if (nonNull(password)) {
+      logger.debug("Loading user '" + username + "' with password ...");
+    } else {
+      logger.debug("Loading user '" + username + "' ...");
+    }
     LdapEntry ldapEntry = findUser(username)
         .orElseThrow(() -> new UsernameNotFoundException(String.format("%s not found.", username)));
     Collection<? extends GrantedAuthority> authorities = getAuthorities(ldapEntry);
+    String pwd = Optional.ofNullable(password)
+        .map(p -> getPasswordProvider().getPassword(ldapEntry, p))
+        .orElseGet(() -> getPasswordProvider().getPassword(ldapEntry));
     return new LdaptiveUserDetails(
         ldapEntry,
         Optional.ofNullable(getAuthenticationProperties().getUsernameAttribute())
@@ -182,7 +173,7 @@ public class LdaptiveUserDetailsService implements UserDetailsService {
             .map(LdapAttribute::getStringValue)
             .orElse(username),
         authorities,
-        getPasswordProvider().getPassword(ldapEntry, password),
+        pwd,
         getAccountControlEvaluator().isAccountNonExpired(ldapEntry),
         getAccountControlEvaluator().isAccountNonLocked(ldapEntry),
         getAccountControlEvaluator().isCredentialsNonExpired(ldapEntry),

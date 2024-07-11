@@ -76,8 +76,10 @@ public class LdaptiveRememberMeAutoConfiguration {
     if (ObjectUtils.isEmpty(properties.getPasswordLastSetAttribute())) {
       message = """
           WARNING: There is no password-last-set attribute configured.
-          * You must provide your own
-          * org.bremersee.spring.security.core.userdetails.ldaptive.LdaptivePasswordProvider!""";
+          * Remembered users can login as long as they exist and have been correctly evaluated.
+          * You may provide your own
+          * org.bremersee.spring.security.core.userdetails.ldaptive.LdaptivePasswordProvider
+          * and org.bremersee.spring.security.authentication.ldaptive.AccountControlEvaluator!""";
     } else {
       message = String.format("OK: Using '%s' as password-last-set attribute.",
           properties.getPasswordLastSetAttribute());

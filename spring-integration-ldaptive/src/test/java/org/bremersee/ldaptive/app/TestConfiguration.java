@@ -66,7 +66,7 @@ public class TestConfiguration {
   }
 
   /**
-   * Ldaptive template.
+   * The ldaptive template.
    *
    * @return the ldaptive template
    */

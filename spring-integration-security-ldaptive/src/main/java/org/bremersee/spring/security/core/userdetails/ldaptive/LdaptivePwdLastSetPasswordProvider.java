@@ -16,12 +16,10 @@
 
 package org.bremersee.spring.security.core.userdetails.ldaptive;
 
-import java.util.Objects;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.bremersee.spring.security.authentication.ldaptive.AccountControlEvaluator;
-import org.bremersee.spring.security.authentication.ldaptive.provider.NoAccountControlEvaluator;
 import org.ldaptive.LdapAttribute;
 import org.ldaptive.LdapEntry;
 import org.springframework.util.ObjectUtils;
@@ -31,13 +29,7 @@ import org.springframework.util.ObjectUtils;
  *
  * @author Christian Bremer
  */
-public class LdaptivePwdLastSetPasswordProvider implements LdaptivePasswordProvider {
-
-  /**
-   * The account control evaluator.
-   */
-  @Getter(AccessLevel.PROTECTED)
-  private AccountControlEvaluator accountControlEvaluator = new NoAccountControlEvaluator();
+public class LdaptivePwdLastSetPasswordProvider extends LdaptiveEvaluatedPasswordProvider {
 
   /**
    * The pwdLastSet attribute name.
@@ -46,14 +38,14 @@ public class LdaptivePwdLastSetPasswordProvider implements LdaptivePasswordProvi
   private String pwdLastSetAttributeName = "pwdLastSet";
 
   /**
-   * Instantiates a new Ldaptive pwd last set password provider.
+   * Instantiates a ldaptive pwd last set password provider.
    */
   public LdaptivePwdLastSetPasswordProvider() {
     this(null);
   }
 
   /**
-   * Instantiates a new Ldaptive pwd last set password provider.
+   * Instantiates a ldaptive pwd last set password provider.
    *
    * @param accountControlEvaluator the account control evaluator
    */
@@ -63,7 +55,7 @@ public class LdaptivePwdLastSetPasswordProvider implements LdaptivePasswordProvi
   }
 
   /**
-   * Instantiates a new Ldaptive pwd last set password provider.
+   * Instantiates a ldaptive pwd last set password provider.
    *
    * @param accountControlEvaluator the account control evaluator
    * @param pwdLastSetAttributeName the pwd last set attribute name
@@ -71,19 +63,8 @@ public class LdaptivePwdLastSetPasswordProvider implements LdaptivePasswordProvi
   public LdaptivePwdLastSetPasswordProvider(
       AccountControlEvaluator accountControlEvaluator,
       String pwdLastSetAttributeName) {
-    setAccountControlEvaluator(accountControlEvaluator);
+    super(accountControlEvaluator);
     setPwdLastSetAttributeName(pwdLastSetAttributeName);
-  }
-
-  /**
-   * Sets account control evaluator.
-   *
-   * @param accountControlEvaluator the account control evaluator
-   */
-  public void setAccountControlEvaluator(AccountControlEvaluator accountControlEvaluator) {
-    if (Objects.nonNull(accountControlEvaluator)) {
-      this.accountControlEvaluator = accountControlEvaluator;
-    }
   }
 
   /**
@@ -98,25 +79,12 @@ public class LdaptivePwdLastSetPasswordProvider implements LdaptivePasswordProvi
   }
 
   @Override
-  public String getPassword(LdapEntry ldapEntry, String clearPassword) {
-    return getPassword(ldapEntry);
-  }
-
-  @Override
   public String getPassword(LdapEntry ldapEntry) {
     return Optional
         .ofNullable(ldapEntry.getAttribute(getPwdLastSetAttributeName()))
         .map(LdapAttribute::getStringValue)
         .map(value -> INVALID + getAccessControlValue(ldapEntry) + value)
         .orElseGet(() -> LdaptivePasswordProvider.invalid().getPassword(ldapEntry));
-  }
-
-  private String getAccessControlValue(LdapEntry ldapEntry) {
-    return String.format("%s:%s:%s:%s-",
-        accountControlEvaluator.isAccountNonExpired(ldapEntry),
-        accountControlEvaluator.isAccountNonLocked(ldapEntry),
-        accountControlEvaluator.isCredentialsNonExpired(ldapEntry),
-        accountControlEvaluator.isEnabled(ldapEntry));
   }
 
 }

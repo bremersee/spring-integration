@@ -45,7 +45,7 @@ class LdaptiveAuthenticationAutoConfigurationTest {
   }
 
   /**
-   * Ldaptive password encoder provider.
+   * The ldaptive password encoder provider.
    */
   @Test
   void ldaptivePasswordEncoderProvider() {
@@ -54,7 +54,7 @@ class LdaptiveAuthenticationAutoConfigurationTest {
   }
 
   /**
-   * Ldaptive authentication manager.
+   * The ldaptive authentication manager.
    */
   @Test
   void ldaptiveAuthenticationManager() {
