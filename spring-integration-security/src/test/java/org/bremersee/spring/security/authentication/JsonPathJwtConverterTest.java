@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
+import org.bremersee.spring.security.core.authority.mapping.CaseTransformation;
+import org.bremersee.spring.security.core.authority.mapping.NormalizedGrantedAuthoritiesMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -46,17 +48,20 @@ class JsonPathJwtConverterTest {
    */
   @Test
   void convertWithScopes(SoftAssertions softly) {
-    JsonPathJwtConverter converter = JsonPathJwtConverter.builder()
-        .firstNameJsonPath("$.given_name")
-        .lastNameJsonPath("$.family_name")
-        .emailJsonPath("$.email")
-        .rolesJsonPath("$.scope")
-        .rolesValueList(false)
-        .rolesValueSeparator(" ")
-        .rolePrefix("ROLE_")
-        .roleCaseTransformation(CaseTransformation.TO_UPPER_CASE)
-        .defaultRoles(List.of("ROLE_USER"))
-        .build();
+    JsonPathJwtConverter converter = new JsonPathJwtConverter(
+        "$.sub",
+        "$.given_name",
+        "$.family_name",
+        "$.email",
+        "$.scope",
+        false,
+        " ",
+        new NormalizedGrantedAuthoritiesMapper(
+            List.of("ROLE_USER"),
+            null,
+            null,
+            CaseTransformation.TO_UPPER_CASE,
+            null));
     Jwt jwt = createJwt();
     NormalizedJwtAuthenticationToken actual = converter.convert(jwt);
     softly
@@ -86,16 +91,20 @@ class JsonPathJwtConverterTest {
    */
   @Test
   void convertWithRoles(SoftAssertions softly) {
-    JsonPathJwtConverter converter = JsonPathJwtConverter.builder()
-        .nameJsonPath("$.preferred_username")
-        .lastNameJsonPath("$.family_name")
-        .emailJsonPath("$.email")
-        .rolesJsonPath("$.realm_access.roles")
-        .rolesValueList(true)
-        .rolePrefix("ROLE_")
-        .roleCaseTransformation(CaseTransformation.NONE)
-        .defaultRoles(List.of("ROLE_USER"))
-        .build();
+    JsonPathJwtConverter converter = new JsonPathJwtConverter(
+        "$.preferred_username",
+        null,
+        "$.family_name",
+        "$.email",
+        "$.realm_access.roles",
+        true,
+        " ",
+        new NormalizedGrantedAuthoritiesMapper(
+            List.of("ROLE_USER"),
+            null,
+            "ROLE_",
+            CaseTransformation.NONE,
+            null));
     Jwt jwt = createJwt();
     NormalizedJwtAuthenticationToken actual = converter.convert(jwt);
     softly

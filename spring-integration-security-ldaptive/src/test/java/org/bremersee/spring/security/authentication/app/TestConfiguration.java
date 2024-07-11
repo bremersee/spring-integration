@@ -16,8 +16,9 @@
 
 package org.bremersee.spring.security.authentication.app;
 
-import org.bremersee.spring.security.authentication.ldaptive.EmailToUsernameConverter;
-import org.bremersee.spring.security.authentication.ldaptive.EmailToUsernameConverterByLdapAttribute;
+import org.bremersee.ldaptive.LdaptiveTemplate;
+import org.bremersee.spring.security.authentication.EmailToUsernameResolver;
+import org.bremersee.spring.security.authentication.ldaptive.EmailToUsernameResolverByLdapAttribute;
 import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager;
 import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationProperties;
 import org.bremersee.spring.security.authentication.ldaptive.provider.OpenLdapTemplate;
@@ -94,12 +95,12 @@ public class TestConfiguration {
    * @return the email to username converter
    */
   @Bean
-  public EmailToUsernameConverter emailToUsernameConverter(
+  public EmailToUsernameResolver emailToUsernameConverter(
       ConnectionFactory connectionFactory,
       LdaptiveAuthenticationProperties authenticationProperties) {
-    return new EmailToUsernameConverterByLdapAttribute(
+    return new EmailToUsernameResolverByLdapAttribute(
         authenticationProperties,
-        connectionFactory.getConnectionConfig());
+        new LdaptiveTemplate(connectionFactory));
   }
 
   /**
@@ -107,18 +108,18 @@ public class TestConfiguration {
    *
    * @param connectionFactory the connection factory
    * @param authenticationProperties the authentication properties
-   * @param emailToUsernameConverter the email to username converter
+   * @param emailToUsernameResolver the email to username converter
    * @return the ldaptive authentication manager
    */
   @Bean
   public LdaptiveAuthenticationManager authenticationManager(
       ConnectionFactory connectionFactory,
       LdaptiveAuthenticationProperties authenticationProperties,
-      EmailToUsernameConverter emailToUsernameConverter) {
+      EmailToUsernameResolver emailToUsernameResolver) {
     LdaptiveAuthenticationManager authenticationManager = new LdaptiveAuthenticationManager(
         connectionFactory.getConnectionConfig(),
         authenticationProperties);
-    authenticationManager.setEmailToUsernameConverter(emailToUsernameConverter);
+    authenticationManager.setEmailToUsernameResolver(emailToUsernameResolver);
     return authenticationManager;
   }
 

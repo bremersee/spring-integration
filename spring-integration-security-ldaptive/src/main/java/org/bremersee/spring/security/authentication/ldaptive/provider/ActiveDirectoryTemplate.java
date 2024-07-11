@@ -46,6 +46,7 @@ public class ActiveDirectoryTemplate
     setEmailAttribute("mail");
     setUserFindOneSearchScope(SearchScope.ONELEVEL);
     setMemberAttribute("memberOf");
+    setPasswordLastSetAttribute("pwdLastSet");
     setAccountControlEvaluator(AccountControlEvaluatorProperty.ACTIVE_DIRECTORY);
   }
 

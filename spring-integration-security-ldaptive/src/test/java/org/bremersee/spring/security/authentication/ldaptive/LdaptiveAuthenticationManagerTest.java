@@ -45,7 +45,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 
 /**
- * The type Ldaptive authentication manager test.
+ * The ldaptive authentication manager test.
  */
 @ExtendWith({SoftAssertionsExtension.class})
 class LdaptiveAuthenticationManagerTest {
@@ -63,7 +63,6 @@ class LdaptiveAuthenticationManagerTest {
     assertThatExceptionOfType(IllegalStateException.class)
         .isThrownBy(target::init);
 
-    target.setLdaptiveTemplateFn(LdaptiveSambaTemplate::new);
     target.setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
     target.init();
   }
@@ -99,8 +98,7 @@ class LdaptiveAuthenticationManagerTest {
     target.setAccountControlEvaluator(new NoAccountControlEvaluator());
     target.setUsernameToBindDnConverter(username -> username);
 
-    LdaptiveTemplate ldaptiveTemplate = spy(new LdaptiveTemplate(target
-        .getConnectionFactory("junit", "secret")));
+    LdaptiveTemplate ldaptiveTemplate = spy(target.getLdapTemplate("junit", "secret"));
     doReturn(ldaptiveTemplate)
         .when(target)
         .getLdapTemplate(anyString(), anyString());
@@ -148,7 +146,7 @@ class LdaptiveAuthenticationManagerTest {
     List<GrantedAuthority> authorities = new ArrayList<>(actual.getAuthorities());
     softly
         .assertThat(authorities)
-        .containsExactlyInAnyOrder(new SimpleGrantedAuthority("test-group"));
+        .containsExactlyInAnyOrder(new SimpleGrantedAuthority("ROLE_test-group"));
   }
 
   /**
@@ -173,8 +171,7 @@ class LdaptiveAuthenticationManagerTest {
     target.setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
     target.init();
 
-    LdaptiveTemplate ldaptiveTemplate = spy(new LdaptiveTemplate(target
-        .getConnectionFactory("junit", "secret")));
+    LdaptiveTemplate ldaptiveTemplate = spy(target.getLdapTemplate("junit", "secret"));
     doReturn(ldaptiveTemplate)
         .when(target)
         .getLdapTemplate(anyString(), anyString());
@@ -242,7 +239,7 @@ class LdaptiveAuthenticationManagerTest {
     List<GrantedAuthority> authorities = new ArrayList<>(actual.getAuthorities());
     softly
         .assertThat(authorities)
-        .containsExactlyInAnyOrder(new SimpleGrantedAuthority("test-group"));
+        .containsExactlyInAnyOrder(new SimpleGrantedAuthority("ROLE_test-group"));
   }
 
   /**
@@ -260,7 +257,7 @@ class LdaptiveAuthenticationManagerTest {
 
   /**
    * Gets user with username not found exception.
-   */
+   *
   @Test
   void getUserWithUsernameNotFoundException() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -276,7 +273,7 @@ class LdaptiveAuthenticationManagerTest {
 
   /**
    * Gets user with bad credentials exception by result code.
-   */
+   *
   @Test
   void getUserWithBadCredentialsExceptionByResultCode() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -294,7 +291,7 @@ class LdaptiveAuthenticationManagerTest {
 
   /**
    * Gets user with bad credentials exception by message.
-   */
+   *
   @Test
   void getUserWithBadCredentialsExceptionByMessage() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -313,7 +310,7 @@ class LdaptiveAuthenticationManagerTest {
 
   /**
    * Gets user with ldaptive exception.
-   */
+   *
   @Test
   void getUserWithLdaptiveException() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -331,7 +328,7 @@ class LdaptiveAuthenticationManagerTest {
 
   /**
    * Change password.
-   */
+   *
   @Test
   void changePassword() {
     LdaptiveAuthenticationManager target = spy(new LdaptiveAuthenticationManager(
@@ -352,7 +349,7 @@ class LdaptiveAuthenticationManagerTest {
 
   /**
    * Check password fails.
-   */
+   *
   @Test
   void checkPasswordFails() {
     OpenLdapTemplate properties = new OpenLdapTemplate();
@@ -372,7 +369,7 @@ class LdaptiveAuthenticationManagerTest {
 
   /**
    * Check account control throws disabled exception.
-   */
+   *
   @Test
   void checkAccountControlThrowsDisabledException() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -390,7 +387,7 @@ class LdaptiveAuthenticationManagerTest {
 
   /**
    * Check account control throws locked exception.
-   */
+   *
   @Test
   void checkAccountControlThrowsLockedException() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -411,7 +408,7 @@ class LdaptiveAuthenticationManagerTest {
 
   /**
    * Check account control throws account expired exception.
-   */
+   *
   @Test
   void checkAccountControlThrowsAccountExpiredException() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -435,7 +432,7 @@ class LdaptiveAuthenticationManagerTest {
 
   /**
    * Check account control throws credentials expired exception.
-   */
+   *
   @Test
   void checkAccountControlThrowsCredentialsExpiredException() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
@@ -462,7 +459,7 @@ class LdaptiveAuthenticationManagerTest {
 
   /**
    * Gets authorities.
-   */
+   *
   @Test
   void getAuthorities() {
     OpenLdapTemplate properties = new OpenLdapTemplate();
@@ -478,7 +475,7 @@ class LdaptiveAuthenticationManagerTest {
 
   /**
    * Gets authority filter.
-   */
+   *
   @Test
   void getAuthorityFilter() {
     OpenLdapTemplate properties = new OpenLdapTemplate();
@@ -503,7 +500,7 @@ class LdaptiveAuthenticationManagerTest {
 
   /**
    * Gets authority name.
-   */
+   *
   @Test
   void getAuthorityName() {
     OpenLdapTemplate properties = new OpenLdapTemplate();

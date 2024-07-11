@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * The type Ldaptive auto configuration test.
+ * The ldaptive auto configuration test.
  */
 class LdaptiveAutoConfigurationTest {
 

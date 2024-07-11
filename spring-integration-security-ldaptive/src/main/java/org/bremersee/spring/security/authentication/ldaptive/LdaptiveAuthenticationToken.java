@@ -17,13 +17,11 @@
 package org.bremersee.spring.security.authentication.ldaptive;
 
 import java.io.Serial;
-import java.util.Collection;
 import java.util.Optional;
 import org.bremersee.ldaptive.serializable.SerLdapAttr;
 import org.bremersee.ldaptive.serializable.SerLdapEntry;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetails;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.util.Assert;
 
 /**
  * The ldaptive authentication token.
@@ -38,51 +36,28 @@ public class LdaptiveAuthenticationToken
   private static final long serialVersionUID = 1L;
 
   /**
-   * The username.
-   */
-  private final String username;
-
-  /**
-   * The ldap entry.
-   */
-  private final SerLdapEntry ldapEntry;
-
-  /**
    * The properties.
    */
   private final LdaptiveAuthenticationProperties properties;
 
-  /**
-   * Creates a token with the supplied array of authorities.
-   *
-   * @param username the username
-   * @param authorities the collection of {@code GrantedAuthority}s for the principal
-   *     represented by this authentication object.
-   * @param ldapEntry the ldap entry
-   * @param properties the properties
-   */
+  private final LdaptiveUserDetails userDetails;
+
   public LdaptiveAuthenticationToken(
-      String username,
-      Collection<? extends GrantedAuthority> authorities,
-      SerLdapEntry ldapEntry,
-      LdaptiveAuthenticationProperties properties) {
-    super(authorities);
-    Assert.notNull(username, "Username must be present.");
-    Assert.notNull(ldapEntry, "Ldap entry of user must be present.");
-    Assert.notNull(ldapEntry, "Ldap properties must be present.");
-    this.username = username;
-    this.ldapEntry = ldapEntry;
+      LdaptiveAuthenticationProperties properties,
+      LdaptiveUserDetails userDetails) {
+    super(userDetails.getAuthorities());
     this.properties = properties;
+    this.userDetails = userDetails;
   }
 
   @Override
   public SerLdapEntry getPrincipal() {
-    return ldapEntry;
+    return userDetails;
   }
 
   @Override
   public String getName() {
-    return username;
+    return userDetails.getUsername();
   }
 
   @Override
@@ -92,13 +67,13 @@ public class LdaptiveAuthenticationToken
 
   @Override
   public Object getCredentials() {
-    return null;
+    return userDetails.getPassword();
   }
 
   @Override
   public String getFirstName() {
     return Optional.ofNullable(properties.getFirstNameAttribute())
-        .map(attr -> ldapEntry.getAttributes().get(attr))
+        .map(attr -> userDetails.getAttributes().get(attr))
         .map(SerLdapAttr::getStringValue)
         .orElse(null);
   }
@@ -106,7 +81,7 @@ public class LdaptiveAuthenticationToken
   @Override
   public String getLastName() {
     return Optional.ofNullable(properties.getLastNameAttribute())
-        .map(attr -> ldapEntry.getAttributes().get(attr))
+        .map(attr -> userDetails.getAttributes().get(attr))
         .map(SerLdapAttr::getStringValue)
         .orElse(null);
   }
@@ -114,7 +89,7 @@ public class LdaptiveAuthenticationToken
   @Override
   public String getEmail() {
     return Optional.ofNullable(properties.getEmailAttribute())
-        .map(attr -> ldapEntry.getAttributes().get(attr))
+        .map(attr -> userDetails.getAttributes().get(attr))
         .map(SerLdapAttr::getStringValue)
         .orElse(null);
   }

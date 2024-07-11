@@ -42,7 +42,7 @@ import org.ldaptive.RoundRobinConnectionStrategy;
 import org.ldaptive.SearchScope;
 
 /**
- * The type Ldaptive properties test.
+ * The ldaptive properties test.
  *
  * @author Christian Bremer
  */

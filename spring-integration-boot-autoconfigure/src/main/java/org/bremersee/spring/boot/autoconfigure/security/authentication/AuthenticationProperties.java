@@ -17,7 +17,12 @@
 package org.bremersee.spring.boot.autoconfigure.security.authentication;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -29,6 +34,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "bremersee.authentication")
 @Data
 public class AuthenticationProperties {
+
+  /**
+   * The remember-me key.
+   */
+  private String rememberMeKey;
 
   /**
    * The jwt converter properties.
@@ -107,6 +117,36 @@ public class AuthenticationProperties {
      */
     private List<StringReplacement> roleStringReplacements;
 
+    /**
+     * To role mappings map.
+     *
+     * @return the map
+     */
+    public Map<String, String> toRoleMappings() {
+      return Stream.ofNullable(getRoleMapping())
+          .flatMap(Collection::stream)
+          .collect(Collectors.toMap(
+              RoleMapping::getSource,
+              RoleMapping::getTarget,
+              (first, second) -> first,
+              LinkedHashMap::new));
+    }
+
+    /**
+     * To role string replacements map.
+     *
+     * @return the map
+     */
+    public Map<String, String> toRoleStringReplacements() {
+      return Stream.ofNullable(getRoleStringReplacements())
+          .flatMap(Collection::stream)
+          .collect(Collectors.toMap(
+              StringReplacement::getRegex,
+              StringReplacement::getReplacement,
+              (first, second) -> first,
+              LinkedHashMap::new));
+    }
+
   }
 
   /**
@@ -156,6 +196,12 @@ public class AuthenticationProperties {
      * is insecure.
      */
     private String passwordAttribute;
+
+    /**
+     * The password last set attribute (like 'pwdLastSet') can be used to activate the remember-me
+     * functionality.
+     */
+    private String passwordLastSetAttribute;
 
     /**
      * The filter to find the user. If it is empty, it will be generated from 'userObjectClass' and

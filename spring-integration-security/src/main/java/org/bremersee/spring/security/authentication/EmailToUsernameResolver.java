@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.bremersee.spring.security.authentication.ldaptive;
+package org.bremersee.spring.security.authentication;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
- * The interface EmailToUsernameConverter.
+ * The email to username resolver.
  *
  * @author Christian Bremer
  */
-public interface EmailToUsernameConverter {
+public interface EmailToUsernameResolver {
 
   /**
    * Email regex from <a href="https://emailregex.com/">emailregex.com</a> (RFC 5322 Official

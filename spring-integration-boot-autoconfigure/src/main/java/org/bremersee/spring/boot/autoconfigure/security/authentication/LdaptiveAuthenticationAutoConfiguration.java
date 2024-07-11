@@ -16,17 +16,24 @@
 
 package org.bremersee.spring.boot.autoconfigure.security.authentication;
 
-import java.util.Optional;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.ldaptive.LdaptiveTemplate;
 import org.bremersee.spring.boot.autoconfigure.ldaptive.LdaptiveAutoConfiguration;
+import org.bremersee.spring.security.authentication.EmailToUsernameResolver;
 import org.bremersee.spring.security.authentication.ldaptive.AccountControlEvaluator;
+import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthentication;
 import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager;
 import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationProperties;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationTokenConverter;
 import org.bremersee.spring.security.authentication.ldaptive.ReactiveLdaptiveAuthenticationManager;
 import org.bremersee.spring.security.authentication.ldaptive.UsernameToBindDnConverter;
-import org.bremersee.spring.security.authentication.ldaptive.provider.Template;
+import org.bremersee.spring.security.core.authority.mapping.NormalizedGrantedAuthoritiesMapper;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptivePasswordProvider;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptivePwdLastSetPasswordProvider;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetails;
 import org.ldaptive.ConnectionConfig;
+import org.ldaptive.ConnectionFactory;
+import org.ldaptive.DefaultConnectionFactory;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.factory.Mappers;
@@ -43,7 +50,10 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * The ldaptive authentication auto-configuration.
@@ -71,17 +81,7 @@ public class LdaptiveAuthenticationAutoConfiguration {
    * @param properties the properties
    */
   public LdaptiveAuthenticationAutoConfiguration(AuthenticationProperties properties) {
-    LdaptiveAuthenticationProperties tmp = PropertiesMapper.INSTANCE.map(properties.getLdaptive());
-    Template template;
-    try {
-      template = Template.valueOf(properties.getLdaptive().getTemplate().name());
-    } catch (Exception ignored) {
-      template = null;
-    }
-    this.properties = Optional
-        .ofNullable(template)
-        .map(t -> t.applyTemplate(tmp))
-        .orElse(tmp);
+    this.properties = LdaptivePropertiesMapper.map(properties);
   }
 
   /**
@@ -99,6 +99,19 @@ public class LdaptiveAuthenticationAutoConfiguration {
         properties);
   }
 
+  private LdaptiveTemplate getLdaptiveTemplate(
+      ConnectionConfig connectionConfig,
+      ObjectProvider<ConnectionFactory> connectionFactoryProvider,
+      ObjectProvider<LdaptiveTemplate> ldaptiveTemplateProvider) {
+
+    return ldaptiveTemplateProvider.getIfAvailable(() -> connectionFactoryProvider.stream()
+        .filter(Objects::nonNull)
+        .map(LdaptiveTemplate::new)
+        .findFirst()
+        .orElseGet(() -> new LdaptiveTemplate(new DefaultConnectionFactory(connectionConfig))));
+  }
+
+
   /**
    * Creates ldaptive password encoder provider.
    *
@@ -111,23 +124,36 @@ public class LdaptiveAuthenticationAutoConfiguration {
   }
 
   /**
-   * Creates ldaptive authentication token converter.
+   * Ldaptive password provider ldaptive password provider.
    *
-   * @return the ldaptive authentication token converter
+   * @param accountControlEvaluator the account control evaluator
+   * @return the ldaptive password provider
    */
   @ConditionalOnMissingBean
   @Bean
-  public LdaptiveAuthenticationTokenConverter ldaptiveAuthenticationTokenConverter() {
-    return new LdaptiveAuthenticationTokenConverter(properties);
+  public LdaptivePasswordProvider ldaptivePasswordProvider(
+      ObjectProvider<AccountControlEvaluator> accountControlEvaluator) {
+    if (!ObjectUtils.isEmpty(properties.getPasswordLastSetAttribute())) {
+      AccountControlEvaluator evaluator = accountControlEvaluator
+          .getIfAvailable(() -> properties.getAccountControlEvaluator().get());
+      return new LdaptivePwdLastSetPasswordProvider(
+          evaluator, properties.getPasswordLastSetAttribute());
+    }
+    return LdaptivePasswordProvider.invalid();
   }
 
   /**
    * Creates ldaptive authentication manager.
    *
    * @param connectionConfig the connection config
-   * @param usernameToBindDnProvider the username to bind dn provider
+   * @param connectionFactoryProvider the connection factory provider
+   * @param ldaptiveTemplateProvider the ldaptive template provider
    * @param ldaptivePasswordEncoderProvider the ldaptive password encoder provider
-   * @param accountControlEvaluatorProvider the account control evaluator provider
+   * @param ldaptivePasswordProvider the ldaptive password provider
+   * @param emailToUsernameResolver the email to username resolver
+   * @param usernameToBindDnConverter the username to bind dn provider
+   * @param accountControlEvaluator the account control evaluator
+   * @param grantedAuthoritiesMapper the granted authorities mapper
    * @param tokenConverter the token converter
    * @return the ldaptive authentication manager
    */
@@ -135,19 +161,26 @@ public class LdaptiveAuthenticationAutoConfiguration {
   @Bean(initMethod = "init")
   public LdaptiveAuthenticationManager ldaptiveAuthenticationManager(
       ConnectionConfig connectionConfig,
-      ObjectProvider<UsernameToBindDnConverter> usernameToBindDnProvider,
+      ObjectProvider<ConnectionFactory> connectionFactoryProvider,
+      ObjectProvider<LdaptiveTemplate> ldaptiveTemplateProvider,
       LdaptivePasswordEncoderProvider ldaptivePasswordEncoderProvider,
-      ObjectProvider<AccountControlEvaluator> accountControlEvaluatorProvider,
-      LdaptiveAuthenticationTokenConverter tokenConverter) {
+      LdaptivePasswordProvider ldaptivePasswordProvider,
+      ObjectProvider<EmailToUsernameResolver> emailToUsernameResolver,
+      ObjectProvider<UsernameToBindDnConverter> usernameToBindDnConverter,
+      ObjectProvider<AccountControlEvaluator> accountControlEvaluator,
+      ObjectProvider<GrantedAuthoritiesMapper> grantedAuthoritiesMapper,
+      ObjectProvider<Converter<LdaptiveUserDetails, LdaptiveAuthentication>> tokenConverter) {
 
     LdaptiveAuthenticationManager manager = new LdaptiveAuthenticationManager(
-        connectionConfig, properties);
+        getLdaptiveTemplate(connectionConfig, connectionFactoryProvider, ldaptiveTemplateProvider),
+        properties);
     manager.setPasswordEncoder(ldaptivePasswordEncoderProvider.get());
-    usernameToBindDnProvider.ifAvailable(manager::setUsernameToBindDnConverter);
-    AccountControlEvaluator accountControlEvaluator = accountControlEvaluatorProvider
-        .getIfAvailable(() -> properties.getAccountControlEvaluator().get());
-    manager.setAccountControlEvaluator(accountControlEvaluator);
-    manager.setAuthenticationTokenConverter(tokenConverter);
+    manager.setPasswordProvider(ldaptivePasswordProvider);
+    emailToUsernameResolver.ifAvailable(manager::setEmailToUsernameResolver);
+    usernameToBindDnConverter.ifAvailable(manager::setUsernameToBindDnConverter);
+    accountControlEvaluator.ifAvailable(manager::setAccountControlEvaluator);
+    manager.setGrantedAuthoritiesMapper(getGrantedAuthoritiesMapper(grantedAuthoritiesMapper));
+    tokenConverter.ifAvailable(manager::setTokenConverter);
     return manager;
   }
 
@@ -155,9 +188,14 @@ public class LdaptiveAuthenticationAutoConfiguration {
    * Creates reactive ldaptive authentication manager.
    *
    * @param connectionConfig the connection config
-   * @param usernameToBindDnProvider the username to bind dn provider
+   * @param connectionFactoryProvider the connection factory provider
+   * @param ldaptiveTemplateProvider the ldaptive template provider
    * @param ldaptivePasswordEncoderProvider the ldaptive password encoder provider
-   * @param accountControlEvaluatorProvider the account control evaluator provider
+   * @param ldaptivePasswordProvider the ldaptive password provider
+   * @param emailToUsernameResolver the email to username resolver
+   * @param usernameToBindDnConverter the username to bind dn converter
+   * @param accountControlEvaluator the account control evaluator
+   * @param grantedAuthoritiesMapper the granted authorities mapper
    * @param tokenConverter the token converter
    * @return the reactive ldaptive authentication manager
    */
@@ -165,17 +203,37 @@ public class LdaptiveAuthenticationAutoConfiguration {
   @Bean
   public ReactiveLdaptiveAuthenticationManager reactiveLdaptiveAuthenticationManager(
       ConnectionConfig connectionConfig,
-      ObjectProvider<UsernameToBindDnConverter> usernameToBindDnProvider,
+      ObjectProvider<ConnectionFactory> connectionFactoryProvider,
+      ObjectProvider<LdaptiveTemplate> ldaptiveTemplateProvider,
       LdaptivePasswordEncoderProvider ldaptivePasswordEncoderProvider,
-      ObjectProvider<AccountControlEvaluator> accountControlEvaluatorProvider,
-      LdaptiveAuthenticationTokenConverter tokenConverter) {
+      LdaptivePasswordProvider ldaptivePasswordProvider,
+      ObjectProvider<EmailToUsernameResolver> emailToUsernameResolver,
+      ObjectProvider<UsernameToBindDnConverter> usernameToBindDnConverter,
+      ObjectProvider<AccountControlEvaluator> accountControlEvaluator,
+      ObjectProvider<GrantedAuthoritiesMapper> grantedAuthoritiesMapper,
+      ObjectProvider<Converter<LdaptiveUserDetails, LdaptiveAuthentication>> tokenConverter) {
     return new ReactiveLdaptiveAuthenticationManager(
         ldaptiveAuthenticationManager(
             connectionConfig,
-            usernameToBindDnProvider,
+            connectionFactoryProvider,
+            ldaptiveTemplateProvider,
             ldaptivePasswordEncoderProvider,
-            accountControlEvaluatorProvider,
+            ldaptivePasswordProvider,
+            emailToUsernameResolver,
+            usernameToBindDnConverter,
+            accountControlEvaluator,
+            grantedAuthoritiesMapper,
             tokenConverter));
+  }
+
+  private GrantedAuthoritiesMapper getGrantedAuthoritiesMapper(
+      ObjectProvider<GrantedAuthoritiesMapper> grantedAuthoritiesMapper) {
+    return grantedAuthoritiesMapper.getIfAvailable(() -> new NormalizedGrantedAuthoritiesMapper(
+        properties.getDefaultRoles(),
+        properties.toRoleMappings(),
+        properties.getRolePrefix(),
+        properties.getRoleCaseTransformation(),
+        properties.toRoleStringReplacements()));
   }
 
   /**

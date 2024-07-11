@@ -4,6 +4,7 @@ org.bremersee.spring.boot.autoconfigure.ldaptive.LdaptiveAutoConfiguration
 org.bremersee.spring.boot.autoconfigure.minio.MinioAutoConfiguration
 org.bremersee.spring.boot.autoconfigure.security.authentication.JwtConverterAutoConfiguration
 org.bremersee.spring.boot.autoconfigure.security.authentication.LdaptiveAuthenticationAutoConfiguration
+org.bremersee.spring.boot.autoconfigure.security.authentication.LdaptiveRememberMeAutoConfiguration
 org.bremersee.spring.boot.autoconfigure.thymeleaf.AdditionalThymeleafAutoConfiguration
 org.bremersee.spring.boot.autoconfigure.web.CorsConfigurationSourceAutoConfiguration
 org.bremersee.spring.boot.autoconfigure.web.reactive.CorsConfigurationSourceAutoConfiguration

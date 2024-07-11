@@ -16,7 +16,7 @@ import org.ldaptive.ConnectionFactory;
 import org.ldaptive.ModifyRequest;
 
 /**
- * The type Ldaptive samba template test.
+ * The ldaptive samba template test.
  */
 class LdaptiveSambaTemplateTest {
 

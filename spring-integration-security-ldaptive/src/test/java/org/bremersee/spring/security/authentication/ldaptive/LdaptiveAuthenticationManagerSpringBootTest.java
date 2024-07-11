@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
+import org.bremersee.spring.security.authentication.EmailToUsernameResolver;
 import org.bremersee.spring.security.authentication.app.TestConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -63,7 +64,7 @@ class LdaptiveAuthenticationManagerSpringBootTest {
   private LdaptiveAuthenticationManager authenticationManager;
 
   @Autowired
-  private EmailToUsernameConverter emailToUsernameConverter;
+  private EmailToUsernameResolver emailToUsernameResolver;
 
   @LocalServerPort
   private int port;
@@ -116,8 +117,8 @@ class LdaptiveAuthenticationManagerSpringBootTest {
         .isEqualTo("uid=anna,ou=people,dc=bremersee,dc=org");
     List<GrantedAuthority> actual = new ArrayList<>(authenticationToken.getAuthorities());
     List<GrantedAuthority> expectedRoles = List.of(
-        new SimpleGrantedAuthority("developers"),
-        new SimpleGrantedAuthority("managers"));
+        new SimpleGrantedAuthority("ROLE_developers"),
+        new SimpleGrantedAuthority("ROLE_managers"));
     softly
         .assertThat(actual)
         .containsExactlyInAnyOrderElementsOf(expectedRoles);
@@ -159,10 +160,10 @@ class LdaptiveAuthenticationManagerSpringBootTest {
   @Test
   void emailToUsername(SoftAssertions softly) {
     softly
-        .assertThat(emailToUsernameConverter.getUsernameByEmail("anna.livia@bremersee.org"))
+        .assertThat(emailToUsernameResolver.getUsernameByEmail("anna.livia@bremersee.org"))
         .hasValue("anna");
     softly
-        .assertThat(emailToUsernameConverter.getUsernameByEmail("anna"))
+        .assertThat(emailToUsernameResolver.getUsernameByEmail("anna"))
         .isEmpty();
   }
 

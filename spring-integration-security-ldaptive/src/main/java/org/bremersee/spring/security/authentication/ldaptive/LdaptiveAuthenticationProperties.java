@@ -19,11 +19,16 @@ package org.bremersee.spring.security.authentication.ldaptive;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bremersee.spring.security.authentication.CaseTransformation;
+import org.bremersee.spring.security.core.authority.mapping.CaseTransformation;
 import org.ldaptive.SearchScope;
 import org.springframework.util.ObjectUtils;
 
@@ -74,6 +79,12 @@ public class LdaptiveAuthenticationProperties implements Serializable {
    * insecure.
    */
   protected String passwordAttribute;
+
+  /**
+   * The password last set attribute (like 'pwdLastSet') can be used to activate the remember-me
+   * functionality.
+   */
+  protected String passwordLastSetAttribute;
 
   /**
    * The filter to find the user. If it is empty, it will be generated from {@code userObjectClass}
@@ -176,6 +187,36 @@ public class LdaptiveAuthenticationProperties implements Serializable {
    * The string replacements for roles.
    */
   protected List<StringReplacement> roleStringReplacements;
+
+  /**
+   * To role mappings map.
+   *
+   * @return the map
+   */
+  public Map<String, String> toRoleMappings() {
+    return Stream.ofNullable(getRoleMapping())
+        .flatMap(Collection::stream)
+        .collect(Collectors.toMap(
+            RoleMapping::getSource,
+            RoleMapping::getTarget,
+            (first, second) -> first,
+            LinkedHashMap::new));
+  }
+
+  /**
+   * To role string replacements map.
+   *
+   * @return the map
+   */
+  public Map<String, String> toRoleStringReplacements() {
+    return Stream.ofNullable(getRoleStringReplacements())
+        .flatMap(Collection::stream)
+        .collect(Collectors.toMap(
+            StringReplacement::getRegex,
+            StringReplacement::getReplacement,
+            (first, second) -> first,
+            LinkedHashMap::new));
+  }
 
   /**
    * The ldaptive authentication properties with defaults.
