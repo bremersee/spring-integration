@@ -239,11 +239,12 @@ public class LdaptiveAuthenticationProperties implements Serializable {
       firstNameAttribute = "givenName";
       lastNameAttribute = "sn";
       emailAttribute = "mail";
+      memberAttribute = "memberOf";
       accountControlEvaluator = AccountControlEvaluatorProperty.NONE;
 
       groupFetchStrategy = GroupFetchStrategy.USER_CONTAINS_GROUPS;
-      groupMemberAttribute = "memberOf";
-      groupIdAttribute = "cn";
+      groupObjectClass = "groupOfUniqueNames";
+      groupMemberAttribute = "uniqueMember";
       groupSearchScope = SearchScope.ONELEVEL;
       roleMapping = new ArrayList<>();
       defaultRoles = new ArrayList<>();

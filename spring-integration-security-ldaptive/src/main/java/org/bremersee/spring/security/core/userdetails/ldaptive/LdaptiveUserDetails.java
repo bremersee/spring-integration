@@ -32,6 +32,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  *
  * @author Christian Bremer
  */
+@Getter
 @ToString(exclude = {"password"})
 public class LdaptiveUserDetails extends SerLdapEntry implements UserDetails {
 
@@ -40,22 +41,16 @@ public class LdaptiveUserDetails extends SerLdapEntry implements UserDetails {
 
   private final String username;
 
-  @Getter
   private final Collection<? extends GrantedAuthority> authorities;
 
-  @Getter
   private final String password;
 
-  @Getter
   private final boolean accountNonExpired;
 
-  @Getter
   private final boolean accountNonLocked;
 
-  @Getter
   private final boolean credentialsNonExpired;
 
-  @Getter
   private final boolean enabled;
 
   /**
@@ -88,11 +83,6 @@ public class LdaptiveUserDetails extends SerLdapEntry implements UserDetails {
     this.accountNonLocked = accountNonLocked;
     this.credentialsNonExpired = credentialsNonExpired;
     this.enabled = enabled;
-  }
-
-  @Override
-  public String getUsername() {
-    return username;
   }
 
 }

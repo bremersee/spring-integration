@@ -45,6 +45,7 @@ import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMap
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.util.Assert;
 
 /**
  * The ldaptive user details service.
@@ -87,7 +88,7 @@ public class LdaptiveUserDetailsService implements UserDetailsService {
   /**
    * The password provider.
    */
-  private LdaptivePasswordProvider passwordProvider = LdaptivePasswordProvider.invalid();
+  private LdaptivePasswordProvider passwordProvider;
 
   /**
    * Instantiates a ldaptive user details service.
@@ -98,10 +99,16 @@ public class LdaptiveUserDetailsService implements UserDetailsService {
   public LdaptiveUserDetailsService(
       LdaptiveAuthenticationProperties authenticationProperties,
       LdaptiveTemplate ldaptiveTemplate) {
+
     this.authenticationProperties = authenticationProperties;
     this.ldaptiveTemplate = ldaptiveTemplate;
+    Assert.notNull(getAuthenticationProperties(), "Authentication properties are required.");
+    Assert.notNull(getLdaptiveTemplate(), "Ldaptive template is required.");
     setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
-    setAccountControlEvaluator(authenticationProperties.getAccountControlEvaluator().get());
+    if (nonNull(authenticationProperties.getAccountControlEvaluator())) {
+      setAccountControlEvaluator(authenticationProperties.getAccountControlEvaluator().get());
+    }
+    setPasswordProvider(new LdaptiveEvaluatedPasswordProvider(getAccountControlEvaluator()));
   }
 
   /**

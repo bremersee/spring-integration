@@ -104,7 +104,7 @@ public class LdaptiveAuthenticationManager
    * The account control evaluator.
    */
   @Getter(AccessLevel.PROTECTED)
-  private AccountControlEvaluator accountControlEvaluator = new NoAccountControlEvaluator();
+  private AccountControlEvaluator accountControlEvaluator;
 
   /**
    * The granted authorities mapper.
@@ -160,13 +160,28 @@ public class LdaptiveAuthenticationManager
   public LdaptiveAuthenticationManager(
       LdaptiveTemplate applicationLdaptiveTemplate,
       LdaptiveAuthenticationProperties authenticationProperties) {
+
     this.applicationLdaptiveTemplate = applicationLdaptiveTemplate;
+    Assert.notNull(getApplicationLdaptiveTemplate(), "Application ldaptive template is required.");
     this.authenticationProperties = authenticationProperties;
-    this.emailToUsernameResolver = new EmailToUsernameResolverByLdapAttribute(
-        authenticationProperties, this.applicationLdaptiveTemplate);
-    this.usernameToBindDnConverter = authenticationProperties
-        .getUsernameToBindDnConverter()
-        .apply(authenticationProperties);
+    Assert.notNull(getAuthenticationProperties(), "Authentication properties are required.");
+
+    // emailToUsernameResolver
+    setEmailToUsernameResolver(new EmailToUsernameResolverByLdapAttribute(
+        getAuthenticationProperties(), getApplicationLdaptiveTemplate()));
+
+    // usernameToBindDnConverter
+    Assert.notNull(getAuthenticationProperties().getUsernameToBindDnConverter(),
+        "Username to bind dn converter is required.");
+    setUsernameToBindDnConverter(getAuthenticationProperties().getUsernameToBindDnConverter()
+        .apply(getAuthenticationProperties()));
+
+    // accountControlEvaluator
+    if (isNull(getAuthenticationProperties().getAccountControlEvaluator())) {
+      setAccountControlEvaluator(new NoAccountControlEvaluator());
+    } else {
+      setAccountControlEvaluator(getAuthenticationProperties().getAccountControlEvaluator().get());
+    }
   }
 
   /**

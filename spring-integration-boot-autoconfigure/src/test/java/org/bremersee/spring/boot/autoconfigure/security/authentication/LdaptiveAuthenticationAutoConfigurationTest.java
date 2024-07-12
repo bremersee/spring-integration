@@ -59,6 +59,7 @@ class LdaptiveAuthenticationAutoConfigurationTest {
   @Test
   void ldaptiveAuthenticationManager() {
     ConnectionConfig connectionConfig = ConnectionConfig.builder().build();
+    //ObjectProvider<>
     ObjectProvider<EmailToUsernameResolver> emailToUsernameResolver = mock();
     ObjectProvider<UsernameToBindDnConverter> usernameToBindDnConverter = mock();
     ObjectProvider<AccountControlEvaluator> accountControlEvaluator = mock();

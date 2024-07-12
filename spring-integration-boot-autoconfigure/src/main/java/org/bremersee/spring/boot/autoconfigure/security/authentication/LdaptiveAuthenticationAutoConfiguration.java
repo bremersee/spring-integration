@@ -16,9 +16,9 @@
 
 package org.bremersee.spring.boot.autoconfigure.security.authentication;
 
+import static java.util.Objects.nonNull;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.ldaptive.LdaptiveTemplate;
 import org.bremersee.spring.boot.autoconfigure.ldaptive.LdaptiveAutoConfiguration;
@@ -100,19 +100,6 @@ public class LdaptiveAuthenticationAutoConfiguration {
         ClassUtils.getUserClass(getClass()).getSimpleName(),
         properties);
   }
-
-  private LdaptiveTemplate getLdaptiveTemplate(
-      ConnectionConfig connectionConfig,
-      ObjectProvider<ConnectionFactory> connectionFactoryProvider,
-      ObjectProvider<LdaptiveTemplate> ldaptiveTemplateProvider) {
-
-    return ldaptiveTemplateProvider.getIfAvailable(() -> connectionFactoryProvider.stream()
-        .filter(Objects::nonNull)
-        .map(LdaptiveTemplate::new)
-        .findFirst()
-        .orElseGet(() -> new LdaptiveTemplate(new DefaultConnectionFactory(connectionConfig))));
-  }
-
 
   /**
    * Creates ldaptive password encoder provider.
@@ -227,6 +214,22 @@ public class LdaptiveAuthenticationAutoConfiguration {
             accountControlEvaluator,
             grantedAuthoritiesMapper,
             tokenConverter));
+  }
+
+  private LdaptiveTemplate getLdaptiveTemplate(
+      ConnectionConfig connectionConfig,
+      ObjectProvider<ConnectionFactory> connectionFactoryProvider,
+      ObjectProvider<LdaptiveTemplate> ldaptiveTemplateProvider) {
+
+    LdaptiveTemplate ldaptiveTemplate = ldaptiveTemplateProvider.getIfAvailable();
+    if (nonNull(ldaptiveTemplate)) {
+      return ldaptiveTemplate;
+    }
+    ConnectionFactory connectionFactory = connectionFactoryProvider.getIfAvailable();
+    if (nonNull(connectionFactory)) {
+      return new LdaptiveTemplate(connectionFactory);
+    }
+    return new LdaptiveTemplate(new DefaultConnectionFactory(connectionConfig));
   }
 
   private GrantedAuthoritiesMapper getGrantedAuthoritiesMapper(

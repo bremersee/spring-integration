@@ -20,7 +20,6 @@ import static java.util.Objects.nonNull;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.AccessLevel;
@@ -32,7 +31,6 @@ import org.bremersee.spring.security.authentication.EmailToUsernameResolver;
 import org.ldaptive.FilterTemplate;
 import org.ldaptive.LdapAttribute;
 import org.ldaptive.SearchRequest;
-import org.ldaptive.SearchResponse;
 
 /**
  * The email to username resolver by ldap attribute.
@@ -113,6 +111,7 @@ public class EmailToUsernameResolverByLdapAttribute implements EmailToUsernameRe
   protected boolean areRequiredPropertiesPresent() {
     return !isEmpty(getProperties().getUserBaseDn())
         && !isEmpty(getProperties().getUserObjectClass())
+        && !isEmpty(getProperties().getUserFindOneSearchScope())
         && !isEmpty(getProperties().getEmailAttribute())
         && !isEmpty(getProperties().getUsernameAttribute());
   }
@@ -128,9 +127,7 @@ public class EmailToUsernameResolverByLdapAttribute implements EmailToUsernameRe
             .build())
         .scope(getProperties().getUserFindOneSearchScope())
         .build();
-    return Stream.ofNullable(getLdaptiveTemplate().search(searchRequest))
-        .map(SearchResponse::getEntries)
-        .filter(Objects::nonNull)
+    return Stream.ofNullable(getLdaptiveTemplate().findAll(searchRequest))
         .filter(collection -> collection.size() == 1)
         .flatMap(Collection::stream)
         .findFirst()
