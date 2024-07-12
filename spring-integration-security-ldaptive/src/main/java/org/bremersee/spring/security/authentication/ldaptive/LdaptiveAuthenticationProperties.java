@@ -276,7 +276,7 @@ public class LdaptiveAuthenticationProperties implements Serializable {
           && !ObjectUtils.isEmpty(getUserObjectClass())
           && !ObjectUtils.isEmpty(getUsernameAttribute())) {
         return String
-            .format("(&(objectClass=%s)(%s={0}))", getUserObjectClass(), getUserRdnAttribute());
+            .format("(&(objectClass=%s)(%s={0}))", getUserObjectClass(), getUsernameAttribute());
       }
       return userFindOneFilter;
     }
