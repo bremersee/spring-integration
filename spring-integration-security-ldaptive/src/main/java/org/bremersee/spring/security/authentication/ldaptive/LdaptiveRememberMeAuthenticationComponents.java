@@ -20,21 +20,24 @@ import static java.util.Objects.nonNull;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.function.BiFunction;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetailsService;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
+import org.springframework.util.Assert;
 
 /**
- * The ldaptive remember-me authentication.
+ * The ldaptive remember-me authentication components.
  *
  * @author Christian Bremer
  */
-public abstract class LdaptiveRememberMeAuthentication {
+public class LdaptiveRememberMeAuthenticationComponents {
 
   /**
    * The key.
@@ -59,13 +62,16 @@ public abstract class LdaptiveRememberMeAuthentication {
    *
    * @param key the key
    * @param authenticationManager the authentication manager
+   * @param rememberMeServicesFactory the remember me services factory
    */
-  public LdaptiveRememberMeAuthentication(
+  public LdaptiveRememberMeAuthenticationComponents(
       String key,
-      LdaptiveAuthenticationManager authenticationManager) {
+      LdaptiveAuthenticationManager authenticationManager,
+      BiFunction<String, UserDetailsService, RememberMeServices> rememberMeServicesFactory) {
     this.key = key;
     this.authenticationManager = authenticationManager;
-    this.rememberMeServices = new LdaptiveRememberMeServices();
+    this.rememberMeServices = new LdaptiveRememberMeServices(
+        rememberMeServicesFactory.apply(getKey(), getUserDetailsService()));
   }
 
   /**
@@ -87,13 +93,6 @@ public abstract class LdaptiveRememberMeAuthentication {
   }
 
   /**
-   * Gets internal remember me services.
-   *
-   * @return the internal remember me services
-   */
-  protected abstract RememberMeServices getInternalRememberMeServices();
-
-  /**
    * Gets remember me authentication filter.
    *
    * @return the remember me authentication filter
@@ -109,11 +108,21 @@ public abstract class LdaptiveRememberMeAuthentication {
    */
   class LdaptiveRememberMeServices implements RememberMeServices {
 
-    private final RememberMeServices internal = getInternalRememberMeServices();
+    private final RememberMeServices delegate;
+
+    /**
+     * Instantiates new ldaptive remember me services.
+     *
+     * @param delegate the delegate
+     */
+    public LdaptiveRememberMeServices(RememberMeServices delegate) {
+      Assert.notNull(delegate, "Delegate remember-me service must not be null.");
+      this.delegate = delegate;
+    }
 
     @Override
     public Authentication autoLogin(HttpServletRequest request, HttpServletResponse response) {
-      Authentication autoAuth = internal.autoLogin(request, response);
+      Authentication autoAuth = delegate.autoLogin(request, response);
       try {
         LdaptiveAuthentication ldapAuth = getAuthenticationManager().authenticate(autoAuth);
         return nonNull(ldapAuth)
@@ -128,13 +137,13 @@ public abstract class LdaptiveRememberMeAuthentication {
 
     @Override
     public void loginFail(HttpServletRequest request, HttpServletResponse response) {
-      internal.loginFail(request, response);
+      delegate.loginFail(request, response);
     }
 
     @Override
     public void loginSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication successfulAuthentication) {
-      internal.loginSuccess(request, response, successfulAuthentication);
+      delegate.loginSuccess(request, response, successfulAuthentication);
     }
   }
 

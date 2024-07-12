@@ -19,8 +19,7 @@ package org.bremersee.spring.boot.autoconfigure.security.authentication;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager;
 import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationProperties;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveRememberMeAuthentication;
-import org.bremersee.spring.security.authentication.ldaptive.TokenBasedLdaptiveRememberMeAuthentication;
+import org.bremersee.spring.security.authentication.ldaptive.LdaptiveRememberMeAuthenticationComponents;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -35,6 +34,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -95,17 +95,20 @@ public class LdaptiveRememberMeAutoConfiguration {
   }
 
   /**
-   * Creates ldaptive remember me authentication.
+   * Creates ldaptive remember me authentication components with token based remember-me services.
    *
    * @param authenticationManager the authentication manager
-   * @return the ldaptive remember me authentication
+   * @return the ldaptive remember me authentication components
    */
   @ConditionalOnMissingBean
   @ConditionalOnBean(LdaptiveAuthenticationManager.class)
   @Bean
-  public LdaptiveRememberMeAuthentication ldaptiveRememberMeAuthentication(
+  public LdaptiveRememberMeAuthenticationComponents ldaptiveRememberMeAuthenticationComponents(
       LdaptiveAuthenticationManager authenticationManager) {
-    return new TokenBasedLdaptiveRememberMeAuthentication(rememberMeKey, authenticationManager);
+    return new LdaptiveRememberMeAuthenticationComponents(
+        rememberMeKey,
+        authenticationManager,
+        TokenBasedRememberMeServices::new);
   }
 
   /**
@@ -117,7 +120,7 @@ public class LdaptiveRememberMeAutoConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public RememberMeAuthenticationProvider rememberMeAuthenticationProvider(
-      LdaptiveRememberMeAuthentication rememberMeAuthentication) {
+      LdaptiveRememberMeAuthenticationComponents rememberMeAuthentication) {
     return rememberMeAuthentication.getRememberMeAuthenticationProvider();
   }
 
@@ -130,7 +133,7 @@ public class LdaptiveRememberMeAutoConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public RememberMeServices rememberMeServices(
-      LdaptiveRememberMeAuthentication rememberMeAuthentication) {
+      LdaptiveRememberMeAuthenticationComponents rememberMeAuthentication) {
     return rememberMeAuthentication.getRememberMeServices();
   }
 
@@ -143,7 +146,7 @@ public class LdaptiveRememberMeAutoConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public RememberMeAuthenticationFilter rememberMeAuthenticationFilter(
-      LdaptiveRememberMeAuthentication rememberMeAuthentication) {
+      LdaptiveRememberMeAuthenticationComponents rememberMeAuthentication) {
     return rememberMeAuthentication.getRememberMeAuthenticationFilter();
   }
 
