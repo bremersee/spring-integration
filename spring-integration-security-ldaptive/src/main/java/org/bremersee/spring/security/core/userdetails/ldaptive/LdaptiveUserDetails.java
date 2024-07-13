@@ -78,7 +78,7 @@ public class LdaptiveUserDetails extends SerLdapEntry implements UserDetails {
     this.username = username;
     this.authorities = Optional.ofNullable(authorities).orElseGet(List::of);
     this.password = Optional.ofNullable(password)
-        .orElseGet(() -> LdaptivePasswordProvider.invalid().getPassword(ldapEntry));
+        .orElseGet(() -> LdaptiveRememberMeTokenProvider.invalid().getRememberMeToken(ldapEntry));
     this.accountNonExpired = accountNonExpired;
     this.accountNonLocked = accountNonLocked;
     this.credentialsNonExpired = credentialsNonExpired;

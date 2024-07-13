@@ -22,7 +22,6 @@ import org.bremersee.ldaptive.LdaptiveTemplate;
 import org.bremersee.spring.security.authentication.ldaptive.provider.ActiveDirectoryTemplate;
 import org.bremersee.spring.security.authentication.ldaptive.provider.OpenLdapTemplate;
 import org.bremersee.spring.security.authentication.ldaptive.provider.UserContainsGroupsTemplate;
-import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptivePasswordProvider;
 import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetails;
 import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetailsService;
 import org.junit.jupiter.api.Test;
@@ -126,21 +125,6 @@ class LdaptiveAuthenticationManagerTest {
         new OpenLdapTemplate());
     assertThat(target.getUserDetailsService())
         .isNotNull();
-  }
-
-  /**
-   * Authenticate unsupported authentication.
-   */
-  @Test
-  void authenticateUnsupportedAuthentication() {
-    ConnectionConfig connectionConfig = new ConnectionConfig("ldap://localhost:389");
-    ConnectionFactory connectionFactory = new DefaultConnectionFactory(connectionConfig);
-    LdaptiveTemplate ldaptiveTemplate = new LdaptiveTemplate(connectionFactory);
-    LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        ldaptiveTemplate,
-        new OpenLdapTemplate());
-    assertThat(target.authenticate(mock(Authentication.class)))
-        .isNull();
   }
 
   /**
@@ -280,7 +264,7 @@ class LdaptiveAuthenticationManagerTest {
     LdaptiveUserDetailsService userDetailsService = mock(LdaptiveUserDetailsService.class);
     doThrow(new UsernameNotFoundException("junit not found"))
         .when(userDetailsService)
-        .loadUserByUsername(anyString(), anyString());
+        .loadUserByUsername(anyString());
     doReturn(userDetailsService)
         .when(target)
         .getUserDetailsService(any());
@@ -350,75 +334,6 @@ class LdaptiveAuthenticationManagerTest {
   }
 
   /**
-   * Authenticate remember me.
-   *
-   * @param softly the softly
-   */
-  @Test
-  void authenticateRememberMe(SoftAssertions softly) {
-    ConnectionConfig connectionConfig = new ConnectionConfig("ldap://localhost:389");
-    ConnectionFactory connectionFactory = new DefaultConnectionFactory(connectionConfig);
-    LdaptiveTemplate ldaptiveTemplate = new LdaptiveTemplate(connectionFactory);
-    UserContainsGroupsTemplate properties = new UserContainsGroupsTemplate();
-    properties.setUserBaseDn(USER_BASE_DN);
-    LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        ldaptiveTemplate, properties);
-
-    LdapEntry user = createUser();
-    LdaptiveUserDetails details = new LdaptiveUserDetails(
-        user, "junit", List.of(new SimpleGrantedAuthority("ROLE_tester")),
-        null, true, true, true, true);
-    LdaptiveAuthenticationToken delegate = new LdaptiveAuthenticationToken(properties, details);
-    LdaptiveRememberMeAuthenticationToken token = new LdaptiveRememberMeAuthenticationToken(
-        "secret-key", delegate);
-
-    LdaptiveAuthentication actual = target.authenticate(token);
-
-    assertActual(actual, softly);
-  }
-
-  /**
-   * Authenticate remember me with clear password.
-   *
-   * @param softly the softly
-   */
-  @Test
-  void authenticateRememberMeWithClearPassword(SoftAssertions softly) {
-    ConnectionConfig connectionConfig = new ConnectionConfig("ldap://localhost:389");
-    ConnectionFactory connectionFactory = new DefaultConnectionFactory(connectionConfig);
-    LdaptiveTemplate ldaptiveTemplate = new LdaptiveTemplate(connectionFactory);
-    UserContainsGroupsTemplate properties = new UserContainsGroupsTemplate();
-    properties.setUserBaseDn(USER_BASE_DN);
-    LdaptiveAuthenticationManager target = spy(new LdaptiveAuthenticationManager(
-        ldaptiveTemplate, properties));
-
-    LdapEntry user = createUser();
-    LdaptiveUserDetails details = new LdaptiveUserDetails(
-        user, "junit", List.of(new SimpleGrantedAuthority("ROLE_tester")),
-        LdaptivePasswordProvider.PLAIN + "secret",
-        true, true, true, true);
-    LdaptiveAuthenticationToken delegate = new LdaptiveAuthenticationToken(properties, details);
-    LdaptiveRememberMeAuthenticationToken token = new LdaptiveRememberMeAuthenticationToken(
-        "secret-key", delegate);
-
-    ArgumentCaptor<UsernamePasswordAuthenticationToken> captor = ArgumentCaptor
-        .forClass(UsernamePasswordAuthenticationToken.class);
-    doReturn(token).when(target).authenticate(captor.capture());
-
-    LdaptiveAuthentication actual = target.authenticate(token);
-
-    UsernamePasswordAuthenticationToken authentication = captor.getValue();
-    softly
-        .assertThat(authentication.getName())
-        .isEqualTo("junit");
-    softly
-        .assertThat(authentication.getCredentials())
-        .isEqualTo("secret");
-
-    assertActual(actual, softly);
-  }
-
-  /**
    * Check account control.
    *
    * @param softly the softly
@@ -437,28 +352,28 @@ class LdaptiveAuthenticationManagerTest {
 
     LdaptiveUserDetails d0 = new LdaptiveUserDetails(
         user, "junit", List.of(new SimpleGrantedAuthority("ROLE_tester")),
-        LdaptivePasswordProvider.PLAIN + "secret",
+        "secret",
         false, true, true, true);
     softly.assertThatExceptionOfType(AccountExpiredException.class)
         .isThrownBy(() -> target.checkAccountControl(d0));
 
     LdaptiveUserDetails d1 = new LdaptiveUserDetails(
         user, "junit", List.of(new SimpleGrantedAuthority("ROLE_tester")),
-        LdaptivePasswordProvider.PLAIN + "secret",
+        "secret",
         true, false, true, true);
     softly.assertThatExceptionOfType(LockedException.class)
         .isThrownBy(() -> target.checkAccountControl(d1));
 
     LdaptiveUserDetails d2 = new LdaptiveUserDetails(
         user, "junit", List.of(new SimpleGrantedAuthority("ROLE_tester")),
-        LdaptivePasswordProvider.PLAIN + "secret",
+        "secret",
         true, true, false, true);
     softly.assertThatExceptionOfType(CredentialsExpiredException.class)
         .isThrownBy(() -> target.checkAccountControl(d2));
 
     LdaptiveUserDetails d3 = new LdaptiveUserDetails(
         user, "junit", List.of(new SimpleGrantedAuthority("ROLE_tester")),
-        LdaptivePasswordProvider.PLAIN + "secret",
+        "secret",
         true, true, true, false);
     softly.assertThatExceptionOfType(DisabledException.class)
         .isThrownBy(() -> target.checkAccountControl(d3));

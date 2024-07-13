@@ -86,9 +86,9 @@ public class LdaptiveUserDetailsService implements UserDetailsService {
   private AccountControlEvaluator accountControlEvaluator = new NoAccountControlEvaluator();
 
   /**
-   * The password provider.
+   * The remember-me token provider.
    */
-  private LdaptivePasswordProvider passwordProvider;
+  private LdaptiveRememberMeTokenProvider rememberMeTokenProvider;
 
   /**
    * Instantiates a ldaptive user details service.
@@ -108,7 +108,14 @@ public class LdaptiveUserDetailsService implements UserDetailsService {
     if (nonNull(authenticationProperties.getAccountControlEvaluator())) {
       setAccountControlEvaluator(authenticationProperties.getAccountControlEvaluator().get());
     }
-    setPasswordProvider(new LdaptiveEvaluatedPasswordProvider(getAccountControlEvaluator()));
+    if (isEmpty(getAuthenticationProperties().getPasswordLastSetAttribute())) {
+      setRememberMeTokenProvider(
+          new LdaptiveEvaluatedRememberMeTokenProvider(getAccountControlEvaluator()));
+    } else {
+      setRememberMeTokenProvider(
+          new LdaptivePwdLastSetRememberMeTokenProvider(getAccountControlEvaluator(),
+              getAuthenticationProperties().getPasswordLastSetAttribute()));
+    }
   }
 
   /**
@@ -136,43 +143,22 @@ public class LdaptiveUserDetailsService implements UserDetailsService {
   }
 
   /**
-   * Sets password provider.
+   * Sets remember-me token provider.
    *
-   * @param passwordProvider the password provider
+   * @param rememberMeTokenProvider the remember-me token provider
    */
-  public void setPasswordProvider(LdaptivePasswordProvider passwordProvider) {
-    if (nonNull(passwordProvider)) {
-      this.passwordProvider = passwordProvider;
+  public void setRememberMeTokenProvider(LdaptiveRememberMeTokenProvider rememberMeTokenProvider) {
+    if (nonNull(rememberMeTokenProvider)) {
+      this.rememberMeTokenProvider = rememberMeTokenProvider;
     }
   }
 
   @Override
   public LdaptiveUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    return loadUserByUsername(username, null);
-  }
-
-  /**
-   * Load user by username ldaptive user details.
-   *
-   * @param username the username
-   * @param password the password
-   * @return the ldaptive user details
-   * @throws UsernameNotFoundException the username not found exception
-   */
-  public LdaptiveUserDetails loadUserByUsername(String username, String password)
-      throws UsernameNotFoundException {
-
-    if (nonNull(password)) {
-      logger.debug("Loading user '" + username + "' with password ...");
-    } else {
-      logger.debug("Loading user '" + username + "' ...");
-    }
+    logger.debug("Loading user '" + username + "' ...");
     LdapEntry ldapEntry = findUser(username)
         .orElseThrow(() -> new UsernameNotFoundException(String.format("%s not found.", username)));
     Collection<? extends GrantedAuthority> authorities = getAuthorities(ldapEntry);
-    String pwd = Optional.ofNullable(password)
-        .map(p -> getPasswordProvider().getPassword(ldapEntry, p))
-        .orElseGet(() -> getPasswordProvider().getPassword(ldapEntry));
     return new LdaptiveUserDetails(
         ldapEntry,
         Optional.ofNullable(getAuthenticationProperties().getUsernameAttribute())
@@ -180,7 +166,7 @@ public class LdaptiveUserDetailsService implements UserDetailsService {
             .map(LdapAttribute::getStringValue)
             .orElse(username),
         authorities,
-        pwd,
+        getRememberMeTokenProvider().getRememberMeToken(ldapEntry),
         getAccountControlEvaluator().isAccountNonExpired(ldapEntry),
         getAccountControlEvaluator().isAccountNonLocked(ldapEntry),
         getAccountControlEvaluator().isCredentialsNonExpired(ldapEntry),

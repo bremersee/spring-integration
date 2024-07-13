@@ -16,7 +16,6 @@
 
 package org.bremersee.spring.security.authentication.ldaptive;
 
-import static java.util.Objects.nonNull;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
 import java.util.Collection;
@@ -26,6 +25,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bremersee.ldaptive.LdaptiveException;
 import org.bremersee.ldaptive.LdaptiveTemplate;
 import org.bremersee.spring.security.authentication.EmailToUsernameResolver;
 import org.ldaptive.FilterTemplate;
@@ -56,8 +56,6 @@ public class EmailToUsernameResolverByLdapAttribute implements EmailToUsernameRe
   @Getter(AccessLevel.PROTECTED)
   private final LdaptiveTemplate ldaptiveTemplate;
 
-  private volatile Boolean canConnect;
-
   /**
    * Instantiates a new Email to username resolver by ldap attribute.
    *
@@ -75,32 +73,8 @@ public class EmailToUsernameResolverByLdapAttribute implements EmailToUsernameRe
   public Optional<String> getUsernameByEmail(String email) {
     return Optional.ofNullable(email)
         .filter(mail -> isValidEmail(mail)
-            && areRequiredPropertiesPresent()
-            && canConnect())
+            && areRequiredPropertiesPresent())
         .flatMap(this::findUsernameByEmail);
-  }
-
-  /**
-   * Determines whether a connection can be done.
-   *
-   * @return the boolean
-   */
-  protected boolean canConnect() {
-    if (nonNull(canConnect)) {
-      return canConnect;
-    }
-    try {
-      SearchRequest searchRequest = SearchRequest
-          .objectScopeSearchRequest(properties.getUserBaseDn());
-      canConnect = getLdaptiveTemplate()
-          .findOne(searchRequest)
-          .isPresent();
-
-    } catch (RuntimeException e) {
-      logger.warn("Email to username resolver is disabled, because ldap connection failed.", e);
-      canConnect = false;
-    }
-    return canConnect;
   }
 
   /**
@@ -117,21 +91,27 @@ public class EmailToUsernameResolverByLdapAttribute implements EmailToUsernameRe
   }
 
   private Optional<String> findUsernameByEmail(String email) {
-    String filter = String.format("(&(objectClass=%s)(%s={0}))",
-        getProperties().getUserObjectClass(), getProperties().getEmailAttribute());
-    SearchRequest searchRequest = SearchRequest.builder()
-        .dn(getProperties().getUserBaseDn())
-        .filter(FilterTemplate.builder()
-            .filter(filter)
-            .parameters(email)
-            .build())
-        .scope(getProperties().getUserFindOneSearchScope())
-        .build();
-    return Stream.ofNullable(getLdaptiveTemplate().findAll(searchRequest))
-        .filter(collection -> collection.size() == 1)
-        .flatMap(Collection::stream)
-        .findFirst()
-        .map(ldapEntry -> ldapEntry.getAttribute(getProperties().getUsernameAttribute()))
-        .map(LdapAttribute::getStringValue);
+    try {
+      String filter = String.format("(&(objectClass=%s)(%s={0}))",
+          getProperties().getUserObjectClass(), getProperties().getEmailAttribute());
+      SearchRequest searchRequest = SearchRequest.builder()
+          .dn(getProperties().getUserBaseDn())
+          .filter(FilterTemplate.builder()
+              .filter(filter)
+              .parameters(email)
+              .build())
+          .scope(getProperties().getUserFindOneSearchScope())
+          .build();
+      return Stream.ofNullable(getLdaptiveTemplate().findAll(searchRequest))
+          .filter(collection -> collection.size() == 1)
+          .flatMap(Collection::stream)
+          .findFirst()
+          .map(ldapEntry -> ldapEntry.getAttribute(getProperties().getUsernameAttribute()))
+          .map(LdapAttribute::getStringValue);
+
+    } catch (LdaptiveException e) {
+      logger.warn("Resolve username by email '" + email + "' failed.", e);
+      return Optional.empty();
+    }
   }
 }

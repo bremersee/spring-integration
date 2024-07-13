@@ -1,50 +1,40 @@
 package org.bremersee.spring.security.core.userdetails.ldaptive;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import org.assertj.core.api.SoftAssertions;
-import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.bremersee.spring.security.authentication.ldaptive.provider.NoAccountControlEvaluator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.ldaptive.LdapEntry;
 
 /**
- * The type Ldaptive evaluated password provider test.
+ * The ldaptive evaluated remember-me token provider test.
  */
-@ExtendWith(SoftAssertionsExtension.class)
 class LdaptiveEvaluatedPasswordProviderTest {
 
-  private LdaptiveEvaluatedPasswordProvider target;
+  private LdaptiveEvaluatedRememberMeTokenProvider target;
 
   /**
    * Init.
    */
   @BeforeEach
   void init() {
-    target = new LdaptiveEvaluatedPasswordProvider();
+    target = new LdaptiveEvaluatedRememberMeTokenProvider();
     target.setAccountControlEvaluator(new NoAccountControlEvaluator());
   }
 
   /**
-   * Gets password.
-   *
-   * @param softly the softly
+   * Gets remember-me token.
    */
   @Test
-  void getPassword(SoftAssertions softly) {
+  void getRememberMeToken() {
     String dn = "cn=test,ou=users,dc=bremersee,dc=org";
     LdapEntry ldapEntry = mock(LdapEntry.class);
     doReturn(dn).when(ldapEntry).getDn();
-    String password = "foobar";
     String evaluation = "true:true:true:true-";
-    softly
-        .assertThat(target.getPassword(ldapEntry, password))
-        .isEqualTo(LdaptivePasswordProvider.INVALID + evaluation + dn);
-    softly
-        .assertThat(target.getPassword(ldapEntry))
-        .isEqualTo(LdaptivePasswordProvider.INVALID + evaluation + dn);
+    assertThat(target.getRememberMeToken(ldapEntry))
+        .isEqualTo(evaluation + dn);
   }
 }

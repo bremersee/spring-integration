@@ -6,7 +6,6 @@ import static org.mockito.Mockito.mock;
 
 import org.bremersee.spring.boot.autoconfigure.security.authentication.AuthenticationProperties.LdaptiveProperties.Template;
 import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveRememberMeAuthenticationComponents;
 import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,8 +20,6 @@ class LdaptiveRememberMeAutoConfigurationTest {
 
   private final AuthenticationProperties properties = new AuthenticationProperties();
 
-  private LdaptiveAuthenticationManager authenticationManager;
-
   private LdaptiveRememberMeAutoConfiguration target;
 
   /**
@@ -30,29 +27,16 @@ class LdaptiveRememberMeAutoConfigurationTest {
    */
   @BeforeEach
   void init() {
-    properties.setRememberMeKey("secret");
-    properties.getLdaptive().setTemplate(Template.ACTIVE_DIRECTORY);
+    properties.getRememberMe().setKey("secret");
     properties.getLdaptive().setUserBaseDn("ou=users,dc=system");
 
-    authenticationManager = mock(LdaptiveAuthenticationManager.class);
-
+    properties.getLdaptive().setTemplate(Template.OPEN_LDAP);
     target = new LdaptiveRememberMeAutoConfiguration(properties);
     target.init();
-  }
 
-  /**
-   * Ldaptive remember me authentication components.
-   */
-  @Test
-  void ldaptiveRememberMeAuthenticationComponents() {
-    LdaptiveUserDetailsService userDetailsService = mock(LdaptiveUserDetailsService.class);
-    doReturn(userDetailsService)
-        .when(authenticationManager)
-        .getUserDetailsService();
-
-    LdaptiveRememberMeAuthenticationComponents actual = target
-        .ldaptiveRememberMeAuthenticationComponents(authenticationManager);
-    assertThat(actual).isNotNull();
+    properties.getLdaptive().setTemplate(Template.ACTIVE_DIRECTORY);
+    target = new LdaptiveRememberMeAutoConfiguration(properties);
+    target.init();
   }
 
   /**
@@ -60,12 +44,8 @@ class LdaptiveRememberMeAutoConfigurationTest {
    */
   @Test
   void rememberMeAuthenticationProvider() {
-    LdaptiveRememberMeAuthenticationComponents components = mock(
-        LdaptiveRememberMeAuthenticationComponents.class);
-    RememberMeAuthenticationProvider expected = mock(RememberMeAuthenticationProvider.class);
-    doReturn(expected).when(components).getRememberMeAuthenticationProvider();
-    RememberMeAuthenticationProvider actual = target.rememberMeAuthenticationProvider(components);
-    assertThat(actual).isEqualTo(expected);
+    RememberMeAuthenticationProvider actual = target.rememberMeAuthenticationProvider();
+    assertThat(actual).isNotNull();
   }
 
   /**
@@ -73,12 +53,11 @@ class LdaptiveRememberMeAutoConfigurationTest {
    */
   @Test
   void rememberMeServices() {
-    LdaptiveRememberMeAuthenticationComponents components = mock(
-        LdaptiveRememberMeAuthenticationComponents.class);
-    RememberMeServices expected = mock(RememberMeServices.class);
-    doReturn(expected).when(components).getRememberMeServices();
-    RememberMeServices actual = target.rememberMeServices(components);
-    assertThat(actual).isEqualTo(expected);
+    LdaptiveAuthenticationManager authenticationManager = mock(LdaptiveAuthenticationManager.class);
+    LdaptiveUserDetailsService userDetailsService = mock(LdaptiveUserDetailsService.class);
+    doReturn(userDetailsService).when(authenticationManager).getUserDetailsService();
+    RememberMeServices services = target.rememberMeServices(authenticationManager);
+    assertThat(services).isNotNull();
   }
 
   /**
@@ -86,11 +65,11 @@ class LdaptiveRememberMeAutoConfigurationTest {
    */
   @Test
   void rememberMeAuthenticationFilter() {
-    LdaptiveRememberMeAuthenticationComponents components = mock(
-        LdaptiveRememberMeAuthenticationComponents.class);
-    RememberMeAuthenticationFilter expected = mock(RememberMeAuthenticationFilter.class);
-    doReturn(expected).when(components).getRememberMeAuthenticationFilter();
-    RememberMeAuthenticationFilter actual = target.rememberMeAuthenticationFilter(components);
-    assertThat(actual).isEqualTo(expected);
+    LdaptiveAuthenticationManager authenticationManager = mock(LdaptiveAuthenticationManager.class);
+    LdaptiveUserDetailsService userDetailsService = mock(LdaptiveUserDetailsService.class);
+    doReturn(userDetailsService).when(authenticationManager).getUserDetailsService();
+    RememberMeAuthenticationFilter actual = target.rememberMeAuthenticationFilter(
+        authenticationManager, target.rememberMeServices(authenticationManager));
+    assertThat(actual).isNotNull();
   }
 }

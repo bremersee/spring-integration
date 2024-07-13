@@ -24,7 +24,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
- * The type Ldaptive user details service test.
+ * The ldaptive user details service test.
  */
 @ExtendWith(SoftAssertionsExtension.class)
 class LdaptiveUserDetailsServiceTest {
@@ -44,7 +44,7 @@ class LdaptiveUserDetailsServiceTest {
     ldaptiveTemplate = mock(LdaptiveTemplate.class);
     LdaptiveUserDetailsService target = new LdaptiveUserDetailsService(
         properties, ldaptiveTemplate);
-    target.setPasswordProvider(null); // has no effect
+    target.setRememberMeTokenProvider(null); // has no effect
     target.setAccountControlEvaluator(null); // has no effect
     target.setGrantedAuthoritiesMapper(null); // has no effect
     return target;
@@ -109,7 +109,7 @@ class LdaptiveUserDetailsServiceTest {
     LdapEntry group = createGroup();
     doReturn(List.of(group)).when(ldaptiveTemplate).findAll(any());
 
-    LdaptiveUserDetails actual = target.loadUserByUsername("junit", "secret");
+    LdaptiveUserDetails actual = target.loadUserByUsername("junit");
 
     assertThat(actual).isNotNull();
     assertActual(actual, softly);

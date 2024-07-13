@@ -25,11 +25,12 @@ import org.ldaptive.LdapEntry;
 import org.springframework.util.ObjectUtils;
 
 /**
- * The ldaptive pwdLastSet password provider.
+ * The ldaptive pwdLastSet remember-me token provider.
  *
  * @author Christian Bremer
  */
-public class LdaptivePwdLastSetPasswordProvider extends LdaptiveEvaluatedPasswordProvider {
+public class LdaptivePwdLastSetRememberMeTokenProvider extends
+    LdaptiveEvaluatedRememberMeTokenProvider {
 
   /**
    * The pwdLastSet attribute name.
@@ -38,29 +39,29 @@ public class LdaptivePwdLastSetPasswordProvider extends LdaptiveEvaluatedPasswor
   private String pwdLastSetAttributeName = "pwdLastSet";
 
   /**
-   * Instantiates a ldaptive pwd last set password provider.
+   * Instantiates a ldaptive pwd last set remember-me token provider.
    */
-  public LdaptivePwdLastSetPasswordProvider() {
+  public LdaptivePwdLastSetRememberMeTokenProvider() {
     this(null);
   }
 
   /**
-   * Instantiates a ldaptive pwd last set password provider.
+   * Instantiates a ldaptive pwd last set remember-me token provider.
    *
    * @param accountControlEvaluator the account control evaluator
    */
-  public LdaptivePwdLastSetPasswordProvider(
+  public LdaptivePwdLastSetRememberMeTokenProvider(
       AccountControlEvaluator accountControlEvaluator) {
-    this(null, null);
+    this(accountControlEvaluator, null);
   }
 
   /**
-   * Instantiates a ldaptive pwd last set password provider.
+   * Instantiates a ldaptive pwd last set remember-me token provider.
    *
    * @param accountControlEvaluator the account control evaluator
    * @param pwdLastSetAttributeName the pwd last set attribute name
    */
-  public LdaptivePwdLastSetPasswordProvider(
+  public LdaptivePwdLastSetRememberMeTokenProvider(
       AccountControlEvaluator accountControlEvaluator,
       String pwdLastSetAttributeName) {
     super(accountControlEvaluator);
@@ -79,12 +80,12 @@ public class LdaptivePwdLastSetPasswordProvider extends LdaptiveEvaluatedPasswor
   }
 
   @Override
-  public String getPassword(LdapEntry ldapEntry) {
+  public String getRememberMeToken(LdapEntry ldapEntry) {
     return Optional
         .ofNullable(ldapEntry.getAttribute(getPwdLastSetAttributeName()))
         .map(LdapAttribute::getStringValue)
-        .map(value -> INVALID + getAccessControlValue(ldapEntry) + value)
-        .orElseGet(() -> LdaptivePasswordProvider.invalid().getPassword(ldapEntry));
+        .map(value -> getAccessControlValue(ldapEntry) + value)
+        .orElseGet(() -> LdaptiveRememberMeTokenProvider.invalid().getRememberMeToken(ldapEntry));
   }
 
 }

@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -105,7 +104,6 @@ public class JsonPathJwtConverter implements Converter<Jwt, AbstractAuthenticati
    * @param rolesValueSeparator the roles value separator
    * @param authoritiesMapper the authorities mapper
    */
-  @Builder(toBuilder = true)
   public JsonPathJwtConverter(
       String nameJsonPath,
       String firstNameJsonPath,

@@ -7,8 +7,6 @@ import static org.mockito.Mockito.doThrow;
 
 import java.util.List;
 import java.util.Optional;
-import org.assertj.core.api.SoftAssertions;
-import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.bremersee.ldaptive.LdaptiveException;
 import org.bremersee.ldaptive.LdaptiveTemplate;
 import org.junit.jupiter.api.Test;
@@ -23,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 /**
  * The type Email to username resolver by ldap attribute test.
  */
-@ExtendWith({MockitoExtension.class, SoftAssertionsExtension.class})
+@ExtendWith({MockitoExtension.class})
 class EmailToUsernameResolverByLdapAttributeTest {
 
   /**
@@ -46,30 +44,22 @@ class EmailToUsernameResolverByLdapAttributeTest {
 
   /**
    * Gets username by email.
-   *
-   * @param softly the softly
    */
   @Test
-  void getUsernameByEmail(SoftAssertions softly) {
+  void getUsernameByEmail() {
     doReturn("ou=people,dc=bremersee,dc=org").when(properties).getUserBaseDn();
     doReturn(SearchScope.ONELEVEL).when(properties).getUserFindOneSearchScope();
     doReturn("person").when(properties).getUserObjectClass();
     doReturn("mail").when(properties).getEmailAttribute();
     doReturn("uid").when(properties).getUsernameAttribute();
 
-    doReturn(Optional.of(new LdapEntry())).when(ldaptiveTemplate).findOne(any());
-
     LdapEntry user = createUser();
     doReturn(List.of(user)).when(ldaptiveTemplate).findAll(any());
 
     Optional<String> actual = target.getUsernameByEmail("junit@example.com");
 
-    softly
-        .assertThat(actual)
+    assertThat(actual)
         .hasValue("junit");
-    softly
-        .assertThat(target.canConnect())
-        .isTrue();
   }
 
   /**
@@ -83,7 +73,9 @@ class EmailToUsernameResolverByLdapAttributeTest {
     doReturn("mail").when(properties).getEmailAttribute();
     doReturn("uid").when(properties).getUsernameAttribute();
 
-    doThrow(LdaptiveException.badRequest()).when(ldaptiveTemplate).findOne(any());
+    doThrow(LdaptiveException.builder().reason("test").build())
+        .when(ldaptiveTemplate)
+        .findAll(any());
 
     Optional<String> actual = target.getUsernameByEmail("junit@example.com");
 

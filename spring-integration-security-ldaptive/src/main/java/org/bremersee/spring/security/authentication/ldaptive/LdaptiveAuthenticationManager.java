@@ -30,7 +30,7 @@ import org.bremersee.ldaptive.LdaptiveException;
 import org.bremersee.ldaptive.LdaptiveTemplate;
 import org.bremersee.spring.security.authentication.EmailToUsernameResolver;
 import org.bremersee.spring.security.authentication.ldaptive.provider.NoAccountControlEvaluator;
-import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptivePasswordProvider;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveRememberMeTokenProvider;
 import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetails;
 import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetailsService;
 import org.ldaptive.BindConnectionInitializer;
@@ -114,11 +114,11 @@ public class LdaptiveAuthenticationManager
   private GrantedAuthoritiesMapper grantedAuthoritiesMapper;
 
   /**
-   * The password provider.
+   * The remember-me token provider.
    */
   @Getter(AccessLevel.PROTECTED)
   @Setter
-  private LdaptivePasswordProvider passwordProvider;
+  private LdaptiveRememberMeTokenProvider passwordProvider;
 
   /**
    * The token converter.
@@ -251,58 +251,13 @@ public class LdaptiveAuthenticationManager
   @Override
   public LdaptiveAuthentication authenticate(Authentication authentication)
       throws AuthenticationException {
-
-    if (isRememberMeAuthenticationToken(authentication)) {
-      RememberMeAuthenticationToken auth = (RememberMeAuthenticationToken) authentication;
-      LdaptiveUserDetails userDetails = (LdaptiveUserDetails) auth.getPrincipal();
-      logger.debug("Authenticating remember me user '" + userDetails.getUsername() + "' ...");
-      return authenticate(userDetails);
-
-    } else if (authentication instanceof UsernamePasswordAuthenticationToken) {
-      logger.debug("Authenticating user '" + authentication.getName() + "' ...");
-      String username = getEmailToUsernameResolver()
-          .getUsernameByEmail(authentication.getName())
-          .orElseGet(authentication::getName);
-      String password = String.valueOf(authentication.getCredentials());
-      LdaptiveTemplate ldaptiveTemplate = getLdapTemplate(username, password);
-      return authenticate(username, password, ldaptiveTemplate);
-
-    } else {
-      return null;
-    }
-  }
-
-  /**
-   * Authenticates the ldaptive user details from the remember-me authentication.
-   *
-   * @param userDetails the user details
-   * @return the ldaptive authentication
-   */
-  protected LdaptiveAuthentication authenticate(LdaptiveUserDetails userDetails) {
-    return Optional.ofNullable(userDetails.getPassword())
-        .filter(password -> password.startsWith(LdaptivePasswordProvider.PLAIN))
-        .map(password -> password.substring(LdaptivePasswordProvider.PLAIN.length()))
-        .map(password -> new UsernamePasswordAuthenticationToken(
-            userDetails.getUsername(), password))
-        .map(this::authenticate)
-        .orElseGet(
-            () -> new LdaptiveAuthenticationToken(getAuthenticationProperties(), userDetails));
-  }
-
-  /**
-   * Authenticates user from the username-password authentication.
-   *
-   * @param username the username
-   * @param password the password
-   * @param ldaptiveTemplate the ldaptive template
-   * @return the ldaptive authentication
-   */
-  protected LdaptiveAuthentication authenticate(
-      String username,
-      String password,
-      LdaptiveTemplate ldaptiveTemplate) {
-
-    LdaptiveUserDetails userDetails = getUserDetails(ldaptiveTemplate, username, password);
+    logger.debug("Authenticating user '" + authentication.getName() + "' ...");
+    String username = getEmailToUsernameResolver()
+        .getUsernameByEmail(authentication.getName())
+        .orElseGet(authentication::getName);
+    String password = String.valueOf(authentication.getCredentials());
+    LdaptiveTemplate ldaptiveTemplate = getLdapTemplate(username, password);
+    LdaptiveUserDetails userDetails = getUserDetails(ldaptiveTemplate, username);
     checkPassword(ldaptiveTemplate, userDetails, password);
     checkAccountControl(userDetails);
     if (nonNull(getTokenConverter())) {
@@ -348,14 +303,11 @@ public class LdaptiveAuthenticationManager
    *
    * @param ldaptiveTemplate the ldaptive template
    * @param username the username
-   * @param password the password
    * @return the user details
    */
-  protected LdaptiveUserDetails getUserDetails(
-      LdaptiveTemplate ldaptiveTemplate, String username, String password) {
+  protected LdaptiveUserDetails getUserDetails(LdaptiveTemplate ldaptiveTemplate, String username) {
     try {
-      return getUserDetailsService(ldaptiveTemplate)
-          .loadUserByUsername(username, password);
+      return getUserDetailsService(ldaptiveTemplate).loadUserByUsername(username);
     } catch (LdaptiveException le) {
       throw getBindException(le);
     }
@@ -381,7 +333,7 @@ public class LdaptiveAuthenticationManager
         getAuthenticationProperties(), ldaptiveTemplate);
     userDetailsService.setAccountControlEvaluator(getAccountControlEvaluator());
     userDetailsService.setGrantedAuthoritiesMapper(getGrantedAuthoritiesMapper());
-    userDetailsService.setPasswordProvider(getPasswordProvider());
+    userDetailsService.setRememberMeTokenProvider(getPasswordProvider());
     return userDetailsService;
   }
 

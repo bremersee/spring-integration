@@ -9,7 +9,7 @@ import org.bremersee.spring.security.authentication.EmailToUsernameResolver;
 import org.bremersee.spring.security.authentication.ldaptive.AccountControlEvaluator;
 import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthentication;
 import org.bremersee.spring.security.authentication.ldaptive.UsernameToBindDnConverter;
-import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptivePasswordProvider;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveRememberMeTokenProvider;
 import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,7 +71,7 @@ class LdaptiveAuthenticationAutoConfigurationTest {
             mock(),
             mock(),
             target.ldaptivePasswordEncoderProvider(),
-            LdaptivePasswordProvider.invalid(),
+            LdaptiveRememberMeTokenProvider.invalid(),
             emailToUsernameResolver,
             usernameToBindDnConverter,
             accountControlEvaluator,
@@ -97,7 +97,7 @@ class LdaptiveAuthenticationAutoConfigurationTest {
             mock(),
             mock(),
             target.ldaptivePasswordEncoderProvider(),
-            LdaptivePasswordProvider.invalid(),
+            LdaptiveRememberMeTokenProvider.invalid(),
             emailToUsernameResolver,
             usernameToBindDnConverter,
             accountControlEvaluator,
@@ -106,16 +106,21 @@ class LdaptiveAuthenticationAutoConfigurationTest {
         .isNotNull();
   }
 
+  /**
+   * Ldaptive remember me token provider.
+   *
+   * @param softly the softly
+   */
   @Test
-  void ldaptivePasswordProvider(SoftAssertions softly) {
+  void ldaptiveRememberMeTokenProvider(SoftAssertions softly) {
     ObjectProvider<AccountControlEvaluator> evaluator = mock();
     softly
-        .assertThat(target.ldaptivePasswordProvider(evaluator))
+        .assertThat(target.ldaptiveRememberMeTokenProvider(evaluator))
         .isNotNull();
 
     properties.getLdaptive().setPasswordLastSetAttribute("pwdLastSet");
     softly
-        .assertThat(target.ldaptivePasswordProvider(evaluator))
+        .assertThat(target.ldaptiveRememberMeTokenProvider(evaluator))
         .isNotNull();
   }
 }

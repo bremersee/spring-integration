@@ -24,11 +24,11 @@ import org.bremersee.spring.security.authentication.ldaptive.provider.NoAccountC
 import org.ldaptive.LdapEntry;
 
 /**
- * The ldaptive evaluated password provider.
+ * The ldaptive evaluated remember-me token provider.
  *
  * @author Christian Bremer
  */
-public class LdaptiveEvaluatedPasswordProvider implements LdaptivePasswordProvider {
+public class LdaptiveEvaluatedRememberMeTokenProvider implements LdaptiveRememberMeTokenProvider {
 
   /**
    * The account control evaluator.
@@ -37,18 +37,18 @@ public class LdaptiveEvaluatedPasswordProvider implements LdaptivePasswordProvid
   private AccountControlEvaluator accountControlEvaluator = new NoAccountControlEvaluator();
 
   /**
-   * Instantiates a new ldaptive evaluated password provider.
+   * Instantiates a new ldaptive evaluated remember-me token provider.
    */
-  public LdaptiveEvaluatedPasswordProvider() {
+  public LdaptiveEvaluatedRememberMeTokenProvider() {
     this(null);
   }
 
   /**
-   * Instantiates a new Ldaptive pwd last set password provider.
+   * Instantiates a new ldaptive evaluated remember-me token provider.
    *
    * @param accountControlEvaluator the account control evaluator
    */
-  public LdaptiveEvaluatedPasswordProvider(
+  public LdaptiveEvaluatedRememberMeTokenProvider(
       AccountControlEvaluator accountControlEvaluator) {
     setAccountControlEvaluator(accountControlEvaluator);
   }
@@ -65,15 +65,16 @@ public class LdaptiveEvaluatedPasswordProvider implements LdaptivePasswordProvid
   }
 
   @Override
-  public final String getPassword(LdapEntry ldapEntry, String clearPassword) {
-    return getPassword(ldapEntry);
+  public String getRememberMeToken(LdapEntry ldapEntry) {
+    return getAccessControlValue(ldapEntry) + ldapEntry.getDn();
   }
 
-  @Override
-  public String getPassword(LdapEntry ldapEntry) {
-    return INVALID + getAccessControlValue(ldapEntry) + ldapEntry.getDn();
-  }
-
+  /**
+   * Gets access control value.
+   *
+   * @param ldapEntry the ldap entry
+   * @return the access control value
+   */
   protected String getAccessControlValue(LdapEntry ldapEntry) {
     return String.format("%s:%s:%s:%s-",
         accountControlEvaluator.isAccountNonExpired(ldapEntry),

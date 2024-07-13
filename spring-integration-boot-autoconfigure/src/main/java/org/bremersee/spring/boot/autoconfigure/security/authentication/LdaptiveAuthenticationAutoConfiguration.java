@@ -30,9 +30,9 @@ import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticat
 import org.bremersee.spring.security.authentication.ldaptive.ReactiveLdaptiveAuthenticationManager;
 import org.bremersee.spring.security.authentication.ldaptive.UsernameToBindDnConverter;
 import org.bremersee.spring.security.core.authority.mapping.NormalizedGrantedAuthoritiesMapper;
-import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveEvaluatedPasswordProvider;
-import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptivePasswordProvider;
-import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptivePwdLastSetPasswordProvider;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveEvaluatedRememberMeTokenProvider;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptivePwdLastSetRememberMeTokenProvider;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveRememberMeTokenProvider;
 import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetails;
 import org.ldaptive.ConnectionConfig;
 import org.ldaptive.ConnectionFactory;
@@ -113,23 +113,23 @@ public class LdaptiveAuthenticationAutoConfiguration {
   }
 
   /**
-   * The ldaptive password provider.
+   * The ldaptive remember-me token provider.
    *
    * @param accountControlEvaluator the account control evaluator
-   * @return the ldaptive password provider
+   * @return the ldaptive remember-me token provider
    */
   @ConditionalOnMissingBean
   @Bean
-  public LdaptivePasswordProvider ldaptivePasswordProvider(
+  public LdaptiveRememberMeTokenProvider ldaptiveRememberMeTokenProvider(
       ObjectProvider<AccountControlEvaluator> accountControlEvaluator) {
 
     AccountControlEvaluator evaluator = accountControlEvaluator
         .getIfAvailable(() -> properties.getAccountControlEvaluator().get());
     if (!isEmpty(properties.getPasswordLastSetAttribute())) {
-      return new LdaptivePwdLastSetPasswordProvider(
+      return new LdaptivePwdLastSetRememberMeTokenProvider(
           evaluator, properties.getPasswordLastSetAttribute());
     }
-    return new LdaptiveEvaluatedPasswordProvider(evaluator);
+    return new LdaptiveEvaluatedRememberMeTokenProvider(evaluator);
   }
 
   /**
@@ -139,7 +139,7 @@ public class LdaptiveAuthenticationAutoConfiguration {
    * @param connectionFactoryProvider the connection factory provider
    * @param ldaptiveTemplateProvider the ldaptive template provider
    * @param ldaptivePasswordEncoderProvider the ldaptive password encoder provider
-   * @param ldaptivePasswordProvider the ldaptive password provider
+   * @param ldaptiveRememberMeTokenProvider the ldaptive remember-me token provider
    * @param emailToUsernameResolver the email to username resolver
    * @param usernameToBindDnConverter the username to bind dn provider
    * @param accountControlEvaluator the account control evaluator
@@ -154,7 +154,7 @@ public class LdaptiveAuthenticationAutoConfiguration {
       ObjectProvider<ConnectionFactory> connectionFactoryProvider,
       ObjectProvider<LdaptiveTemplate> ldaptiveTemplateProvider,
       LdaptivePasswordEncoderProvider ldaptivePasswordEncoderProvider,
-      LdaptivePasswordProvider ldaptivePasswordProvider,
+      LdaptiveRememberMeTokenProvider ldaptiveRememberMeTokenProvider,
       ObjectProvider<EmailToUsernameResolver> emailToUsernameResolver,
       ObjectProvider<UsernameToBindDnConverter> usernameToBindDnConverter,
       ObjectProvider<AccountControlEvaluator> accountControlEvaluator,
@@ -165,7 +165,7 @@ public class LdaptiveAuthenticationAutoConfiguration {
         getLdaptiveTemplate(connectionConfig, connectionFactoryProvider, ldaptiveTemplateProvider),
         properties);
     manager.setPasswordEncoder(ldaptivePasswordEncoderProvider.get());
-    manager.setPasswordProvider(ldaptivePasswordProvider);
+    manager.setPasswordProvider(ldaptiveRememberMeTokenProvider);
     emailToUsernameResolver.ifAvailable(manager::setEmailToUsernameResolver);
     usernameToBindDnConverter.ifAvailable(manager::setUsernameToBindDnConverter);
     accountControlEvaluator.ifAvailable(manager::setAccountControlEvaluator);
@@ -181,7 +181,7 @@ public class LdaptiveAuthenticationAutoConfiguration {
    * @param connectionFactoryProvider the connection factory provider
    * @param ldaptiveTemplateProvider the ldaptive template provider
    * @param ldaptivePasswordEncoderProvider the ldaptive password encoder provider
-   * @param ldaptivePasswordProvider the ldaptive password provider
+   * @param ldaptiveRememberMeTokenProvider the ldaptive remember-me token provider
    * @param emailToUsernameResolver the email to username resolver
    * @param usernameToBindDnConverter the username to bind dn converter
    * @param accountControlEvaluator the account control evaluator
@@ -196,7 +196,7 @@ public class LdaptiveAuthenticationAutoConfiguration {
       ObjectProvider<ConnectionFactory> connectionFactoryProvider,
       ObjectProvider<LdaptiveTemplate> ldaptiveTemplateProvider,
       LdaptivePasswordEncoderProvider ldaptivePasswordEncoderProvider,
-      LdaptivePasswordProvider ldaptivePasswordProvider,
+      LdaptiveRememberMeTokenProvider ldaptiveRememberMeTokenProvider,
       ObjectProvider<EmailToUsernameResolver> emailToUsernameResolver,
       ObjectProvider<UsernameToBindDnConverter> usernameToBindDnConverter,
       ObjectProvider<AccountControlEvaluator> accountControlEvaluator,
@@ -208,7 +208,7 @@ public class LdaptiveAuthenticationAutoConfiguration {
             connectionFactoryProvider,
             ldaptiveTemplateProvider,
             ldaptivePasswordEncoderProvider,
-            ldaptivePasswordProvider,
+            ldaptiveRememberMeTokenProvider,
             emailToUsernameResolver,
             usernameToBindDnConverter,
             accountControlEvaluator,

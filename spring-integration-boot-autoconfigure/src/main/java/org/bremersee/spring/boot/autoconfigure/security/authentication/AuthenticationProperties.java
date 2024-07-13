@@ -36,9 +36,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class AuthenticationProperties {
 
   /**
-   * The remember-me key.
+   * The remember-me properties.
    */
-  private String rememberMeKey;
+  private RememberMeProperties rememberMe = new RememberMeProperties();
 
   /**
    * The jwt converter properties.
@@ -49,6 +49,50 @@ public class AuthenticationProperties {
    * The ldaptive properties.
    */
   private LdaptiveProperties ldaptive = new LdaptiveProperties();
+
+  /**
+   * The remember-me properties.
+   *
+   * @author Christian Bremer
+   */
+  @Data
+  public static class RememberMeProperties {
+
+    /**
+     * The key.
+     */
+    private String key;
+
+    /**
+     * Specifies whether remember-me is always activated.
+     */
+    private Boolean alwaysRemember;
+
+    /**
+     * The cookie name.
+     */
+    private String cookieName;
+
+    /**
+     * The cookie domain.
+     */
+    private String cookieDomain;
+
+    /**
+     * Specifies whether to use secure cookie.
+     */
+    private Boolean useSecureCookie;
+
+    /**
+     * The parameter name (default remember-me).
+     */
+    private String parameterName;
+
+    /**
+     * The token validity in seconds (default two weeks).
+     */
+    private Integer tokenValiditySeconds;
+  }
 
   /**
    * The jwt converter properties.

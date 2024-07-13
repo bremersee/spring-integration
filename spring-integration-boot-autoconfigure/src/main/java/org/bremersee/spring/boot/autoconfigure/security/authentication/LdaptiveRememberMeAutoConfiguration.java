@@ -16,10 +16,12 @@
 
 package org.bremersee.spring.boot.autoconfigure.security.authentication;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.spring.boot.autoconfigure.security.authentication.AuthenticationProperties.RememberMeProperties;
 import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager;
 import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationProperties;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveRememberMeAuthenticationComponents;
+import org.bremersee.spring.security.authentication.ldaptive.LdaptiveTokenBasedRememberMeServices;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -34,7 +36,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
-import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -45,7 +46,7 @@ import org.springframework.util.ObjectUtils;
  */
 @AutoConfiguration
 @ConditionalOnWebApplication(type = Type.SERVLET)
-@ConditionalOnProperty(prefix = "bremersee.authentication", name = "remember-me-key")
+@ConditionalOnProperty(prefix = "bremersee.authentication.remember-me", name = "key")
 @ConditionalOnBean(
     type = "org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager")
 @AutoConfigureAfter({LdaptiveAuthenticationAutoConfiguration.class})
@@ -53,7 +54,7 @@ import org.springframework.util.ObjectUtils;
 @Slf4j
 public class LdaptiveRememberMeAutoConfiguration {
 
-  private final String rememberMeKey;
+  private final RememberMeProperties rememberMeProperties;
 
   private final LdaptiveAuthenticationProperties properties;
 
@@ -63,7 +64,7 @@ public class LdaptiveRememberMeAutoConfiguration {
    * @param properties the properties
    */
   public LdaptiveRememberMeAutoConfiguration(AuthenticationProperties properties) {
-    this.rememberMeKey = properties.getRememberMeKey();
+    this.rememberMeProperties = properties.getRememberMe();
     this.properties = LdaptivePropertiesMapper.map(properties);
   }
 
@@ -78,7 +79,7 @@ public class LdaptiveRememberMeAutoConfiguration {
           WARNING: There is no password-last-set attribute configured.
           * Remembered users can login as long as they exist and have been correctly evaluated.
           * You may provide your own
-          * org.bremersee.spring.security.core.userdetails.ldaptive.LdaptivePasswordProvider
+          * org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveRememberMeTokenProvider
           * and org.bremersee.spring.security.authentication.ldaptive.AccountControlEvaluator!""";
     } else {
       message = String.format("OK: Using '%s' as password-last-set attribute.",
@@ -89,65 +90,66 @@ public class LdaptiveRememberMeAutoConfiguration {
             *********************************************************************************
             * {}
             * {}
+            * {}
             *********************************************************************************""",
         ClassUtils.getUserClass(getClass()).getSimpleName(),
+        rememberMeProperties,
         message);
-  }
-
-  /**
-   * Creates ldaptive remember me authentication components with token based remember-me services.
-   *
-   * @param authenticationManager the authentication manager
-   * @return the ldaptive remember me authentication components
-   */
-  @ConditionalOnMissingBean
-  @ConditionalOnBean(LdaptiveAuthenticationManager.class)
-  @Bean
-  public LdaptiveRememberMeAuthenticationComponents ldaptiveRememberMeAuthenticationComponents(
-      LdaptiveAuthenticationManager authenticationManager) {
-    return new LdaptiveRememberMeAuthenticationComponents(
-        rememberMeKey,
-        authenticationManager,
-        TokenBasedRememberMeServices::new);
   }
 
   /**
    * Creates remember me authentication provider.
    *
-   * @param rememberMeAuthentication the remember me authentication
    * @return the remember me authentication provider
    */
   @ConditionalOnMissingBean
   @Bean
-  public RememberMeAuthenticationProvider rememberMeAuthenticationProvider(
-      LdaptiveRememberMeAuthenticationComponents rememberMeAuthentication) {
-    return rememberMeAuthentication.getRememberMeAuthenticationProvider();
+  public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
+    return new RememberMeAuthenticationProvider(rememberMeProperties.getKey());
   }
 
   /**
    * Creates remember me services.
    *
-   * @param rememberMeAuthentication the remember me authentication
+   * @param authenticationManager the authentication manager
    * @return the remember me services
    */
+  @ConditionalOnBean(LdaptiveAuthenticationManager.class)
   @ConditionalOnMissingBean
   @Bean
   public RememberMeServices rememberMeServices(
-      LdaptiveRememberMeAuthenticationComponents rememberMeAuthentication) {
-    return rememberMeAuthentication.getRememberMeServices();
+      LdaptiveAuthenticationManager authenticationManager) {
+    LdaptiveTokenBasedRememberMeServices services = new LdaptiveTokenBasedRememberMeServices(
+        rememberMeProperties.getKey(), properties, authenticationManager);
+    Optional.ofNullable(rememberMeProperties.getAlwaysRemember())
+        .ifPresent(services::setAlwaysRemember);
+    Optional.ofNullable(rememberMeProperties.getCookieName())
+        .ifPresent(services::setCookieName);
+    Optional.ofNullable(rememberMeProperties.getCookieDomain())
+        .ifPresent(services::setCookieDomain);
+    Optional.ofNullable(rememberMeProperties.getUseSecureCookie())
+        .ifPresent(services::setUseSecureCookie);
+    Optional.ofNullable(rememberMeProperties.getParameterName())
+        .ifPresent(services::setParameter);
+    Optional.ofNullable(rememberMeProperties.getTokenValiditySeconds())
+        .ifPresent(services::setTokenValiditySeconds);
+    return services;
   }
 
   /**
    * Creates remember me authentication filter.
    *
-   * @param rememberMeAuthentication the remember me authentication
+   * @param authenticationManager the authentication manager
+   * @param rememberMeServices the remember me services
    * @return the remember me authentication filter
    */
+  @ConditionalOnBean(LdaptiveAuthenticationManager.class)
   @ConditionalOnMissingBean
   @Bean
   public RememberMeAuthenticationFilter rememberMeAuthenticationFilter(
-      LdaptiveRememberMeAuthenticationComponents rememberMeAuthentication) {
-    return rememberMeAuthentication.getRememberMeAuthenticationFilter();
+      LdaptiveAuthenticationManager authenticationManager,
+      RememberMeServices rememberMeServices) {
+    return new RememberMeAuthenticationFilter(authenticationManager, rememberMeServices);
   }
 
 }
