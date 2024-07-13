@@ -39,7 +39,7 @@ public class LdaptiveRememberMeAuthenticationToken
    *
    * @param key to identify if this object made by an authorised client
    * @param ldaptiveAuthentication the ldaptive authentication
-   * @throws IllegalArgumentException if a <code>null</code> was passed
+   * @throws IllegalArgumentException if a {@code null} was passed
    */
   public LdaptiveRememberMeAuthenticationToken(
       String key,
@@ -50,7 +50,7 @@ public class LdaptiveRememberMeAuthenticationToken
 
   @Override
   public SerLdapEntry getPrincipal() {
-    return (SerLdapEntry) super.getPrincipal();
+    return delegate.getPrincipal();
   }
 
   @Override

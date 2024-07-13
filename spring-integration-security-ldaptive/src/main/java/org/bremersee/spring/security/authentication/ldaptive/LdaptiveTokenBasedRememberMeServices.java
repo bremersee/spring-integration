@@ -34,7 +34,7 @@ public class LdaptiveTokenBasedRememberMeServices extends TokenBasedRememberMeSe
   private final LdaptiveAuthenticationProperties properties;
 
   /**
-   * Instantiates a new Ldaptive token based remember me services.
+   * Instantiates new ldaptive token based remember-me services.
    *
    * @param key the key
    * @param properties the properties
@@ -56,10 +56,10 @@ public class LdaptiveTokenBasedRememberMeServices extends TokenBasedRememberMeSe
   @Override
   protected Authentication createSuccessfulAuthentication(
       HttpServletRequest request, UserDetails user) {
-    if (user instanceof LdaptiveUserDetails) {
+    if (user instanceof LdaptiveUserDetails ldaptiveUser) {
       return new LdaptiveRememberMeAuthenticationToken(
           getKey(),
-          new LdaptiveAuthenticationToken(properties, (LdaptiveUserDetails) user));
+          new LdaptiveAuthenticationToken(properties, ldaptiveUser));
     }
     return super.createSuccessfulAuthentication(request, user);
   }
