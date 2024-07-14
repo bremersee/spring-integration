@@ -25,9 +25,6 @@ import org.springframework.security.core.Authentication;
  */
 public interface NormalizedAuthentication extends Authentication {
 
-  @Override
-  String getName();
-
   /**
    * Gets first name.
    *

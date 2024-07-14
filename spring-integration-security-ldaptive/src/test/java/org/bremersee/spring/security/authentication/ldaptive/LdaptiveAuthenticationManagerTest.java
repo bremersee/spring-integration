@@ -4,51 +4,59 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.bremersee.ldaptive.DefaultLdaptiveErrorHandler;
 import org.bremersee.ldaptive.LdaptiveException;
-import org.bremersee.ldaptive.LdaptiveSambaTemplate;
 import org.bremersee.ldaptive.LdaptiveTemplate;
-import org.bremersee.ldaptive.serializable.SerLdapEntry;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationProperties.GroupFetchStrategy;
 import org.bremersee.spring.security.authentication.ldaptive.provider.ActiveDirectoryTemplate;
-import org.bremersee.spring.security.authentication.ldaptive.provider.GroupContainsUsersTemplate;
-import org.bremersee.spring.security.authentication.ldaptive.provider.NoAccountControlEvaluator;
 import org.bremersee.spring.security.authentication.ldaptive.provider.OpenLdapTemplate;
 import org.bremersee.spring.security.authentication.ldaptive.provider.UserContainsGroupsTemplate;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetails;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetailsService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.ldaptive.CompareRequest;
 import org.ldaptive.ConnectionConfig;
+import org.ldaptive.ConnectionFactory;
+import org.ldaptive.DefaultConnectionFactory;
 import org.ldaptive.LdapAttribute;
 import org.ldaptive.LdapEntry;
 import org.ldaptive.LdapException;
 import org.ldaptive.ResultCode;
+import org.mockito.ArgumentCaptor;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * The type Ldaptive authentication manager test.
+ * The ldaptive authentication manager test.
  */
 @ExtendWith({SoftAssertionsExtension.class})
 class LdaptiveAuthenticationManagerTest {
+
+  private static final String USER_BASE_DN = "ou=people,dc=bremersee,dc=org";
+  private static final String USER_DN = "uid=junit,ou=people,dc=bremersee,dc=org";
 
   /**
    * Init.
@@ -63,8 +71,10 @@ class LdaptiveAuthenticationManagerTest {
     assertThatExceptionOfType(IllegalStateException.class)
         .isThrownBy(target::init);
 
-    target.setLdaptiveTemplateFn(LdaptiveSambaTemplate::new);
     target.setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
+    target.setEmailToUsernameResolver(null); // has no effect
+    target.setUsernameToBindDnConverter(null); // has no effect
+    target.setAccountControlEvaluator(null); // has no effect
     target.init();
   }
 
@@ -74,7 +84,7 @@ class LdaptiveAuthenticationManagerTest {
   @Test
   void supports() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
+        mock(ConnectionFactory.class),
         new OpenLdapTemplate());
     target.init();
     boolean actual = target.supports(UsernamePasswordAuthenticationToken.class);
@@ -83,458 +93,374 @@ class LdaptiveAuthenticationManagerTest {
   }
 
   /**
-   * Authenticate with bind.
-   *
-   * @param softly the softly
-   */
-  @Test
-  void authenticateWithBind(SoftAssertions softly) {
-    ActiveDirectoryTemplate properties = new ActiveDirectoryTemplate();
-    properties.setUserBaseDn("cn=users,dc=example,dc=org");
-    properties.setFirstNameAttribute("givenName");
-    properties.setLastNameAttribute("sn");
-    LdaptiveAuthenticationManager target = spy(new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
-        properties));
-    target.setAccountControlEvaluator(new NoAccountControlEvaluator());
-    target.setUsernameToBindDnConverter(username -> username);
-
-    LdaptiveTemplate ldaptiveTemplate = spy(new LdaptiveTemplate(target
-        .getConnectionFactory("junit", "secret")));
-    doReturn(ldaptiveTemplate)
-        .when(target)
-        .getLdapTemplate(anyString(), anyString());
-    LdapEntry user = LdapEntry.builder()
-        .dn("cn=junit,cn=users,dc=example,dc=org")
-        .attributes(
-            LdapAttribute.builder()
-                .name("givenName")
-                .values("Junit")
-                .build(),
-            LdapAttribute.builder()
-                .name("sn")
-                .values("Tester")
-                .build(),
-            LdapAttribute.builder()
-                .name("mail")
-                .values("junit@example.org")
-                .build(),
-            LdapAttribute.builder()
-                .name("memberOf")
-                .values("cn=test-group,cn=users,dc=example,dc=org")
-                .build())
-        .build();
-    doReturn(Optional.of(user))
-        .when(ldaptiveTemplate)
-        .findOne(any());
-
-    LdaptiveAuthentication actual = target.authenticate(
-        new UsernamePasswordAuthenticationToken("junit", "secret"));
-    softly
-        .assertThat(actual.isAuthenticated())
-        .isTrue();
-    softly
-        .assertThat(actual.getName())
-        .isEqualTo("junit");
-    softly
-        .assertThat(actual.getFirstName())
-        .isEqualTo("Junit");
-    softly
-        .assertThat(actual.getLastName())
-        .isEqualTo("Tester");
-    softly
-        .assertThat(actual.getEmail())
-        .isEqualTo("junit@example.org");
-    List<GrantedAuthority> authorities = new ArrayList<>(actual.getAuthorities());
-    softly
-        .assertThat(authorities)
-        .containsExactlyInAnyOrder(new SimpleGrantedAuthority("test-group"));
-  }
-
-  /**
-   * Authenticate with user password.
-   *
-   * @param softly the softly
-   */
-  @Test
-  void authenticateWithUserPassword(SoftAssertions softly) {
-    GroupContainsUsersTemplate properties = new GroupContainsUsersTemplate();
-    properties.setUsernameAttribute("uid");
-    properties.setFirstNameAttribute("givenName");
-    properties.setLastNameAttribute("sn");
-    properties.setPasswordAttribute("userPassword");
-    properties.setUserBaseDn("cn=users,dc=example,dc=org");
-    properties.setGroupBaseDn("cn=groups,dc=example,dc=org");
-    LdaptiveAuthenticationManager target = spy(new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
-        properties));
-    target.setAccountControlEvaluator(new NoAccountControlEvaluator());
-    target.setUsernameToBindDnConverter(username -> username);
-    target.setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
-    target.init();
-
-    LdaptiveTemplate ldaptiveTemplate = spy(new LdaptiveTemplate(target
-        .getConnectionFactory("junit", "secret")));
-    doReturn(ldaptiveTemplate)
-        .when(target)
-        .getLdapTemplate(anyString(), anyString());
-    doReturn(true)
-        .when(ldaptiveTemplate)
-        .compare(any());
-
-    LdapEntry user = LdapEntry.builder()
-        .dn("cn=junit,cn=users,dc=example,dc=org")
-        .attributes(
-            LdapAttribute.builder()
-                .name("uid")
-                .values("junit")
-                .build(),
-            LdapAttribute.builder()
-                .name("userPassword")
-                .values("{noop}secret")
-                .build(),
-            LdapAttribute.builder()
-                .name("givenName")
-                .values("Junit")
-                .build(),
-            LdapAttribute.builder()
-                .name("sn")
-                .values("Tester")
-                .build(),
-            LdapAttribute.builder()
-                .name("mail")
-                .values("junit@example.org")
-                .build())
-        .build();
-    doReturn(Optional.of(user))
-        .when(ldaptiveTemplate)
-        .findOne(any());
-
-    LdapEntry group = LdapEntry.builder()
-        .dn("cn=test-group,cn=groups,dc=example,dc=org")
-        .attributes(
-            LdapAttribute.builder()
-                .name("cn")
-                .values("test-group")
-                .build())
-        .build();
-    doReturn(List.of(group))
-        .when(ldaptiveTemplate)
-        .findAll(any());
-
-    LdaptiveAuthentication actual = target.authenticate(
-        new UsernamePasswordAuthenticationToken("junit", "secret"));
-    softly
-        .assertThat(actual.isAuthenticated())
-        .isTrue();
-    softly
-        .assertThat(actual.getName())
-        .isEqualTo("junit");
-    softly
-        .assertThat(actual.getFirstName())
-        .isEqualTo("Junit");
-    softly
-        .assertThat(actual.getLastName())
-        .isEqualTo("Tester");
-    softly
-        .assertThat(actual.getEmail())
-        .isEqualTo("junit@example.org");
-    List<GrantedAuthority> authorities = new ArrayList<>(actual.getAuthorities());
-    softly
-        .assertThat(authorities)
-        .containsExactlyInAnyOrder(new SimpleGrantedAuthority("test-group"));
-  }
-
-  /**
    * Gets ldaptive template.
+   *
+   * @param softly the softly
    */
   @Test
-  void getLdaptiveTemplate() {
+  void getLdaptiveTemplate(SoftAssertions softly) {
+    ConnectionConfig connectionConfig = new ConnectionConfig("ldap://localhost:389");
+    ConnectionFactory connectionFactory = new DefaultConnectionFactory(connectionConfig);
+    LdaptiveTemplate ldaptiveTemplate = new LdaptiveTemplate(connectionFactory);
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
+        ldaptiveTemplate,
         new ActiveDirectoryTemplate());
     target.setUsernameToBindDnConverter(username -> username);
-    assertThat(target.getLdapTemplate("junit", "secret"))
+    target.init();
+    softly
+        .assertThat(target.getApplicationLdaptiveTemplate())
+        .isEqualTo(ldaptiveTemplate);
+    softly
+        .assertThat(target.getLdapTemplate("junit", "secret"))
         .isNotNull();
   }
 
   /**
-   * Gets user with username not found exception.
+   * Gets user details service.
    */
   @Test
-  void getUserWithUsernameNotFoundException() {
+  void getUserDetailsService() {
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
-        new ActiveDirectoryTemplate());
-    LdaptiveTemplate ldaptiveTemplate = mock(LdaptiveTemplate.class);
-    doReturn(Optional.empty())
-        .when(ldaptiveTemplate)
-        .findOne(any());
-    assertThatExceptionOfType(UsernameNotFoundException.class)
-        .isThrownBy(() -> target.getUser(ldaptiveTemplate, "junit"));
+        mock(ConnectionFactory.class),
+        new OpenLdapTemplate());
+    assertThat(target.getUserDetailsService())
+        .isNotNull();
   }
 
   /**
-   * Gets user with bad credentials exception by result code.
+   * Authenticate with application ldaptive template.
+   *
+   * @param softly the softly
    */
   @Test
-  void getUserWithBadCredentialsExceptionByResultCode() {
-    LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
-        new ActiveDirectoryTemplate());
-    LdaptiveException ldaptiveException = new DefaultLdaptiveErrorHandler()
-        .map(new LdapException(ResultCode.INVALID_CREDENTIALS, "Bad credentials"));
-    LdaptiveTemplate ldaptiveTemplate = mock(LdaptiveTemplate.class);
-    doThrow(ldaptiveException)
-        .when(ldaptiveTemplate)
-        .findOne(any());
-    assertThatExceptionOfType(BadCredentialsException.class)
-        .isThrownBy(() -> target.getUser(ldaptiveTemplate, "junit"));
-  }
-
-  /**
-   * Gets user with bad credentials exception by message.
-   */
-  @Test
-  void getUserWithBadCredentialsExceptionByMessage() {
-    LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
-        new ActiveDirectoryTemplate());
-    LdaptiveException ldaptiveException = new DefaultLdaptiveErrorHandler()
-        .map(new LdapException(ResultCode.CONNECT_ERROR,
-            "resultCode=" + ResultCode.INVALID_CREDENTIALS));
-    LdaptiveTemplate ldaptiveTemplate = mock(LdaptiveTemplate.class);
-    doThrow(ldaptiveException)
-        .when(ldaptiveTemplate)
-        .findOne(any());
-    assertThatExceptionOfType(BadCredentialsException.class)
-        .isThrownBy(() -> target.getUser(ldaptiveTemplate, "junit"));
-  }
-
-  /**
-   * Gets user with ldaptive exception.
-   */
-  @Test
-  void getUserWithLdaptiveException() {
-    LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
-        new ActiveDirectoryTemplate());
-    LdaptiveException ldaptiveException = new DefaultLdaptiveErrorHandler()
-        .map(new LdapException(ResultCode.CONNECT_ERROR, "Something went wrong"));
-    LdaptiveTemplate ldaptiveTemplate = mock(LdaptiveTemplate.class);
-    doThrow(ldaptiveException)
-        .when(ldaptiveTemplate)
-        .findOne(any());
-    assertThatExceptionOfType(LdaptiveException.class)
-        .isThrownBy(() -> target.getUser(ldaptiveTemplate, "junit"));
-  }
-
-  /**
-   * Change password.
-   */
-  @Test
-  void changePassword() {
+  void authenticateWithApplicationLdaptiveTemplate(SoftAssertions softly) {
+    ConnectionConfig connectionConfig = new ConnectionConfig("ldap://localhost:389");
+    ConnectionFactory connectionFactory = new DefaultConnectionFactory(connectionConfig);
+    LdaptiveTemplate ldaptiveTemplate = spy(new LdaptiveTemplate(connectionFactory));
+    UserContainsGroupsTemplate properties = new UserContainsGroupsTemplate();
+    properties.setUserBaseDn(USER_BASE_DN);
+    properties.setPasswordAttribute("userPassword");
+    properties.setAccountControlEvaluator(null);
     LdaptiveAuthenticationManager target = spy(new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
-        new ActiveDirectoryTemplate()));
-    LdaptiveTemplate ldaptiveTemplate = mock(LdaptiveTemplate.class);
-    doReturn(ldaptiveTemplate)
-        .when(target)
-        .getLdapTemplate(anyString(), anyString());
-    LdapEntry user = LdapEntry.builder().dn("cn=junit,cn=users,dc=example,dc=org").build();
-    LdaptiveAuthenticationToken token = new LdaptiveAuthenticationToken(
-        "junit", List.of(), new SerLdapEntry(user), new LdaptiveAuthenticationProperties());
-    doReturn(token)
-        .when(target)
-        .authenticate("junit", "old", ldaptiveTemplate);
-    target.changePassword("junit", "old", "new");
+        ldaptiveTemplate, properties));
+    target.setTokenConverter(userDetails -> new LdaptiveAuthenticationToken(
+        properties, userDetails));
+
+    PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+    doAnswer(invocationOnMock -> invocationOnMock.getArgument(0))
+        .when(passwordEncoder)
+        .encode(anyString());
+    target.setPasswordEncoder(passwordEncoder);
+
+    target.init();
+
+    LdapEntry user = createUser();
+    doReturn(Optional.of(user))
+        .when(ldaptiveTemplate)
+        .findOne(any());
+    ArgumentCaptor<CompareRequest> compareCaptor = ArgumentCaptor.forClass(CompareRequest.class);
+    doReturn(true)
+        .when(ldaptiveTemplate)
+        .compare(compareCaptor.capture());
+
+    LdaptiveAuthentication actual = target
+        .authenticate(new UsernamePasswordAuthenticationToken("junit", "secret"));
+
+    softly
+        .assertThat(compareCaptor.getValue())
+        .isNotNull();
+    verify(target)
+        .checkAccountControl(any());
+    assertActual(actual, softly);
   }
 
   /**
-   * Check password fails.
+   * Authenticate with application ldaptive template and bad credentials.
    */
   @Test
-  void checkPasswordFails() {
-    OpenLdapTemplate properties = new OpenLdapTemplate();
+  void authenticateWithApplicationLdaptiveTemplateAndBadCredentials() {
+    ConnectionConfig connectionConfig = new ConnectionConfig("ldap://localhost:389");
+    ConnectionFactory connectionFactory = new DefaultConnectionFactory(connectionConfig);
+    LdaptiveTemplate ldaptiveTemplate = spy(new LdaptiveTemplate(connectionFactory));
+    UserContainsGroupsTemplate properties = new UserContainsGroupsTemplate();
+    properties.setUserBaseDn(USER_BASE_DN);
     properties.setPasswordAttribute("userPassword");
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
-        properties);
-    target.setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
-    LdaptiveTemplate ldaptiveTemplate = mock(LdaptiveTemplate.class);
+        ldaptiveTemplate, properties);
+
+    PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+    doAnswer(invocationOnMock -> invocationOnMock.getArgument(0))
+        .when(passwordEncoder)
+        .encode(anyString());
+    target.setPasswordEncoder(passwordEncoder);
+
+    target.init();
+
+    LdapEntry user = createUser();
+    doReturn(Optional.of(user))
+        .when(ldaptiveTemplate)
+        .findOne(any());
     doReturn(false)
         .when(ldaptiveTemplate)
         .compare(any());
-    LdapEntry user = LdapEntry.builder().dn("cn=junit,cn=users,dc=example,dc=org").build();
+
     assertThatExceptionOfType(BadCredentialsException.class)
-        .isThrownBy(() -> target.checkPassword(ldaptiveTemplate, user, "wrong"));
+        .isThrownBy(() -> target
+            .authenticate(new UsernamePasswordAuthenticationToken("junit", "secret")));
   }
 
   /**
-   * Check account control throws disabled exception.
+   * Authenticate with user ldaptive template.
+   *
+   * @param softly the softly
    */
   @Test
-  void checkAccountControlThrowsDisabledException() {
-    LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
-        new ActiveDirectoryTemplate());
-    AccountControlEvaluator evaluator = mock(AccountControlEvaluator.class);
-    target.setAccountControlEvaluator(evaluator);
-    LdapEntry user = LdapEntry.builder().dn("cn=junit,cn=users,dc=example,dc=org").build();
-    doReturn(false)
-        .when(evaluator)
-        .isEnabled(user);
-    assertThatExceptionOfType(DisabledException.class)
-        .isThrownBy(() -> target.checkAccountControl(user));
+  void authenticateWithUserLdaptiveTemplate(SoftAssertions softly) {
+    ConnectionConfig connectionConfig = new ConnectionConfig("ldap://localhost:389");
+    ConnectionFactory connectionFactory = new DefaultConnectionFactory(connectionConfig);
+    LdaptiveTemplate ldaptiveTemplate = spy(new LdaptiveTemplate(connectionFactory));
+    UserContainsGroupsTemplate properties = new UserContainsGroupsTemplate();
+    properties.setUserBaseDn(USER_BASE_DN);
+    LdaptiveAuthenticationManager target = spy(new LdaptiveAuthenticationManager(
+        ldaptiveTemplate, properties));
+
+    target.init();
+
+    doReturn(ldaptiveTemplate)
+        .when(target)
+        .getLdapTemplate("junit", "secret");
+
+    LdapEntry user = createUser();
+    doReturn(Optional.of(user))
+        .when(ldaptiveTemplate)
+        .findOne(any());
+
+    LdaptiveAuthentication actual = target
+        .authenticate(new UsernamePasswordAuthenticationToken("junit", "secret"));
+
+    verify(target)
+        .checkAccountControl(any());
+    assertActual(actual, softly);
   }
 
   /**
-   * Check account control throws locked exception.
+   * Authenticate with user ldaptive template and username not found.
    */
   @Test
-  void checkAccountControlThrowsLockedException() {
-    LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
-        new ActiveDirectoryTemplate());
-    AccountControlEvaluator evaluator = mock(AccountControlEvaluator.class);
-    target.setAccountControlEvaluator(evaluator);
-    LdapEntry user = LdapEntry.builder().dn("cn=junit,cn=users,dc=example,dc=org").build();
-    doReturn(true)
-        .when(evaluator)
-        .isEnabled(user);
-    doReturn(false)
-        .when(evaluator)
-        .isAccountNonLocked(user);
-    assertThatExceptionOfType(LockedException.class)
-        .isThrownBy(() -> target.checkAccountControl(user));
+  void authenticateWithUserLdaptiveTemplateAndUsernameNotFound() {
+    ConnectionConfig connectionConfig = new ConnectionConfig("ldap://localhost:389");
+    ConnectionFactory connectionFactory = new DefaultConnectionFactory(connectionConfig);
+    LdaptiveTemplate ldaptiveTemplate = spy(new LdaptiveTemplate(connectionFactory));
+    UserContainsGroupsTemplate properties = new UserContainsGroupsTemplate();
+    properties.setUserBaseDn(USER_BASE_DN);
+    LdaptiveAuthenticationManager target = spy(new LdaptiveAuthenticationManager(
+        ldaptiveTemplate, properties));
+
+    target.init();
+
+    doReturn(ldaptiveTemplate)
+        .when(target)
+        .getLdapTemplate("junit", "secret");
+    LdaptiveUserDetailsService userDetailsService = mock(LdaptiveUserDetailsService.class);
+    doThrow(new UsernameNotFoundException("junit not found"))
+        .when(userDetailsService)
+        .loadUserByUsername(anyString());
+    doReturn(userDetailsService)
+        .when(target)
+        .getUserDetailsService(any());
+
+    assertThatExceptionOfType(UsernameNotFoundException.class)
+        .isThrownBy(() -> target
+            .authenticate(new UsernamePasswordAuthenticationToken("junit", "secret")));
   }
 
   /**
-   * Check account control throws account expired exception.
+   * Authenticate with user ldaptive template and bad credentials with result code.
    */
   @Test
-  void checkAccountControlThrowsAccountExpiredException() {
-    LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
-        new ActiveDirectoryTemplate());
-    AccountControlEvaluator evaluator = mock(AccountControlEvaluator.class);
-    target.setAccountControlEvaluator(evaluator);
-    LdapEntry user = LdapEntry.builder().dn("cn=junit,cn=users,dc=example,dc=org").build();
-    doReturn(true)
-        .when(evaluator)
-        .isEnabled(user);
-    doReturn(true)
-        .when(evaluator)
-        .isAccountNonLocked(user);
-    doReturn(false)
-        .when(evaluator)
-        .isAccountNonExpired(user);
-    assertThatExceptionOfType(AccountExpiredException.class)
-        .isThrownBy(() -> target.checkAccountControl(user));
+  void authenticateWithUserLdaptiveTemplateAndBadCredentialsWithResultCode() {
+    ConnectionConfig connectionConfig = new ConnectionConfig("ldap://localhost:389");
+    ConnectionFactory connectionFactory = new DefaultConnectionFactory(connectionConfig);
+    LdaptiveTemplate ldaptiveTemplate = spy(new LdaptiveTemplate(connectionFactory));
+    UserContainsGroupsTemplate properties = new UserContainsGroupsTemplate();
+    properties.setUserBaseDn(USER_BASE_DN);
+    LdaptiveAuthenticationManager target = spy(new LdaptiveAuthenticationManager(
+        ldaptiveTemplate, properties));
+
+    target.init();
+
+    doReturn(ldaptiveTemplate)
+        .when(target)
+        .getLdapTemplate("junit", "secret");
+    LdaptiveException ldaptiveException = new DefaultLdaptiveErrorHandler()
+        .map(new LdapException(ResultCode.INVALID_CREDENTIALS, "Bad credentials"));
+    doThrow(ldaptiveException)
+        .when(ldaptiveTemplate)
+        .findOne(any());
+
+    assertThatExceptionOfType(BadCredentialsException.class)
+        .isThrownBy(() -> target
+            .authenticate(new UsernamePasswordAuthenticationToken("junit", "secret")));
   }
 
   /**
-   * Check account control throws credentials expired exception.
+   * Authenticate with user ldaptive template and bad credentials with message.
    */
   @Test
-  void checkAccountControlThrowsCredentialsExpiredException() {
-    LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
-        new ActiveDirectoryTemplate());
-    AccountControlEvaluator evaluator = mock(AccountControlEvaluator.class);
-    target.setAccountControlEvaluator(evaluator);
-    LdapEntry user = LdapEntry.builder().dn("cn=junit,cn=users,dc=example,dc=org").build();
-    doReturn(true)
-        .when(evaluator)
-        .isEnabled(user);
-    doReturn(true)
-        .when(evaluator)
-        .isAccountNonLocked(user);
-    doReturn(true)
-        .when(evaluator)
-        .isAccountNonExpired(user);
-    doReturn(false)
-        .when(evaluator)
-        .isCredentialsNonExpired(user);
-    assertThatExceptionOfType(CredentialsExpiredException.class)
-        .isThrownBy(() -> target.checkAccountControl(user));
+  void authenticateWithUserLdaptiveTemplateAndBadCredentialsWithMessage() {
+    ConnectionConfig connectionConfig = new ConnectionConfig("ldap://localhost:389");
+    ConnectionFactory connectionFactory = new DefaultConnectionFactory(connectionConfig);
+    LdaptiveTemplate ldaptiveTemplate = spy(new LdaptiveTemplate(connectionFactory));
+    UserContainsGroupsTemplate properties = new UserContainsGroupsTemplate();
+    properties.setUserBaseDn(USER_BASE_DN);
+    LdaptiveAuthenticationManager target = spy(new LdaptiveAuthenticationManager(
+        ldaptiveTemplate, properties));
+
+    target.init();
+
+    doReturn(ldaptiveTemplate)
+        .when(target)
+        .getLdapTemplate("junit", "secret");
+    LdaptiveException ldaptiveException = new DefaultLdaptiveErrorHandler()
+        .map(new LdapException(ResultCode.CONNECT_ERROR,
+            "resultCode=" + ResultCode.INVALID_CREDENTIALS));
+    doThrow(ldaptiveException)
+        .when(ldaptiveTemplate)
+        .findOne(any());
+
+    assertThatExceptionOfType(BadCredentialsException.class)
+        .isThrownBy(() -> target
+            .authenticate(new UsernamePasswordAuthenticationToken("junit", "secret")));
   }
 
   /**
-   * Gets authorities.
+   * Check account control.
+   *
+   * @param softly the softly
    */
   @Test
-  void getAuthorities() {
-    OpenLdapTemplate properties = new OpenLdapTemplate();
-    properties.setGroupFetchStrategy(GroupFetchStrategy.NONE);
+  void checkAccountControl(SoftAssertions softly) {
+    ConnectionConfig connectionConfig = new ConnectionConfig("ldap://localhost:389");
+    ConnectionFactory connectionFactory = new DefaultConnectionFactory(connectionConfig);
+    LdaptiveTemplate ldaptiveTemplate = new LdaptiveTemplate(connectionFactory);
+    UserContainsGroupsTemplate properties = new UserContainsGroupsTemplate();
+    properties.setUserBaseDn(USER_BASE_DN);
     LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
-        properties);
-    LdapEntry user = LdapEntry.builder().dn("cn=junit,cn=users,dc=example,dc=org").build();
-    Collection<? extends String> actual = target.getAuthorities(mock(LdaptiveTemplate.class), user);
-    assertThat(actual)
-        .isEmpty();
+        ldaptiveTemplate, properties);
+
+    LdapEntry user = createUser();
+
+    LdaptiveUserDetails d0 = new LdaptiveUserDetails(
+        user, "junit", List.of(new SimpleGrantedAuthority("ROLE_tester")),
+        "secret",
+        false, true, true, true);
+    softly.assertThatExceptionOfType(AccountExpiredException.class)
+        .isThrownBy(() -> target.checkAccountControl(d0));
+
+    LdaptiveUserDetails d1 = new LdaptiveUserDetails(
+        user, "junit", List.of(new SimpleGrantedAuthority("ROLE_tester")),
+        "secret",
+        true, false, true, true);
+    softly.assertThatExceptionOfType(LockedException.class)
+        .isThrownBy(() -> target.checkAccountControl(d1));
+
+    LdaptiveUserDetails d2 = new LdaptiveUserDetails(
+        user, "junit", List.of(new SimpleGrantedAuthority("ROLE_tester")),
+        "secret",
+        true, true, false, true);
+    softly.assertThatExceptionOfType(CredentialsExpiredException.class)
+        .isThrownBy(() -> target.checkAccountControl(d2));
+
+    LdaptiveUserDetails d3 = new LdaptiveUserDetails(
+        user, "junit", List.of(new SimpleGrantedAuthority("ROLE_tester")),
+        "secret",
+        true, true, true, false);
+    softly.assertThatExceptionOfType(DisabledException.class)
+        .isThrownBy(() -> target.checkAccountControl(d3));
   }
 
-  /**
-   * Gets authority filter.
-   */
-  @Test
-  void getAuthorityFilter() {
-    OpenLdapTemplate properties = new OpenLdapTemplate();
-    properties.setUsernameAttribute("uid");
-    properties.setGroupObjectClass("group");
-    properties.setGroupMemberAttribute("member");
-    properties.setGroupMemberFormat("cn=${username},cn=users,dc=example,dc=org");
-    LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
-        properties);
-    LdapEntry user = LdapEntry.builder()
-        .dn("cn=junit,cn=users,dc=example,dc=org")
-        .attributes(LdapAttribute.builder()
-            .name("uid")
-            .values("junit")
-            .build())
-        .build();
-    String actual = target.getAuthorityFilter(user);
-    assertThat(actual)
-        .isEqualTo("(&(objectClass=group)(member=cn=junit,cn=users,dc=example,dc=org))");
-  }
-
-  /**
-   * Gets authority name.
-   */
-  @Test
-  void getAuthorityName() {
-    OpenLdapTemplate properties = new OpenLdapTemplate();
-    properties.setGroupIdAttribute(null);
-    LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
-        new ConnectionConfig("ldap://localhost:389"),
-        properties);
-    LdapEntry group = LdapEntry.builder().dn("cn=junit,cn=groups,dc=example,dc=org").build();
-    String actual = target.getAuthorityName(group);
-    assertThat(actual)
+  private void assertActual(LdaptiveAuthentication authentication, SoftAssertions softly) {
+    List<GrantedAuthority> actualAuthorities = new ArrayList<>(authentication.getAuthorities());
+    List<GrantedAuthority> expectedAuthorities = List.of(new SimpleGrantedAuthority("ROLE_tester"));
+    softly
+        .assertThat(actualAuthorities)
+        .containsExactlyInAnyOrderElementsOf(expectedAuthorities);
+    softly
+        .assertThat(authentication.getName())
         .isEqualTo("junit");
+    softly
+        .assertThat(authentication.getFirstName())
+        .isEqualTo("Test");
+    softly
+        .assertThat(authentication.getLastName())
+        .isEqualTo("User");
+    softly
+        .assertThat(authentication.getEmail())
+        .isEqualTo("junit@example.com");
+
+    assertThat(authentication.getPrincipal())
+        .isInstanceOf(LdaptiveUserDetails.class);
+    LdaptiveUserDetails principal = (LdaptiveUserDetails) authentication.getPrincipal();
+    softly
+        .assertThat(principal.getName())
+        .isEqualTo(USER_DN);
+    softly
+        .assertThat(principal.getUsername())
+        .isEqualTo("junit");
+    softly
+        .assertThat(principal.getPassword())
+        .isNotEmpty();
+    softly
+        .assertThat(principal.isEnabled())
+        .isTrue();
+    softly
+        .assertThat(principal.isAccountNonLocked())
+        .isTrue();
+    softly
+        .assertThat(principal.isAccountNonExpired())
+        .isTrue();
+    softly
+        .assertThat(principal.isCredentialsNonExpired())
+        .isTrue();
   }
 
   /**
-   * Gets authorities by groups in user.
+   * Is remember me authentication token.
+   *
+   * @param softly the softly
    */
   @Test
-  void getAuthoritiesByGroupsInUser() {
+  void isRememberMeAuthenticationToken(SoftAssertions softly) {
+    LdaptiveAuthenticationManager target = new LdaptiveAuthenticationManager(
+        mock(ConnectionFactory.class),
+        new OpenLdapTemplate());
+
+    Authentication token = mock(RememberMeAuthenticationToken.class);
+    softly
+        .assertThat(target.isRememberMeAuthenticationToken(token))
+        .isFalse();
+
+    token = mock(LdaptiveRememberMeAuthenticationToken.class);
+    softly
+        .assertThat(target.isRememberMeAuthenticationToken(token))
+        .isFalse();
+
+    doReturn(mock(LdaptiveUserDetails.class)).when(token).getPrincipal();
+    softly
+        .assertThat(target.isRememberMeAuthenticationToken(token))
+        .isTrue();
   }
 
-  /**
-   * Gets authorities by groups with user.
-   */
-  @Test
-  void getAuthoritiesByGroupsWithUser() {
+  private LdapEntry createUser() {
+    LdapEntry entry = new LdapEntry();
+    entry.setDn(USER_DN);
+    entry.addAttributes(LdapAttribute.builder().name("uid").values("junit").build());
+    entry.addAttributes(LdapAttribute.builder().name("givenName").values("Test").build());
+    entry.addAttributes(LdapAttribute.builder().name("sn").values("User").build());
+    entry.addAttributes(LdapAttribute.builder().name("mail").values("junit@example.com").build());
+    entry.addAttributes(LdapAttribute.builder()
+        .name("memberOf").values("cn=tester," + USER_BASE_DN).build());
+    return entry;
   }
 
-  /**
-   * Gets username.
-   */
-  @Test
-  void getUsername() {
-  }
 }

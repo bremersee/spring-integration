@@ -1,5 +1,7 @@
 package org.bremersee.ldaptive.serializable;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Map;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
@@ -55,6 +57,18 @@ class SerLdapEntryTest {
   }
 
   /**
+   * Gets name.
+   */
+  @Test
+  void getName() {
+    LdapEntry ldapEntry = new LdapEntry();
+    ldapEntry.setDn("cn=junit,dc=system");
+    SerLdapEntry serLdapEntry = new SerLdapEntry(ldapEntry);
+    assertThat(serLdapEntry.getName())
+        .isEqualTo("cn=junit,dc=system");
+  }
+
+  /**
    * Gets attributes.
    *
    * @param softly the softly
@@ -74,6 +88,6 @@ class SerLdapEntryTest {
     softly
         .assertThat(e0.getAttributes())
         .containsAllEntriesOf(Map.of("say", new SerLdapAttr(la0)));
-
   }
+
 }

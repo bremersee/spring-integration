@@ -14,37 +14,23 @@
  * limitations under the License.
  */
 
-package org.bremersee.spring.security.authentication;
+package org.bremersee.spring.security.authentication.ldaptive;
 
-import java.util.Collection;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.RememberMeServices;
 
 /**
- * The interface AuthenticationValues.
+ * The ldaptive remember-me services.
  *
- * @param <A> the type parameter
  * @author Christian Bremer
  */
-public interface AuthenticationSource<A> {
+public interface LdaptiveRememberMeServices extends RememberMeServices {
 
   /**
-   * Gets name.
+   * Gets user details service.
    *
-   * @return the name
+   * @return the user details service
    */
-  String getName();
-
-  /**
-   * Gets authorities.
-   *
-   * @return the authorities
-   */
-  Collection<? extends String> getAuthorities();
-
-  /**
-   * Gets attributes.
-   *
-   * @return the attributes
-   */
-  A getAttributes();
+  UserDetailsService getUserDetailsService();
 
 }

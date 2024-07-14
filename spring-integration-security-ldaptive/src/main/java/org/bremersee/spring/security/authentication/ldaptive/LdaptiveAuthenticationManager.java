@@ -18,35 +18,28 @@ package org.bremersee.spring.security.authentication.ldaptive;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.springframework.util.ObjectUtils.isEmpty;
 
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import org.bremersee.ldaptive.LdaptiveEntryMapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.bremersee.ldaptive.LdaptiveException;
 import org.bremersee.ldaptive.LdaptiveTemplate;
-import org.bremersee.spring.security.authentication.AuthenticationSource;
+import org.bremersee.spring.security.authentication.EmailToUsernameResolver;
 import org.bremersee.spring.security.authentication.ldaptive.provider.NoAccountControlEvaluator;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveRememberMeTokenProvider;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetails;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetailsService;
 import org.ldaptive.BindConnectionInitializer;
 import org.ldaptive.CompareRequest;
 import org.ldaptive.ConnectionConfig;
 import org.ldaptive.ConnectionFactory;
 import org.ldaptive.DefaultConnectionFactory;
-import org.ldaptive.FilterTemplate;
-import org.ldaptive.LdapAttribute;
-import org.ldaptive.LdapEntry;
 import org.ldaptive.LdapException;
 import org.ldaptive.ResultCode;
-import org.ldaptive.SearchRequest;
-import org.ldaptive.transcode.StringValueTranscoder;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -55,10 +48,11 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
 
@@ -71,39 +65,67 @@ public class LdaptiveAuthenticationManager
     implements AuthenticationManager, AuthenticationProvider { // message source aware
 
   /**
-   * The constant USERNAME_PLACEHOLDER.
+   * The Logger.
    */
-  protected static final String USERNAME_PLACEHOLDER = "${username}";
+  protected final Log logger = LogFactory.getLog(this.getClass());
 
   /**
-   * The constant STRING_TRANSCODER.
+   * The authentication properties.
    */
-  protected static final StringValueTranscoder STRING_TRANSCODER = new StringValueTranscoder();
-
-  @Getter(AccessLevel.PROTECTED)
-  private final ConnectionConfig connectionConfig;
-
   @Getter(AccessLevel.PROTECTED)
   private final LdaptiveAuthenticationProperties authenticationProperties;
 
+  /**
+   * The application ldaptive template.
+   */
   @Getter(AccessLevel.PROTECTED)
-  private Function<ConnectionFactory, LdaptiveTemplate> ldaptiveTemplateFn;
+  private final LdaptiveTemplate applicationLdaptiveTemplate;
 
+  /**
+   * The email to username resolver.
+   */
   @Getter(AccessLevel.PROTECTED)
-  private EmailToUsernameConverter emailToUsernameConverter;
+  private EmailToUsernameResolver emailToUsernameResolver;
 
+  /**
+   * The username to bind-dn converter.
+   */
   @Getter(AccessLevel.PROTECTED)
   private UsernameToBindDnConverter usernameToBindDnConverter;
 
+  /**
+   * The password encoder.
+   */
   @Getter(AccessLevel.PROTECTED)
   @Setter
   private PasswordEncoder passwordEncoder;
 
+  /**
+   * The account control evaluator.
+   */
   @Getter(AccessLevel.PROTECTED)
-  private AccountControlEvaluator accountControlEvaluator = new NoAccountControlEvaluator();
+  private AccountControlEvaluator accountControlEvaluator;
 
+  /**
+   * The granted authorities mapper.
+   */
   @Getter(AccessLevel.PROTECTED)
-  private Converter<AuthenticationSource<LdapEntry>, LdaptiveAuthentication> tokenConverter;
+  @Setter
+  private GrantedAuthoritiesMapper grantedAuthoritiesMapper;
+
+  /**
+   * The remember-me token provider.
+   */
+  @Getter(AccessLevel.PROTECTED)
+  @Setter
+  private LdaptiveRememberMeTokenProvider passwordProvider;
+
+  /**
+   * The token converter.
+   */
+  @Getter(AccessLevel.PROTECTED)
+  @Setter
+  private Converter<LdaptiveUserDetails, LdaptiveAuthentication> tokenConverter;
 
   /**
    * Instantiates a new ldaptive authentication manager.
@@ -114,38 +136,63 @@ public class LdaptiveAuthenticationManager
   public LdaptiveAuthenticationManager(
       ConnectionConfig connectionConfig,
       LdaptiveAuthenticationProperties authenticationProperties) {
-    this.connectionConfig = connectionConfig;
-    this.authenticationProperties = authenticationProperties;
-    this.ldaptiveTemplateFn = LdaptiveTemplate::new;
-    this.emailToUsernameConverter = new EmailToUsernameConverterByLdapAttribute(
-        authenticationProperties, connectionConfig);
-    this.usernameToBindDnConverter = authenticationProperties
-        .getUsernameToBindDnConverter()
-        .apply(authenticationProperties);
-    this.tokenConverter = new LdaptiveAuthenticationTokenConverter(authenticationProperties);
+    this(new DefaultConnectionFactory(connectionConfig), authenticationProperties);
   }
 
   /**
-   * Sets ldaptive template fn.
+   * Instantiates a new ldaptive authentication manager.
    *
-   * @param ldaptiveTemplateFn the ldaptive template fn
+   * @param connectionFactory the connection factory
+   * @param authenticationProperties the authentication properties
    */
-  public void setLdaptiveTemplateFn(
-      Function<ConnectionFactory, LdaptiveTemplate> ldaptiveTemplateFn) {
-    if (nonNull(ldaptiveTemplateFn)) {
-      this.ldaptiveTemplateFn = ldaptiveTemplateFn;
+  public LdaptiveAuthenticationManager(
+      ConnectionFactory connectionFactory,
+      LdaptiveAuthenticationProperties authenticationProperties) {
+    this(new LdaptiveTemplate(connectionFactory), authenticationProperties);
+  }
+
+  /**
+   * Instantiates a new ldaptive authentication manager.
+   *
+   * @param applicationLdaptiveTemplate the application ldaptive template
+   * @param authenticationProperties the authentication properties
+   */
+  public LdaptiveAuthenticationManager(
+      LdaptiveTemplate applicationLdaptiveTemplate,
+      LdaptiveAuthenticationProperties authenticationProperties) {
+
+    this.applicationLdaptiveTemplate = applicationLdaptiveTemplate;
+    Assert.notNull(getApplicationLdaptiveTemplate(), "Application ldaptive template is required.");
+    this.authenticationProperties = authenticationProperties;
+    Assert.notNull(getAuthenticationProperties(), "Authentication properties are required.");
+
+    // emailToUsernameResolver
+    setEmailToUsernameResolver(new EmailToUsernameResolverByLdapAttribute(
+        getAuthenticationProperties(), getApplicationLdaptiveTemplate()));
+
+    // usernameToBindDnConverter
+    Assert.notNull(getAuthenticationProperties().getUsernameToBindDnConverter(),
+        "Username to bind dn converter is required.");
+    setUsernameToBindDnConverter(getAuthenticationProperties().getUsernameToBindDnConverter()
+        .apply(getAuthenticationProperties()));
+
+    // accountControlEvaluator
+    if (isNull(getAuthenticationProperties().getAccountControlEvaluator())) {
+      setAccountControlEvaluator(new NoAccountControlEvaluator());
+    } else {
+      setAccountControlEvaluator(getAuthenticationProperties().getAccountControlEvaluator().get());
     }
   }
 
   /**
-   * Sets email to username converter.
+   * Sets email to username resolver.
    *
-   * @param emailToUsernameConverter the email to username converter
+   * @param emailToUsernameResolver the email to username resolver
    */
-  public void setEmailToUsernameConverter(
-      EmailToUsernameConverter emailToUsernameConverter) {
-    if (nonNull(emailToUsernameConverter)) {
-      this.emailToUsernameConverter = emailToUsernameConverter;
+  public void setEmailToUsernameResolver(
+      EmailToUsernameResolver emailToUsernameResolver) {
+    if (nonNull(emailToUsernameResolver)) {
+      this.emailToUsernameResolver = emailToUsernameResolver;
     }
   }
 
@@ -174,18 +221,6 @@ public class LdaptiveAuthenticationManager
   }
 
   /**
-   * Sets authentication token converter.
-   *
-   * @param converter the converter
-   */
-  public void setAuthenticationTokenConverter(
-      Converter<AuthenticationSource<LdapEntry>, LdaptiveAuthentication> converter) {
-    if (nonNull(converter)) {
-      this.tokenConverter = converter;
-    }
-  }
-
-  /**
    * Init.
    */
   public void init() {
@@ -199,93 +234,47 @@ public class LdaptiveAuthenticationManager
 
   @Override
   public boolean supports(Class<?> authentication) {
-    return UsernamePasswordAuthenticationToken.class
-        .isAssignableFrom(authentication);
+    return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
   }
 
   /**
-   * Changes the password of the user. Extended Operation(1.3.6.1.4.1.4203.1.11.1) must be
-   * supported.
+   * Determines whether the given authentication is a remember-me authentication.
    *
-   * @param username the username
-   * @param currentRawPassword the current password
-   * @param newRawPassword the new password
+   * @param authentication the authentication
+   * @return the boolean
    */
-  public void changePassword(String username, String currentRawPassword, String newRawPassword) {
-    LdaptiveTemplate ldaptiveTemplate = getLdapTemplate(username, currentRawPassword);
-    String dn = authenticate(username, currentRawPassword, ldaptiveTemplate)
-        .getPrincipal()
-        .getDn();
-    ldaptiveTemplate.modifyUserPassword(dn, currentRawPassword, newRawPassword);
+  protected boolean isRememberMeAuthenticationToken(Authentication authentication) {
+    return authentication instanceof RememberMeAuthenticationToken
+        && authentication.getPrincipal() instanceof LdaptiveUserDetails;
   }
 
   @Override
   public LdaptiveAuthentication authenticate(Authentication authentication)
       throws AuthenticationException {
-    String username = getEmailToUsernameConverter()
+    logger.debug("Authenticating user '" + authentication.getName() + "' ...");
+    String username = getEmailToUsernameResolver()
         .getUsernameByEmail(authentication.getName())
         .orElseGet(authentication::getName);
     String password = String.valueOf(authentication.getCredentials());
     LdaptiveTemplate ldaptiveTemplate = getLdapTemplate(username, password);
-    return authenticate(username, password, ldaptiveTemplate);
-  }
-
-  /**
-   * Authenticate ldaptive authentication.
-   *
-   * @param username the username
-   * @param password the password
-   * @param ldaptiveTemplate the ldaptive template
-   * @return the ldaptive authentication
-   */
-  protected LdaptiveAuthentication authenticate(
-      String username,
-      String password,
-      LdaptiveTemplate ldaptiveTemplate) {
-
-    LdapEntry user = getUser(ldaptiveTemplate, username);
-    if (isNull(getUsername(user))) {
-      user.addAttributes(LdapAttribute.builder()
-          .name(getAuthenticationProperties().getUsernameAttribute())
-          .values(username)
-          .build());
+    LdaptiveUserDetails userDetails = getUserDetails(ldaptiveTemplate, username);
+    checkPassword(ldaptiveTemplate, userDetails, password);
+    checkAccountControl(userDetails);
+    if (nonNull(getTokenConverter())) {
+      return getTokenConverter().convert(userDetails);
     }
-    checkPassword(ldaptiveTemplate, user, password);
-    checkAccountControl(user);
-    return getTokenConverter().convert(
-        new LdaptiveAuthenticationSource(getUsername(user),
-            getAuthorities(ldaptiveTemplate, user),
-            user));
+    return new LdaptiveAuthenticationToken(getAuthenticationProperties(), userDetails);
   }
 
   /**
-   * Bind with authentication boolean.
+   * Determines whether to bind with username and password or with the application ldaptive
+   * template.
    *
    * @return the boolean
    */
   protected boolean bindWithAuthentication() {
     return isNull(getAuthenticationProperties().getPasswordAttribute())
         || getAuthenticationProperties().getPasswordAttribute().isBlank();
-  }
-
-  /**
-   * Gets connection factory.
-   *
-   * @param username the username
-   * @param password the password
-   * @return the connection factory
-   */
-  protected ConnectionFactory getConnectionFactory(String username, String password) {
-    if (bindWithAuthentication()) {
-      ConnectionConfig authConfig = ConnectionConfig.copy(getConnectionConfig());
-      String bindDn = getUsernameToBindDnConverter().convert(username);
-      authConfig.setConnectionInitializers(BindConnectionInitializer.builder()
-          .dn(bindDn)
-          .credential(password)
-          .build());
-      return new DefaultConnectionFactory(authConfig);
-    }
-    return new DefaultConnectionFactory(getConnectionConfig());
   }
 
   /**
@@ -296,37 +285,56 @@ public class LdaptiveAuthenticationManager
    * @return the ldap template
    */
   protected LdaptiveTemplate getLdapTemplate(String username, String password) {
-    return getLdaptiveTemplateFn().apply(getConnectionFactory(username, password));
+    if (bindWithAuthentication()) {
+      ConnectionConfig authConfig = ConnectionConfig
+          .copy(getApplicationLdaptiveTemplate().getConnectionFactory().getConnectionConfig());
+      String bindDn = getUsernameToBindDnConverter().convert(username);
+      authConfig.setConnectionInitializers(BindConnectionInitializer.builder()
+          .dn(bindDn)
+          .credential(password)
+          .build());
+      return new LdaptiveTemplate(new DefaultConnectionFactory(authConfig));
+    }
+    return getApplicationLdaptiveTemplate();
   }
 
   /**
-   * Gets user.
+   * Gets user details.
    *
    * @param ldaptiveTemplate the ldaptive template
    * @param username the username
-   * @return the user
-   * @throws UsernameNotFoundException the username not found exception
+   * @return the user details
    */
-  protected LdapEntry getUser(LdaptiveTemplate ldaptiveTemplate, String username)
-      throws UsernameNotFoundException {
-
+  protected LdaptiveUserDetails getUserDetails(LdaptiveTemplate ldaptiveTemplate, String username) {
     try {
-      return ldaptiveTemplate
-          .findOne(
-              SearchRequest.builder()
-                  .dn(getAuthenticationProperties().getUserBaseDn())
-                  .filter(FilterTemplate.builder()
-                      .filter(getAuthenticationProperties().getUserFindOneFilter())
-                      .parameters(username)
-                      .build())
-                  .scope(getAuthenticationProperties().getUserFindOneSearchScope())
-                  .sizeLimit(1)
-                  .build())
-          .orElseThrow(() -> new UsernameNotFoundException(
-              "User '" + username + "' was not found."));
+      return getUserDetailsService(ldaptiveTemplate).loadUserByUsername(username);
     } catch (LdaptiveException le) {
       throw getBindException(le);
     }
+  }
+
+  /**
+   * Gets user details service.
+   *
+   * @return the user details service
+   */
+  public LdaptiveUserDetailsService getUserDetailsService() {
+    return getUserDetailsService(getApplicationLdaptiveTemplate());
+  }
+
+  /**
+   * Gets user details service.
+   *
+   * @param ldaptiveTemplate the ldaptive template
+   * @return the user details service
+   */
+  protected LdaptiveUserDetailsService getUserDetailsService(LdaptiveTemplate ldaptiveTemplate) {
+    LdaptiveUserDetailsService userDetailsService = new LdaptiveUserDetailsService(
+        getAuthenticationProperties(), ldaptiveTemplate);
+    userDetailsService.setAccountControlEvaluator(getAccountControlEvaluator());
+    userDetailsService.setGrantedAuthoritiesMapper(getGrantedAuthoritiesMapper());
+    userDetailsService.setRememberMeTokenProvider(getPasswordProvider());
+    return userDetailsService;
   }
 
   private RuntimeException getBindException(LdaptiveException exception) {
@@ -366,7 +374,7 @@ public class LdaptiveAuthenticationManager
    */
   protected void checkPassword(
       LdaptiveTemplate ldaptiveTemplate,
-      LdapEntry user,
+      LdaptiveUserDetails user,
       String password) {
 
     if (!bindWithAuthentication()) {
@@ -387,122 +395,19 @@ public class LdaptiveAuthenticationManager
    *
    * @param user the user
    */
-  protected void checkAccountControl(LdapEntry user) {
-    if (!getAccountControlEvaluator().isEnabled(user)) {
+  protected void checkAccountControl(LdaptiveUserDetails user) {
+    if (!user.isEnabled()) {
       throw new DisabledException("Account is disabled.");
     }
-    if (!getAccountControlEvaluator().isAccountNonLocked(user)) {
+    if (!user.isAccountNonLocked()) {
       throw new LockedException("Account is locked.");
     }
-    if (!getAccountControlEvaluator().isAccountNonExpired(user)) {
+    if (!user.isAccountNonExpired()) {
       throw new AccountExpiredException("Account is expired.");
     }
-    if (!getAccountControlEvaluator().isCredentialsNonExpired(user)) {
+    if (!user.isCredentialsNonExpired()) {
       throw new CredentialsExpiredException("Credentials are expired.");
     }
-  }
-
-  /**
-   * Gets authorities.
-   *
-   * @param ldaptiveTemplate the ldaptive template
-   * @param user the user
-   * @return the authorities
-   */
-  protected Collection<? extends String> getAuthorities(
-      LdaptiveTemplate ldaptiveTemplate, LdapEntry user) {
-
-    return switch (getAuthenticationProperties().getGroupFetchStrategy()) {
-      case NONE -> Set.of();
-      case USER_CONTAINS_GROUPS -> getAuthoritiesByGroupsInUser(user);
-      case GROUP_CONTAINS_USERS -> getAuthoritiesByGroupsWithUser(ldaptiveTemplate, user);
-    };
-  }
-
-  /**
-   * Gets roles by groups in user.
-   *
-   * @param user the user
-   * @return the roles by groups in user
-   */
-  protected Collection<? extends String> getAuthoritiesByGroupsInUser(LdapEntry user) {
-    return LdaptiveEntryMapper.getAttributeValues(
-            user, getAuthenticationProperties().getMemberAttribute(), STRING_TRANSCODER)
-        .stream()
-        .map(LdaptiveEntryMapper::getRdn)
-        .collect(Collectors.toSet());
-  }
-
-  /**
-   * Gets roles by groups with user.
-   *
-   * @param ldaptiveTemplate the ldaptive template
-   * @param user the user
-   * @return the roles by groups with user
-   */
-  protected Collection<? extends String> getAuthoritiesByGroupsWithUser(
-      LdaptiveTemplate ldaptiveTemplate, LdapEntry user) {
-    return ldaptiveTemplate
-        .findAll(
-            SearchRequest.builder()
-                .dn(getAuthenticationProperties().getGroupBaseDn())
-                .filter(FilterTemplate.builder()
-                    .filter(getAuthorityFilter(user))
-                    .build())
-                .scope(getAuthenticationProperties().getGroupSearchScope())
-                .build())
-        .stream()
-        .map(this::getAuthorityName)
-        .collect(Collectors.toSet());
-  }
-
-  /**
-   * Gets group filter.
-   *
-   * @param user the user
-   * @return the group filter
-   */
-  protected String getAuthorityFilter(LdapEntry user) {
-    String groupObjectClass = getAuthenticationProperties().getGroupObjectClass();
-    String groupMemberAttribute = getAuthenticationProperties().getGroupMemberAttribute();
-    String groupMemberValue;
-    String groupMemberFormat = getAuthenticationProperties().getGroupMemberFormat();
-    if (isEmpty(groupMemberFormat)) {
-      groupMemberValue = user.getDn();
-    } else {
-      String username = getUsername(user);
-      groupMemberValue = groupMemberFormat
-          .replaceFirst(Pattern.quote(USERNAME_PLACEHOLDER), username);
-    }
-    return String.format("(&(objectClass=%s)(%s=%s))",
-        groupObjectClass, groupMemberAttribute, groupMemberValue);
-  }
-
-  /**
-   * Gets group name.
-   *
-   * @param group the group
-   * @return the group name
-   */
-  protected String getAuthorityName(LdapEntry group) {
-    String groupIdAttribute = getAuthenticationProperties().getGroupIdAttribute();
-    String fallback = LdaptiveEntryMapper.getRdn(group.getDn());
-    if (isEmpty(groupIdAttribute)) {
-      return fallback;
-    }
-    return LdaptiveEntryMapper
-        .getAttributeValue(group, groupIdAttribute, STRING_TRANSCODER, fallback);
-  }
-
-  /**
-   * Gets username.
-   *
-   * @param user the user
-   * @return the username
-   */
-  protected String getUsername(LdapEntry user) {
-    return LdaptiveEntryMapper.getAttributeValue(
-        user, getAuthenticationProperties().getUsernameAttribute(), STRING_TRANSCODER, null);
   }
 
 }

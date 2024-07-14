@@ -17,7 +17,12 @@
 package org.bremersee.spring.boot.autoconfigure.security.authentication;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -31,6 +36,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class AuthenticationProperties {
 
   /**
+   * The remember-me properties.
+   */
+  private RememberMeProperties rememberMe = new RememberMeProperties();
+
+  /**
    * The jwt converter properties.
    */
   private JwtConverterProperties jwtConverter = new JwtConverterProperties();
@@ -39,6 +49,50 @@ public class AuthenticationProperties {
    * The ldaptive properties.
    */
   private LdaptiveProperties ldaptive = new LdaptiveProperties();
+
+  /**
+   * The remember-me properties.
+   *
+   * @author Christian Bremer
+   */
+  @Data
+  public static class RememberMeProperties {
+
+    /**
+     * The key.
+     */
+    private String key;
+
+    /**
+     * Specifies whether remember-me is always activated.
+     */
+    private Boolean alwaysRemember;
+
+    /**
+     * The cookie name.
+     */
+    private String cookieName;
+
+    /**
+     * The cookie domain.
+     */
+    private String cookieDomain;
+
+    /**
+     * Specifies whether to use secure cookie.
+     */
+    private Boolean useSecureCookie;
+
+    /**
+     * The parameter name (default remember-me).
+     */
+    private String parameterName;
+
+    /**
+     * The token validity in seconds (default two weeks).
+     */
+    private Integer tokenValiditySeconds;
+  }
 
   /**
    * The jwt converter properties.
@@ -107,6 +161,36 @@ public class AuthenticationProperties {
      */
     private List<StringReplacement> roleStringReplacements;
 
+    /**
+     * To role mappings map.
+     *
+     * @return the map
+     */
+    public Map<String, String> toRoleMappings() {
+      return Stream.ofNullable(getRoleMapping())
+          .flatMap(Collection::stream)
+          .collect(Collectors.toMap(
+              RoleMapping::getSource,
+              RoleMapping::getTarget,
+              (first, second) -> first,
+              LinkedHashMap::new));
+    }
+
+    /**
+     * To role string replacements map.
+     *
+     * @return the map
+     */
+    public Map<String, String> toRoleStringReplacements() {
+      return Stream.ofNullable(getRoleStringReplacements())
+          .flatMap(Collection::stream)
+          .collect(Collectors.toMap(
+              StringReplacement::getRegex,
+              StringReplacement::getReplacement,
+              (first, second) -> first,
+              LinkedHashMap::new));
+    }
+
   }
 
   /**
@@ -156,6 +240,12 @@ public class AuthenticationProperties {
      * is insecure.
      */
     private String passwordAttribute;
+
+    /**
+     * The password last set attribute (like 'pwdLastSet') can be used to activate the remember-me
+     * functionality.
+     */
+    private String passwordLastSetAttribute;
 
     /**
      * The filter to find the user. If it is empty, it will be generated from 'userObjectClass' and

@@ -18,16 +18,12 @@ package org.bremersee.spring.boot.autoconfigure.security.authentication;
 
 import static java.util.Objects.isNull;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.spring.boot.autoconfigure.security.authentication.AuthenticationProperties.JwtConverterProperties;
-import org.bremersee.spring.boot.autoconfigure.security.authentication.AuthenticationProperties.RoleMapping;
-import org.bremersee.spring.boot.autoconfigure.security.authentication.AuthenticationProperties.StringReplacement;
-import org.bremersee.spring.security.authentication.CaseTransformation;
 import org.bremersee.spring.security.authentication.JsonPathJwtConverter;
+import org.bremersee.spring.security.core.authority.mapping.CaseTransformation;
+import org.bremersee.spring.security.core.authority.mapping.NormalizedGrantedAuthoritiesMapper;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -38,6 +34,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.util.ClassUtils;
 
@@ -86,38 +83,32 @@ public class JwtConverterAutoConfiguration {
   /**
    * Creates jwt converter.
    *
+   * @param mapper the mapper
    * @return the converter
    */
   @ConditionalOnMissingBean
   @Bean
-  public Converter<Jwt, AbstractAuthenticationToken> jwtConverter() {
-    return JsonPathJwtConverter.builder()
-        .nameJsonPath(properties.getNameJsonPath())
-        .firstNameJsonPath(properties.getFirstNameJsonPath())
-        .lastNameJsonPath(properties.getLastNameJsonPath())
-        .emailJsonPath(properties.getEmailJsonPath())
+  public Converter<Jwt, AbstractAuthenticationToken> jwtConverter(
+      ObjectProvider<GrantedAuthoritiesMapper> mapper) {
 
-        .rolesJsonPath(properties.getRolesJsonPath())
-        .rolesValueList(properties.isRolesValueList())
-        .rolesValueSeparator(properties.getRolesValueSeparator())
-        .roleMapping(Stream.ofNullable(properties.getRoleMapping())
-            .flatMap(Collection::stream)
-            .collect(Collectors.toMap(
-                RoleMapping::getSource,
-                RoleMapping::getTarget,
-                (first, second) -> first,
-                LinkedHashMap::new)))
-        .roleStringReplacements(Stream.ofNullable(properties.getRoleStringReplacements())
-            .flatMap(Collection::stream)
-            .collect(Collectors.toMap(
-                StringReplacement::getRegex,
-                StringReplacement::getReplacement,
-                (first, second) -> first,
-                LinkedHashMap::new)))
-        .roleCaseTransformation(getCaseTransformation(properties.getRoleCaseTransformation()))
-        .rolePrefix(properties.getRolePrefix())
-        .defaultRoles(properties.getDefaultRoles())
-        .build();
+    GrantedAuthoritiesMapper grantedAuthoritiesMapper = mapper
+        .getIfAvailable(() -> new NormalizedGrantedAuthoritiesMapper(
+            properties.getDefaultRoles(),
+            properties.toRoleMappings(),
+            properties.getRolePrefix(),
+            getCaseTransformation(properties.getRoleCaseTransformation()),
+            properties.toRoleStringReplacements()));
+
+    return new JsonPathJwtConverter(
+        properties.getNameJsonPath(),
+        properties.getFirstNameJsonPath(),
+        properties.getLastNameJsonPath(),
+        properties.getEmailJsonPath(),
+        properties.getRolesJsonPath(),
+        properties.isRolesValueList(),
+        properties.getRolesValueSeparator(),
+        grantedAuthoritiesMapper
+    );
   }
 
   private CaseTransformation getCaseTransformation(

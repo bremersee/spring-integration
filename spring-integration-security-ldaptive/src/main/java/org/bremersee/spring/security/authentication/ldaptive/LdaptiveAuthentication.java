@@ -20,7 +20,7 @@ import org.bremersee.ldaptive.serializable.SerLdapEntry;
 import org.bremersee.spring.security.authentication.NormalizedAuthentication;
 
 /**
- * The interface LdaptiveAuthentication.
+ * The ldaptive authentication.
  *
  * @author Christian Bremer
  */

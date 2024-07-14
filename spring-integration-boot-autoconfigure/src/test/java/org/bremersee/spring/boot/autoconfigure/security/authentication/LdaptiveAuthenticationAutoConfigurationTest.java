@@ -3,16 +3,26 @@ package org.bremersee.spring.boot.autoconfigure.security.authentication;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
+import org.bremersee.spring.security.authentication.EmailToUsernameResolver;
 import org.bremersee.spring.security.authentication.ldaptive.AccountControlEvaluator;
+import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthentication;
 import org.bremersee.spring.security.authentication.ldaptive.UsernameToBindDnConverter;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveRememberMeTokenProvider;
+import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.ldaptive.ConnectionConfig;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 
 /**
- * The type Ldaptive authentication auto configuration test.
+ * The ldaptive authentication autoconfiguration test.
  */
+@ExtendWith(SoftAssertionsExtension.class)
 class LdaptiveAuthenticationAutoConfigurationTest {
 
   /**
@@ -35,7 +45,7 @@ class LdaptiveAuthenticationAutoConfigurationTest {
   }
 
   /**
-   * Ldaptive password encoder provider.
+   * The ldaptive password encoder provider.
    */
   @Test
   void ldaptivePasswordEncoderProvider() {
@@ -44,29 +54,29 @@ class LdaptiveAuthenticationAutoConfigurationTest {
   }
 
   /**
-   * Ldaptive authentication token converter.
-   */
-  @Test
-  void ldaptiveAuthenticationTokenConverter() {
-    assertThat(target.ldaptiveAuthenticationTokenConverter())
-        .isNotNull();
-  }
-
-  /**
-   * Ldaptive authentication manager.
+   * The ldaptive authentication manager.
    */
   @Test
   void ldaptiveAuthenticationManager() {
     ConnectionConfig connectionConfig = ConnectionConfig.builder().build();
-    ObjectProvider<UsernameToBindDnConverter> usernameToBindDnProvider = mock();
-    ObjectProvider<AccountControlEvaluator> accountControlEvaluatorProvider = mock();
+    //ObjectProvider<>
+    ObjectProvider<EmailToUsernameResolver> emailToUsernameResolver = mock();
+    ObjectProvider<UsernameToBindDnConverter> usernameToBindDnConverter = mock();
+    ObjectProvider<AccountControlEvaluator> accountControlEvaluator = mock();
+    ObjectProvider<GrantedAuthoritiesMapper> grantedAuthoritiesMapper = mock();
+    ObjectProvider<Converter<LdaptiveUserDetails, LdaptiveAuthentication>> tokenConverter = mock();
     assertThat(target
         .ldaptiveAuthenticationManager(
             connectionConfig,
-            usernameToBindDnProvider,
+            mock(),
+            mock(),
             target.ldaptivePasswordEncoderProvider(),
-            accountControlEvaluatorProvider,
-            target.ldaptiveAuthenticationTokenConverter()))
+            LdaptiveRememberMeTokenProvider.invalid(),
+            emailToUsernameResolver,
+            usernameToBindDnConverter,
+            accountControlEvaluator,
+            grantedAuthoritiesMapper,
+            tokenConverter))
         .isNotNull();
   }
 
@@ -76,15 +86,41 @@ class LdaptiveAuthenticationAutoConfigurationTest {
   @Test
   void reactiveLdaptiveAuthenticationManager() {
     ConnectionConfig connectionConfig = ConnectionConfig.builder().build();
-    ObjectProvider<UsernameToBindDnConverter> usernameToBindDnProvider = mock();
-    ObjectProvider<AccountControlEvaluator> accountControlEvaluatorProvider = mock();
+    ObjectProvider<EmailToUsernameResolver> emailToUsernameResolver = mock();
+    ObjectProvider<UsernameToBindDnConverter> usernameToBindDnConverter = mock();
+    ObjectProvider<AccountControlEvaluator> accountControlEvaluator = mock();
+    ObjectProvider<GrantedAuthoritiesMapper> grantedAuthoritiesMapper = mock();
+    ObjectProvider<Converter<LdaptiveUserDetails, LdaptiveAuthentication>> tokenConverter = mock();
     assertThat(target
         .reactiveLdaptiveAuthenticationManager(
             connectionConfig,
-            usernameToBindDnProvider,
+            mock(),
+            mock(),
             target.ldaptivePasswordEncoderProvider(),
-            accountControlEvaluatorProvider,
-            target.ldaptiveAuthenticationTokenConverter()))
+            LdaptiveRememberMeTokenProvider.invalid(),
+            emailToUsernameResolver,
+            usernameToBindDnConverter,
+            accountControlEvaluator,
+            grantedAuthoritiesMapper,
+            tokenConverter))
+        .isNotNull();
+  }
+
+  /**
+   * Ldaptive remember me token provider.
+   *
+   * @param softly the softly
+   */
+  @Test
+  void ldaptiveRememberMeTokenProvider(SoftAssertions softly) {
+    ObjectProvider<AccountControlEvaluator> evaluator = mock();
+    softly
+        .assertThat(target.ldaptiveRememberMeTokenProvider(evaluator))
+        .isNotNull();
+
+    properties.getLdaptive().setPasswordLastSetAttribute("pwdLastSet");
+    softly
+        .assertThat(target.ldaptiveRememberMeTokenProvider(evaluator))
         .isNotNull();
   }
 }
