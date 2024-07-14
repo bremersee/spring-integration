@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LdaptivePwdLastSetRememberMeTokenProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Integration Security Ldaptive</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.spring.security.core.userdetails.ldaptive</a> &gt; <span class="el_source">LdaptivePwdLastSetRememberMeTokenProvider.java</span></div><h1>LdaptivePwdLastSetRememberMeTokenProvider.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.spring.security.core.userdetails.ldaptive;
+
+import java.util.Optional;
+import lombok.AccessLevel;
+import lombok.Getter;
+import org.bremersee.spring.security.authentication.ldaptive.AccountControlEvaluator;
+import org.ldaptive.LdapAttribute;
+import org.ldaptive.LdapEntry;
+import org.springframework.util.ObjectUtils;
+
+/**
+ * The ldaptive pwdLastSet remember-me token provider.
+ *
+ * @author Christian Bremer
+ */
+public class LdaptivePwdLastSetRememberMeTokenProvider extends
+    LdaptiveEvaluatedRememberMeTokenProvider {
+
+  /**
+   * The pwdLastSet attribute name.
+   */
+<span class="fc" id="L38">  @Getter(AccessLevel.PROTECTED)</span>
+  private String pwdLastSetAttributeName = &quot;pwdLastSet&quot;;
+
+  /**
+   * Instantiates a ldaptive pwd last set remember-me token provider.
+   */
+  public LdaptivePwdLastSetRememberMeTokenProvider() {
+<span class="fc" id="L45">    this(null);</span>
+<span class="fc" id="L46">  }</span>
+
+  /**
+   * Instantiates a ldaptive pwd last set remember-me token provider.
+   *
+   * @param accountControlEvaluator the account control evaluator
+   */
+  public LdaptivePwdLastSetRememberMeTokenProvider(
+      AccountControlEvaluator accountControlEvaluator) {
+<span class="fc" id="L55">    this(accountControlEvaluator, null);</span>
+<span class="fc" id="L56">  }</span>
+
+  /**
+   * Instantiates a ldaptive pwd last set remember-me token provider.
+   *
+   * @param accountControlEvaluator the account control evaluator
+   * @param pwdLastSetAttributeName the pwd last set attribute name
+   */
+  public LdaptivePwdLastSetRememberMeTokenProvider(
+      AccountControlEvaluator accountControlEvaluator,
+      String pwdLastSetAttributeName) {
+<span class="fc" id="L67">    super(accountControlEvaluator);</span>
+<span class="fc" id="L68">    setPwdLastSetAttributeName(pwdLastSetAttributeName);</span>
+<span class="fc" id="L69">  }</span>
+
+  /**
+   * Sets pwdLastSet attribute name.
+   *
+   * @param pwdLastSetAttributeName the pwdLastSet attribute name
+   */
+  public void setPwdLastSetAttributeName(String pwdLastSetAttributeName) {
+<span class="fc bfc" id="L77" title="All 2 branches covered.">    if (!ObjectUtils.isEmpty(pwdLastSetAttributeName)) {</span>
+<span class="fc" id="L78">      this.pwdLastSetAttributeName = pwdLastSetAttributeName;</span>
+    }
+<span class="fc" id="L80">  }</span>
+
+  @Override
+  public String getRememberMeToken(LdapEntry ldapEntry) {
+<span class="fc" id="L84">    return Optional</span>
+<span class="fc" id="L85">        .ofNullable(ldapEntry.getAttribute(getPwdLastSetAttributeName()))</span>
+<span class="fc" id="L86">        .map(LdapAttribute::getStringValue)</span>
+<span class="fc" id="L87">        .map(value -&gt; getAccessControlValue(ldapEntry) + value)</span>
+<span class="pc" id="L88">        .orElseGet(() -&gt; LdaptiveRememberMeTokenProvider.invalid().getRememberMeToken(ldapEntry));</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

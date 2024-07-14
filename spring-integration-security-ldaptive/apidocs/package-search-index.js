@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.bremersee.spring.security.authentication.ldaptive"},{"l":"org.bremersee.spring.security.authentication.ldaptive.provider"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.bremersee.spring.security.authentication.ldaptive"},{"l":"org.bremersee.spring.security.authentication.ldaptive.provider"},{"l":"org.bremersee.spring.security.core.userdetails.ldaptive"}];updateSearchResults();

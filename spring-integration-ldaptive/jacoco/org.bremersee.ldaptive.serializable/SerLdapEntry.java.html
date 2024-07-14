@@ -18,6 +18,7 @@ package org.bremersee.ldaptive.serializable;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.security.Principal;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +38,7 @@ import org.ldaptive.LdapEntry;
 @Getter
 @ToString
 @EqualsAndHashCode
-public class SerLdapEntry implements Serializable {
+public class SerLdapEntry implements Serializable, Principal {
 
   @Serial
   private static final long serialVersionUID = 1L;
@@ -57,16 +58,21 @@ public class SerLdapEntry implements Serializable {
    *
    * @param ldapEntry the ldap entry
    */
-<span class="fc" id="L60">  public SerLdapEntry(LdapEntry ldapEntry) {</span>
-<span class="fc" id="L61">    this.dn = Optional.ofNullable(ldapEntry)</span>
-<span class="fc" id="L62">        .map(LdapEntry::getDn)</span>
-<span class="fc" id="L63">        .orElse(null);</span>
-<span class="fc" id="L64">    this.attributes = Stream.ofNullable(ldapEntry)</span>
-<span class="fc" id="L65">        .map(LdapEntry::getAttributes)</span>
-<span class="fc" id="L66">        .flatMap(Collection::stream)</span>
-<span class="fc" id="L67">        .map(SerLdapAttr::new)</span>
-<span class="fc" id="L68">        .collect(Collectors</span>
-<span class="fc" id="L69">            .toUnmodifiableMap(SerLdapAttr::getAttributeName, Function.identity()));</span>
-<span class="fc" id="L70">  }</span>
+<span class="fc" id="L61">  public SerLdapEntry(LdapEntry ldapEntry) {</span>
+<span class="fc" id="L62">    this.dn = Optional.ofNullable(ldapEntry)</span>
+<span class="fc" id="L63">        .map(LdapEntry::getDn)</span>
+<span class="fc" id="L64">        .orElse(null);</span>
+<span class="fc" id="L65">    this.attributes = Stream.ofNullable(ldapEntry)</span>
+<span class="fc" id="L66">        .map(LdapEntry::getAttributes)</span>
+<span class="fc" id="L67">        .flatMap(Collection::stream)</span>
+<span class="fc" id="L68">        .map(SerLdapAttr::new)</span>
+<span class="fc" id="L69">        .collect(Collectors</span>
+<span class="fc" id="L70">            .toUnmodifiableMap(SerLdapAttr::getAttributeName, Function.identity()));</span>
+<span class="fc" id="L71">  }</span>
+
+  @Override
+  public String getName() {
+<span class="fc" id="L75">    return getDn();</span>
+  }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

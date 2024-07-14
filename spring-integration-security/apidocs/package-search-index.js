@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.bremersee.spring.security.authentication"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.bremersee.spring.security.authentication"},{"l":"org.bremersee.spring.security.core.authority.mapping"}];updateSearchResults();

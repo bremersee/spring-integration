@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LdaptiveRememberMeAutoConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Integration Boot Autoconfiguration</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.spring.boot.autoconfigure.security.authentication</a> &gt; <span class="el_source">LdaptiveRememberMeAutoConfiguration.java</span></div><h1>LdaptiveRememberMeAutoConfiguration.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.spring.boot.autoconfigure.security.authentication;
+
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.spring.boot.autoconfigure.security.authentication.AuthenticationProperties.RememberMeProperties;
+import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager;
+import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationProperties;
+import org.bremersee.spring.security.authentication.ldaptive.LdaptiveTokenBasedRememberMeServices;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
+import org.springframework.security.authentication.RememberMeAuthenticationProvider;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.ObjectUtils;
+
+/**
+ * The ldaptive remember-me autoconfiguration.
+ *
+ * @author Christian Bremer
+ */
+@AutoConfiguration
+@ConditionalOnWebApplication(type = Type.SERVLET)
+@ConditionalOnProperty(prefix = &quot;bremersee.authentication.remember-me&quot;, name = &quot;key&quot;)
+@ConditionalOnBean(
+    type = &quot;org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager&quot;)
+@AutoConfigureAfter({LdaptiveAuthenticationAutoConfiguration.class})
+@EnableConfigurationProperties(AuthenticationProperties.class)
+<span class="fc" id="L54">@Slf4j</span>
+public class LdaptiveRememberMeAutoConfiguration {
+
+  private final RememberMeProperties rememberMeProperties;
+
+  private final LdaptiveAuthenticationProperties properties;
+
+  /**
+   * Instantiates a new ldaptive remember-me autoconfiguration.
+   *
+   * @param properties the properties
+   */
+<span class="fc" id="L66">  public LdaptiveRememberMeAutoConfiguration(AuthenticationProperties properties) {</span>
+<span class="fc" id="L67">    this.rememberMeProperties = properties.getRememberMe();</span>
+<span class="fc" id="L68">    this.properties = LdaptivePropertiesMapper.map(properties);</span>
+<span class="fc" id="L69">  }</span>
+
+  /**
+   * Init.
+   */
+  @EventListener(ApplicationReadyEvent.class)
+  public void init() {
+    String message;
+<span class="fc bfc" id="L77" title="All 2 branches covered.">    if (ObjectUtils.isEmpty(properties.getPasswordLastSetAttribute())) {</span>
+<span class="fc" id="L78">      message = &quot;&quot;&quot;</span>
+          WARNING: There is no password-last-set attribute configured.
+          * Remembered users can login as long as they exist and have been correctly evaluated.
+          * You may provide your own
+          * org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveRememberMeTokenProvider
+          * and org.bremersee.spring.security.authentication.ldaptive.AccountControlEvaluator!&quot;&quot;&quot;;
+    } else {
+<span class="fc" id="L85">      message = String.format(&quot;OK: Using '%s' as password-last-set attribute.&quot;,</span>
+<span class="fc" id="L86">          properties.getPasswordLastSetAttribute());</span>
+    }
+<span class="fc" id="L88">    log.info(&quot;&quot;&quot;</span>
+
+            *********************************************************************************
+            * {}
+            * {}
+            * {}
+            *********************************************************************************&quot;&quot;&quot;,
+<span class="fc" id="L95">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
+        rememberMeProperties,
+        message);
+<span class="fc" id="L98">  }</span>
+
+  /**
+   * Creates remember me authentication provider.
+   *
+   * @return the remember me authentication provider
+   */
+  @ConditionalOnMissingBean
+  @Bean
+  public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
+<span class="fc" id="L108">    return new RememberMeAuthenticationProvider(rememberMeProperties.getKey());</span>
+  }
+
+  /**
+   * Creates remember me services.
+   *
+   * @param authenticationManager the authentication manager
+   * @return the remember me services
+   */
+  @ConditionalOnBean(LdaptiveAuthenticationManager.class)
+  @ConditionalOnMissingBean
+  @Bean
+  public RememberMeServices rememberMeServices(
+      LdaptiveAuthenticationManager authenticationManager) {
+<span class="fc" id="L122">    LdaptiveTokenBasedRememberMeServices services = new LdaptiveTokenBasedRememberMeServices(</span>
+<span class="fc" id="L123">        rememberMeProperties.getKey(), properties, authenticationManager);</span>
+<span class="fc" id="L124">    Optional.ofNullable(rememberMeProperties.getAlwaysRemember())</span>
+<span class="fc" id="L125">        .ifPresent(services::setAlwaysRemember);</span>
+<span class="fc" id="L126">    Optional.ofNullable(rememberMeProperties.getCookieName())</span>
+<span class="fc" id="L127">        .ifPresent(services::setCookieName);</span>
+<span class="fc" id="L128">    Optional.ofNullable(rememberMeProperties.getCookieDomain())</span>
+<span class="fc" id="L129">        .ifPresent(services::setCookieDomain);</span>
+<span class="fc" id="L130">    Optional.ofNullable(rememberMeProperties.getUseSecureCookie())</span>
+<span class="fc" id="L131">        .ifPresent(services::setUseSecureCookie);</span>
+<span class="fc" id="L132">    Optional.ofNullable(rememberMeProperties.getParameterName())</span>
+<span class="fc" id="L133">        .ifPresent(services::setParameter);</span>
+<span class="fc" id="L134">    Optional.ofNullable(rememberMeProperties.getTokenValiditySeconds())</span>
+<span class="fc" id="L135">        .ifPresent(services::setTokenValiditySeconds);</span>
+<span class="fc" id="L136">    return services;</span>
+  }
+
+  /**
+   * Creates remember me authentication filter.
+   *
+   * @param authenticationManager the authentication manager
+   * @param rememberMeServices the remember me services
+   * @return the remember me authentication filter
+   */
+  @ConditionalOnBean(LdaptiveAuthenticationManager.class)
+  @ConditionalOnMissingBean
+  @Bean
+  public RememberMeAuthenticationFilter rememberMeAuthenticationFilter(
+      LdaptiveAuthenticationManager authenticationManager,
+      RememberMeServices rememberMeServices) {
+<span class="fc" id="L152">    return new RememberMeAuthenticationFilter(authenticationManager, rememberMeServices);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

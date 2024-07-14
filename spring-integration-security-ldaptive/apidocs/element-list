@@ -1,2 +1,3 @@
 org.bremersee.spring.security.authentication.ldaptive
 org.bremersee.spring.security.authentication.ldaptive.provider
+org.bremersee.spring.security.core.userdetails.ldaptive

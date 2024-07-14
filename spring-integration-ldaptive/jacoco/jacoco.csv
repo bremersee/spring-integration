@@ -17,7 +17,7 @@ Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveProperties,0,159,2,12
 Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveException,0,31,0,4,0,6,0,6,0,4
 Spring Integration Ldaptive,org.bremersee.ldaptive,LdaptiveException.new AbstractServiceExceptionBuilder() {...},0,11,0,0,0,2,0,2,0,2
 Spring Integration Ldaptive,org.bremersee.ldaptive.serializable,SerLdapAttr,11,198,8,18,5,35,8,19,0,14
-Spring Integration Ldaptive,org.bremersee.ldaptive.serializable,SerLdapEntry,0,27,0,0,0,11,0,1,0,1
+Spring Integration Ldaptive,org.bremersee.ldaptive.serializable,SerLdapEntry,0,30,0,0,0,12,0,2,0,2
 Spring Integration Ldaptive,org.bremersee.ldaptive.reactive,ReactiveLdaptiveTemplate.FluxSinkAwareResultHandler,11,24,2,2,1,8,2,2,0,2
 Spring Integration Ldaptive,org.bremersee.ldaptive.reactive,ReactiveLdaptiveTemplate,146,552,6,10,26,124,15,31,9,29
 Spring Integration Ldaptive,org.bremersee.ldaptive.reactive,ReactiveLdaptiveOperations,4,122,1,1,1,20,1,14,0,14

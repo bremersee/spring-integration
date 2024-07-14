@@ -17,7 +17,12 @@
 package org.bremersee.spring.boot.autoconfigure.security.authentication;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -31,6 +36,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class AuthenticationProperties {
 
   /**
+   * The remember-me properties.
+   */
+  private RememberMeProperties rememberMe = new RememberMeProperties();
+
+  /**
    * The jwt converter properties.
    */
   private JwtConverterProperties jwtConverter = new JwtConverterProperties();
@@ -39,6 +49,50 @@ public class AuthenticationProperties {
    * The ldaptive properties.
    */
   private LdaptiveProperties ldaptive = new LdaptiveProperties();
+
+  /**
+   * The remember-me properties.
+   *
+   * @author Christian Bremer
+   */
+  @Data
+  public static class RememberMeProperties {
+
+    /**
+     * The key.
+     */
+    private String key;
+
+    /**
+     * Specifies whether remember-me is always activated.
+     */
+    private Boolean alwaysRemember;
+
+    /**
+     * The cookie name.
+     */
+    private String cookieName;
+
+    /**
+     * The cookie domain.
+     */
+    private String cookieDomain;
+
+    /**
+     * Specifies whether to use secure cookie.
+     */
+    private Boolean useSecureCookie;
+
+    /**
+     * The parameter name (default remember-me).
+     */
+    private String parameterName;
+
+    /**
+     * The token validity in seconds (default two weeks).
+     */
+    private Integer tokenValiditySeconds;
+  }
 
   /**
    * The jwt converter properties.
@@ -107,6 +161,36 @@ public class AuthenticationProperties {
      */
     private List&lt;StringReplacement&gt; roleStringReplacements;
 
+    /**
+     * To role mappings map.
+     *
+     * @return the map
+     */
+    public Map&lt;String, String&gt; toRoleMappings() {
+<span class="nc" id="L170">      return Stream.ofNullable(getRoleMapping())</span>
+<span class="nc" id="L171">          .flatMap(Collection::stream)</span>
+<span class="nc" id="L172">          .collect(Collectors.toMap(</span>
+              RoleMapping::getSource,
+              RoleMapping::getTarget,
+<span class="nc" id="L175">              (first, second) -&gt; first,</span>
+              LinkedHashMap::new));
+    }
+
+    /**
+     * To role string replacements map.
+     *
+     * @return the map
+     */
+    public Map&lt;String, String&gt; toRoleStringReplacements() {
+<span class="nc" id="L185">      return Stream.ofNullable(getRoleStringReplacements())</span>
+<span class="nc" id="L186">          .flatMap(Collection::stream)</span>
+<span class="nc" id="L187">          .collect(Collectors.toMap(</span>
+              StringReplacement::getRegex,
+              StringReplacement::getReplacement,
+<span class="nc" id="L190">              (first, second) -&gt; first,</span>
+              LinkedHashMap::new));
+    }
+
   }
 
   /**
@@ -156,6 +240,12 @@ public class AuthenticationProperties {
      * is insecure.
      */
     private String passwordAttribute;
+
+    /**
+     * The password last set attribute (like 'pwdLastSet') can be used to activate the remember-me
+     * functionality.
+     */
+    private String passwordLastSetAttribute;
 
     /**
      * The filter to find the user. If it is empty, it will be generated from 'userObjectClass' and
@@ -262,80 +352,80 @@ public class AuthenticationProperties {
     /**
      * The search scope.
      */
-<span class="nc" id="L265">    public enum SearchScope {</span>
+<span class="nc" id="L355">    public enum SearchScope {</span>
 
       /**
        * Base object search.
        */
-<span class="nc" id="L270">      OBJECT,</span>
+<span class="nc" id="L360">      OBJECT,</span>
 
       /**
        * Single level search.
        */
-<span class="nc" id="L275">      ONELEVEL,</span>
+<span class="nc" id="L365">      ONELEVEL,</span>
 
       /**
        * Whole subtree search.
        */
-<span class="nc" id="L280">      SUBTREE,</span>
+<span class="nc" id="L370">      SUBTREE,</span>
 
       /**
        * Subordinate subtree search. See draft-sermersheim-ldap-subordinate-scope.
        */
-<span class="nc" id="L285">      SUBORDINATE</span>
+<span class="nc" id="L375">      SUBORDINATE</span>
     }
 
     /**
      * The username to bind dn converter property.
      */
-<span class="nc" id="L291">    public enum UsernameToBindDnConverterProperty {</span>
+<span class="nc" id="L381">    public enum UsernameToBindDnConverterProperty {</span>
 
       /**
        * By user rdn attribute username to bind dn converter property.
        */
-<span class="nc" id="L296">      BY_USER_RDN_ATTRIBUTE,</span>
+<span class="nc" id="L386">      BY_USER_RDN_ATTRIBUTE,</span>
 
       /**
        * By domain email username to bind dn converter property.
        */
-<span class="nc" id="L301">      BY_DOMAIN_EMAIL</span>
+<span class="nc" id="L391">      BY_DOMAIN_EMAIL</span>
     }
 
     /**
      * The account control evaluator property.
      */
-<span class="nc" id="L307">    public enum AccountControlEvaluatorProperty {</span>
+<span class="nc" id="L397">    public enum AccountControlEvaluatorProperty {</span>
 
       /**
        * The None.
        */
-<span class="nc" id="L312">      NONE,</span>
+<span class="nc" id="L402">      NONE,</span>
 
       /**
        * The Active directory.
        */
-<span class="nc" id="L317">      ACTIVE_DIRECTORY</span>
+<span class="nc" id="L407">      ACTIVE_DIRECTORY</span>
     }
 
     /**
      * The group fetch strategy.
      */
-<span class="nc" id="L323">    public enum GroupFetchStrategy {</span>
+<span class="nc" id="L413">    public enum GroupFetchStrategy {</span>
 
       /**
        * Groups will not be fetched.
        */
-<span class="nc" id="L328">      NONE,</span>
+<span class="nc" id="L418">      NONE,</span>
 
       /**
        * User contains groups group-fetch strategy.
        */
-<span class="nc" id="L333">      USER_CONTAINS_GROUPS,</span>
+<span class="nc" id="L423">      USER_CONTAINS_GROUPS,</span>
 
       /**
        * Group contains users group-fetch strategy.
        */
-<span class="nc" id="L338">      GROUP_CONTAINS_USERS</span>
+<span class="nc" id="L428">      GROUP_CONTAINS_USERS</span>
     }
 
     /**
@@ -343,27 +433,27 @@ public class AuthenticationProperties {
      *
      * @author Christian Bremer
      */
-<span class="fc" id="L346">    public enum Template {</span>
+<span class="fc" id="L436">    public enum Template {</span>
 
       /**
        * Active directory template.
        */
-<span class="fc" id="L351">      ACTIVE_DIRECTORY,</span>
+<span class="fc" id="L441">      ACTIVE_DIRECTORY,</span>
 
       /**
        * Open ldap template.
        */
-<span class="fc" id="L356">      OPEN_LDAP,</span>
+<span class="fc" id="L446">      OPEN_LDAP,</span>
 
       /**
        * User contains groups template.
        */
-<span class="fc" id="L361">      USER_CONTAINS_GROUPS,</span>
+<span class="fc" id="L451">      USER_CONTAINS_GROUPS,</span>
 
       /**
        * Group contains users template.
        */
-<span class="fc" id="L366">      GROUP_CONTAINS_USERS</span>
+<span class="fc" id="L456">      GROUP_CONTAINS_USERS</span>
     }
   }
 
@@ -381,22 +471,22 @@ public class AuthenticationProperties {
   /**
    * The case transformation.
    */
-<span class="nc" id="L384">  public enum CaseTransformation {</span>
+<span class="nc" id="L474">  public enum CaseTransformation {</span>
 
     /**
      * None case transformation.
      */
-<span class="nc" id="L389">    NONE,</span>
+<span class="nc" id="L479">    NONE,</span>
 
     /**
      * To upper case transformation.
      */
-<span class="nc" id="L394">    TO_UPPER_CASE,</span>
+<span class="nc" id="L484">    TO_UPPER_CASE,</span>
 
     /**
      * To lower case transformation.
      */
-<span class="nc" id="L399">    TO_LOWER_CASE</span>
+<span class="nc" id="L489">    TO_LOWER_CASE</span>
   }
 
   /**
@@ -418,4 +508,4 @@ public class AuthenticationProperties {
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

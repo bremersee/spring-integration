@@ -3,15 +3,15 @@
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.processing.Generated;
-import org.bremersee.spring.security.authentication.CaseTransformation;
 import org.bremersee.spring.security.authentication.ldaptive.AccountControlEvaluatorProperty;
 import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationProperties;
 import org.bremersee.spring.security.authentication.ldaptive.UsernameToBindDnConverterProperty;
+import org.bremersee.spring.security.core.authority.mapping.CaseTransformation;
 import org.ldaptive.SearchScope;
 
 @Generated(
     value = &quot;org.mapstruct.ap.MappingProcessor&quot;,
-    date = &quot;2024-07-08T21:16:54+0200&quot;,
+    date = &quot;2024-07-14T23:39:53+0200&quot;,
     comments = &quot;version: 1.5.5.Final, compiler: javac, environment: Java 17.0.11 (Debian)&quot;
 )
 <span class="fc" id="L17">class LdaptiveAuthenticationAutoConfiguration$PropertiesMapperImpl implements LdaptiveAuthenticationAutoConfiguration.PropertiesMapper {</span>
@@ -42,226 +42,229 @@ import org.ldaptive.SearchScope;
 <span class="pc bpc" id="L42" title="1 of 2 branches missed.">        if ( source.getPasswordAttribute() != null ) {</span>
 <span class="nc" id="L43">            ldaptiveAuthenticationProperties.setPasswordAttribute( source.getPasswordAttribute() );</span>
         }
-<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if ( source.getUserFindOneFilter() != null ) {</span>
-<span class="nc" id="L46">            ldaptiveAuthenticationProperties.setUserFindOneFilter( source.getUserFindOneFilter() );</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if ( source.getPasswordLastSetAttribute() != null ) {</span>
+<span class="nc" id="L46">            ldaptiveAuthenticationProperties.setPasswordLastSetAttribute( source.getPasswordLastSetAttribute() );</span>
         }
-<span class="pc bpc" id="L48" title="1 of 2 branches missed.">        if ( source.getUserFindOneSearchScope() != null ) {</span>
-<span class="nc" id="L49">            ldaptiveAuthenticationProperties.setUserFindOneSearchScope( searchScopeToSearchScope( source.getUserFindOneSearchScope() ) );</span>
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">        if ( source.getUserFindOneFilter() != null ) {</span>
+<span class="nc" id="L49">            ldaptiveAuthenticationProperties.setUserFindOneFilter( source.getUserFindOneFilter() );</span>
         }
-<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        if ( source.getFirstNameAttribute() != null ) {</span>
-<span class="nc" id="L52">            ldaptiveAuthenticationProperties.setFirstNameAttribute( source.getFirstNameAttribute() );</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        if ( source.getUserFindOneSearchScope() != null ) {</span>
+<span class="nc" id="L52">            ldaptiveAuthenticationProperties.setUserFindOneSearchScope( searchScopeToSearchScope( source.getUserFindOneSearchScope() ) );</span>
         }
-<span class="pc bpc" id="L54" title="1 of 2 branches missed.">        if ( source.getLastNameAttribute() != null ) {</span>
-<span class="nc" id="L55">            ldaptiveAuthenticationProperties.setLastNameAttribute( source.getLastNameAttribute() );</span>
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">        if ( source.getFirstNameAttribute() != null ) {</span>
+<span class="nc" id="L55">            ldaptiveAuthenticationProperties.setFirstNameAttribute( source.getFirstNameAttribute() );</span>
         }
-<span class="pc bpc" id="L57" title="1 of 2 branches missed.">        if ( source.getEmailAttribute() != null ) {</span>
-<span class="nc" id="L58">            ldaptiveAuthenticationProperties.setEmailAttribute( source.getEmailAttribute() );</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">        if ( source.getLastNameAttribute() != null ) {</span>
+<span class="nc" id="L58">            ldaptiveAuthenticationProperties.setLastNameAttribute( source.getLastNameAttribute() );</span>
         }
-<span class="pc bpc" id="L60" title="1 of 2 branches missed.">        if ( source.getAccountControlEvaluator() != null ) {</span>
-<span class="nc" id="L61">            ldaptiveAuthenticationProperties.setAccountControlEvaluator( accountControlEvaluatorPropertyToAccountControlEvaluatorProperty( source.getAccountControlEvaluator() ) );</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">        if ( source.getEmailAttribute() != null ) {</span>
+<span class="nc" id="L61">            ldaptiveAuthenticationProperties.setEmailAttribute( source.getEmailAttribute() );</span>
         }
-<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        if ( source.getGroupFetchStrategy() != null ) {</span>
-<span class="nc" id="L64">            ldaptiveAuthenticationProperties.setGroupFetchStrategy( groupFetchStrategyToGroupFetchStrategy( source.getGroupFetchStrategy() ) );</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        if ( source.getAccountControlEvaluator() != null ) {</span>
+<span class="nc" id="L64">            ldaptiveAuthenticationProperties.setAccountControlEvaluator( accountControlEvaluatorPropertyToAccountControlEvaluatorProperty( source.getAccountControlEvaluator() ) );</span>
         }
-<span class="pc bpc" id="L66" title="1 of 2 branches missed.">        if ( source.getMemberAttribute() != null ) {</span>
-<span class="nc" id="L67">            ldaptiveAuthenticationProperties.setMemberAttribute( source.getMemberAttribute() );</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">        if ( source.getGroupFetchStrategy() != null ) {</span>
+<span class="nc" id="L67">            ldaptiveAuthenticationProperties.setGroupFetchStrategy( groupFetchStrategyToGroupFetchStrategy( source.getGroupFetchStrategy() ) );</span>
         }
-<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        if ( source.getGroupBaseDn() != null ) {</span>
-<span class="nc" id="L70">            ldaptiveAuthenticationProperties.setGroupBaseDn( source.getGroupBaseDn() );</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        if ( source.getMemberAttribute() != null ) {</span>
+<span class="nc" id="L70">            ldaptiveAuthenticationProperties.setMemberAttribute( source.getMemberAttribute() );</span>
         }
-<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if ( source.getGroupSearchScope() != null ) {</span>
-<span class="nc" id="L73">            ldaptiveAuthenticationProperties.setGroupSearchScope( searchScopeToSearchScope( source.getGroupSearchScope() ) );</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if ( source.getGroupBaseDn() != null ) {</span>
+<span class="nc" id="L73">            ldaptiveAuthenticationProperties.setGroupBaseDn( source.getGroupBaseDn() );</span>
         }
-<span class="pc bpc" id="L75" title="1 of 2 branches missed.">        if ( source.getGroupObjectClass() != null ) {</span>
-<span class="nc" id="L76">            ldaptiveAuthenticationProperties.setGroupObjectClass( source.getGroupObjectClass() );</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">        if ( source.getGroupSearchScope() != null ) {</span>
+<span class="nc" id="L76">            ldaptiveAuthenticationProperties.setGroupSearchScope( searchScopeToSearchScope( source.getGroupSearchScope() ) );</span>
         }
-<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        if ( source.getGroupIdAttribute() != null ) {</span>
-<span class="nc" id="L79">            ldaptiveAuthenticationProperties.setGroupIdAttribute( source.getGroupIdAttribute() );</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        if ( source.getGroupObjectClass() != null ) {</span>
+<span class="nc" id="L79">            ldaptiveAuthenticationProperties.setGroupObjectClass( source.getGroupObjectClass() );</span>
         }
-<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        if ( source.getGroupMemberAttribute() != null ) {</span>
-<span class="nc" id="L82">            ldaptiveAuthenticationProperties.setGroupMemberAttribute( source.getGroupMemberAttribute() );</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        if ( source.getGroupIdAttribute() != null ) {</span>
+<span class="nc" id="L82">            ldaptiveAuthenticationProperties.setGroupIdAttribute( source.getGroupIdAttribute() );</span>
         }
-<span class="pc bpc" id="L84" title="1 of 2 branches missed.">        if ( source.getGroupMemberFormat() != null ) {</span>
-<span class="nc" id="L85">            ldaptiveAuthenticationProperties.setGroupMemberFormat( source.getGroupMemberFormat() );</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">        if ( source.getGroupMemberAttribute() != null ) {</span>
+<span class="nc" id="L85">            ldaptiveAuthenticationProperties.setGroupMemberAttribute( source.getGroupMemberAttribute() );</span>
         }
-<span class="fc" id="L87">        List&lt;LdaptiveAuthenticationProperties.RoleMapping&gt; list = roleMappingListToRoleMappingList( source.getRoleMapping() );</span>
-<span class="pc bpc" id="L88" title="1 of 2 branches missed.">        if ( list != null ) {</span>
-<span class="nc" id="L89">            ldaptiveAuthenticationProperties.setRoleMapping( list );</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">        if ( source.getGroupMemberFormat() != null ) {</span>
+<span class="nc" id="L88">            ldaptiveAuthenticationProperties.setGroupMemberFormat( source.getGroupMemberFormat() );</span>
         }
-<span class="fc" id="L91">        List&lt;String&gt; list1 = source.getDefaultRoles();</span>
-<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        if ( list1 != null ) {</span>
-<span class="nc" id="L93">            ldaptiveAuthenticationProperties.setDefaultRoles( new ArrayList&lt;String&gt;( list1 ) );</span>
+<span class="fc" id="L90">        List&lt;LdaptiveAuthenticationProperties.RoleMapping&gt; list = roleMappingListToRoleMappingList( source.getRoleMapping() );</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">        if ( list != null ) {</span>
+<span class="nc" id="L92">            ldaptiveAuthenticationProperties.setRoleMapping( list );</span>
         }
-<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if ( source.getRolePrefix() != null ) {</span>
-<span class="nc" id="L96">            ldaptiveAuthenticationProperties.setRolePrefix( source.getRolePrefix() );</span>
+<span class="fc" id="L94">        List&lt;String&gt; list1 = source.getDefaultRoles();</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if ( list1 != null ) {</span>
+<span class="nc" id="L96">            ldaptiveAuthenticationProperties.setDefaultRoles( new ArrayList&lt;String&gt;( list1 ) );</span>
         }
-<span class="pc bpc" id="L98" title="1 of 2 branches missed.">        if ( source.getRoleCaseTransformation() != null ) {</span>
-<span class="nc" id="L99">            ldaptiveAuthenticationProperties.setRoleCaseTransformation( caseTransformationToCaseTransformation( source.getRoleCaseTransformation() ) );</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">        if ( source.getRolePrefix() != null ) {</span>
+<span class="nc" id="L99">            ldaptiveAuthenticationProperties.setRolePrefix( source.getRolePrefix() );</span>
         }
-<span class="fc" id="L101">        List&lt;LdaptiveAuthenticationProperties.StringReplacement&gt; list2 = stringReplacementListToStringReplacementList( source.getRoleStringReplacements() );</span>
-<span class="pc bpc" id="L102" title="1 of 2 branches missed.">        if ( list2 != null ) {</span>
-<span class="nc" id="L103">            ldaptiveAuthenticationProperties.setRoleStringReplacements( list2 );</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">        if ( source.getRoleCaseTransformation() != null ) {</span>
+<span class="nc" id="L102">            ldaptiveAuthenticationProperties.setRoleCaseTransformation( caseTransformationToCaseTransformation( source.getRoleCaseTransformation() ) );</span>
+        }
+<span class="fc" id="L104">        List&lt;LdaptiveAuthenticationProperties.StringReplacement&gt; list2 = stringReplacementListToStringReplacementList( source.getRoleStringReplacements() );</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">        if ( list2 != null ) {</span>
+<span class="nc" id="L106">            ldaptiveAuthenticationProperties.setRoleStringReplacements( list2 );</span>
         }
 
-<span class="fc" id="L106">        return ldaptiveAuthenticationProperties;</span>
+<span class="fc" id="L109">        return ldaptiveAuthenticationProperties;</span>
     }
 
     protected UsernameToBindDnConverterProperty usernameToBindDnConverterPropertyToUsernameToBindDnConverterProperty(AuthenticationProperties.LdaptiveProperties.UsernameToBindDnConverterProperty usernameToBindDnConverterProperty) {
-<span class="nc bnc" id="L110" title="All 2 branches missed.">        if ( usernameToBindDnConverterProperty == null ) {</span>
-<span class="nc" id="L111">            return null;</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if ( usernameToBindDnConverterProperty == null ) {</span>
+<span class="nc" id="L114">            return null;</span>
         }
 
         UsernameToBindDnConverterProperty usernameToBindDnConverterProperty1;
 
-<span class="nc bnc" id="L116" title="All 3 branches missed.">        switch ( usernameToBindDnConverterProperty ) {</span>
-<span class="nc" id="L117">            case BY_USER_RDN_ATTRIBUTE: usernameToBindDnConverterProperty1 = UsernameToBindDnConverterProperty.BY_USER_RDN_ATTRIBUTE;</span>
-<span class="nc" id="L118">            break;</span>
-<span class="nc" id="L119">            case BY_DOMAIN_EMAIL: usernameToBindDnConverterProperty1 = UsernameToBindDnConverterProperty.BY_DOMAIN_EMAIL;</span>
-<span class="nc" id="L120">            break;</span>
-<span class="nc" id="L121">            default: throw new IllegalArgumentException( &quot;Unexpected enum constant: &quot; + usernameToBindDnConverterProperty );</span>
+<span class="nc bnc" id="L119" title="All 3 branches missed.">        switch ( usernameToBindDnConverterProperty ) {</span>
+<span class="nc" id="L120">            case BY_USER_RDN_ATTRIBUTE: usernameToBindDnConverterProperty1 = UsernameToBindDnConverterProperty.BY_USER_RDN_ATTRIBUTE;</span>
+<span class="nc" id="L121">            break;</span>
+<span class="nc" id="L122">            case BY_DOMAIN_EMAIL: usernameToBindDnConverterProperty1 = UsernameToBindDnConverterProperty.BY_DOMAIN_EMAIL;</span>
+<span class="nc" id="L123">            break;</span>
+<span class="nc" id="L124">            default: throw new IllegalArgumentException( &quot;Unexpected enum constant: &quot; + usernameToBindDnConverterProperty );</span>
         }
 
-<span class="nc" id="L124">        return usernameToBindDnConverterProperty1;</span>
+<span class="nc" id="L127">        return usernameToBindDnConverterProperty1;</span>
     }
 
     protected SearchScope searchScopeToSearchScope(AuthenticationProperties.LdaptiveProperties.SearchScope searchScope) {
-<span class="nc bnc" id="L128" title="All 2 branches missed.">        if ( searchScope == null ) {</span>
-<span class="nc" id="L129">            return null;</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">        if ( searchScope == null ) {</span>
+<span class="nc" id="L132">            return null;</span>
         }
 
         SearchScope searchScope1;
 
-<span class="nc bnc" id="L134" title="All 5 branches missed.">        switch ( searchScope ) {</span>
-<span class="nc" id="L135">            case OBJECT: searchScope1 = SearchScope.OBJECT;</span>
-<span class="nc" id="L136">            break;</span>
-<span class="nc" id="L137">            case ONELEVEL: searchScope1 = SearchScope.ONELEVEL;</span>
-<span class="nc" id="L138">            break;</span>
-<span class="nc" id="L139">            case SUBTREE: searchScope1 = SearchScope.SUBTREE;</span>
-<span class="nc" id="L140">            break;</span>
-<span class="nc" id="L141">            case SUBORDINATE: searchScope1 = SearchScope.SUBORDINATE;</span>
-<span class="nc" id="L142">            break;</span>
-<span class="nc" id="L143">            default: throw new IllegalArgumentException( &quot;Unexpected enum constant: &quot; + searchScope );</span>
+<span class="nc bnc" id="L137" title="All 5 branches missed.">        switch ( searchScope ) {</span>
+<span class="nc" id="L138">            case OBJECT: searchScope1 = SearchScope.OBJECT;</span>
+<span class="nc" id="L139">            break;</span>
+<span class="nc" id="L140">            case ONELEVEL: searchScope1 = SearchScope.ONELEVEL;</span>
+<span class="nc" id="L141">            break;</span>
+<span class="nc" id="L142">            case SUBTREE: searchScope1 = SearchScope.SUBTREE;</span>
+<span class="nc" id="L143">            break;</span>
+<span class="nc" id="L144">            case SUBORDINATE: searchScope1 = SearchScope.SUBORDINATE;</span>
+<span class="nc" id="L145">            break;</span>
+<span class="nc" id="L146">            default: throw new IllegalArgumentException( &quot;Unexpected enum constant: &quot; + searchScope );</span>
         }
 
-<span class="nc" id="L146">        return searchScope1;</span>
+<span class="nc" id="L149">        return searchScope1;</span>
     }
 
     protected AccountControlEvaluatorProperty accountControlEvaluatorPropertyToAccountControlEvaluatorProperty(AuthenticationProperties.LdaptiveProperties.AccountControlEvaluatorProperty accountControlEvaluatorProperty) {
-<span class="nc bnc" id="L150" title="All 2 branches missed.">        if ( accountControlEvaluatorProperty == null ) {</span>
-<span class="nc" id="L151">            return null;</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">        if ( accountControlEvaluatorProperty == null ) {</span>
+<span class="nc" id="L154">            return null;</span>
         }
 
         AccountControlEvaluatorProperty accountControlEvaluatorProperty1;
 
-<span class="nc bnc" id="L156" title="All 3 branches missed.">        switch ( accountControlEvaluatorProperty ) {</span>
-<span class="nc" id="L157">            case NONE: accountControlEvaluatorProperty1 = AccountControlEvaluatorProperty.NONE;</span>
-<span class="nc" id="L158">            break;</span>
-<span class="nc" id="L159">            case ACTIVE_DIRECTORY: accountControlEvaluatorProperty1 = AccountControlEvaluatorProperty.ACTIVE_DIRECTORY;</span>
-<span class="nc" id="L160">            break;</span>
-<span class="nc" id="L161">            default: throw new IllegalArgumentException( &quot;Unexpected enum constant: &quot; + accountControlEvaluatorProperty );</span>
+<span class="nc bnc" id="L159" title="All 3 branches missed.">        switch ( accountControlEvaluatorProperty ) {</span>
+<span class="nc" id="L160">            case NONE: accountControlEvaluatorProperty1 = AccountControlEvaluatorProperty.NONE;</span>
+<span class="nc" id="L161">            break;</span>
+<span class="nc" id="L162">            case ACTIVE_DIRECTORY: accountControlEvaluatorProperty1 = AccountControlEvaluatorProperty.ACTIVE_DIRECTORY;</span>
+<span class="nc" id="L163">            break;</span>
+<span class="nc" id="L164">            default: throw new IllegalArgumentException( &quot;Unexpected enum constant: &quot; + accountControlEvaluatorProperty );</span>
         }
 
-<span class="nc" id="L164">        return accountControlEvaluatorProperty1;</span>
+<span class="nc" id="L167">        return accountControlEvaluatorProperty1;</span>
     }
 
     protected LdaptiveAuthenticationProperties.GroupFetchStrategy groupFetchStrategyToGroupFetchStrategy(AuthenticationProperties.LdaptiveProperties.GroupFetchStrategy groupFetchStrategy) {
-<span class="nc bnc" id="L168" title="All 2 branches missed.">        if ( groupFetchStrategy == null ) {</span>
-<span class="nc" id="L169">            return null;</span>
+<span class="nc bnc" id="L171" title="All 2 branches missed.">        if ( groupFetchStrategy == null ) {</span>
+<span class="nc" id="L172">            return null;</span>
         }
 
         LdaptiveAuthenticationProperties.GroupFetchStrategy groupFetchStrategy1;
 
-<span class="nc bnc" id="L174" title="All 4 branches missed.">        switch ( groupFetchStrategy ) {</span>
-<span class="nc" id="L175">            case NONE: groupFetchStrategy1 = LdaptiveAuthenticationProperties.GroupFetchStrategy.NONE;</span>
-<span class="nc" id="L176">            break;</span>
-<span class="nc" id="L177">            case USER_CONTAINS_GROUPS: groupFetchStrategy1 = LdaptiveAuthenticationProperties.GroupFetchStrategy.USER_CONTAINS_GROUPS;</span>
-<span class="nc" id="L178">            break;</span>
-<span class="nc" id="L179">            case GROUP_CONTAINS_USERS: groupFetchStrategy1 = LdaptiveAuthenticationProperties.GroupFetchStrategy.GROUP_CONTAINS_USERS;</span>
-<span class="nc" id="L180">            break;</span>
-<span class="nc" id="L181">            default: throw new IllegalArgumentException( &quot;Unexpected enum constant: &quot; + groupFetchStrategy );</span>
+<span class="nc bnc" id="L177" title="All 4 branches missed.">        switch ( groupFetchStrategy ) {</span>
+<span class="nc" id="L178">            case NONE: groupFetchStrategy1 = LdaptiveAuthenticationProperties.GroupFetchStrategy.NONE;</span>
+<span class="nc" id="L179">            break;</span>
+<span class="nc" id="L180">            case USER_CONTAINS_GROUPS: groupFetchStrategy1 = LdaptiveAuthenticationProperties.GroupFetchStrategy.USER_CONTAINS_GROUPS;</span>
+<span class="nc" id="L181">            break;</span>
+<span class="nc" id="L182">            case GROUP_CONTAINS_USERS: groupFetchStrategy1 = LdaptiveAuthenticationProperties.GroupFetchStrategy.GROUP_CONTAINS_USERS;</span>
+<span class="nc" id="L183">            break;</span>
+<span class="nc" id="L184">            default: throw new IllegalArgumentException( &quot;Unexpected enum constant: &quot; + groupFetchStrategy );</span>
         }
 
-<span class="nc" id="L184">        return groupFetchStrategy1;</span>
+<span class="nc" id="L187">        return groupFetchStrategy1;</span>
     }
 
     protected LdaptiveAuthenticationProperties.RoleMapping roleMappingToRoleMapping(AuthenticationProperties.RoleMapping roleMapping) {
-<span class="nc bnc" id="L188" title="All 2 branches missed.">        if ( roleMapping == null ) {</span>
-<span class="nc" id="L189">            return null;</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">        if ( roleMapping == null ) {</span>
+<span class="nc" id="L192">            return null;</span>
         }
 
-<span class="nc" id="L192">        LdaptiveAuthenticationProperties.RoleMapping roleMapping1 = new LdaptiveAuthenticationProperties.RoleMapping();</span>
+<span class="nc" id="L195">        LdaptiveAuthenticationProperties.RoleMapping roleMapping1 = new LdaptiveAuthenticationProperties.RoleMapping();</span>
 
-<span class="nc bnc" id="L194" title="All 2 branches missed.">        if ( roleMapping.getSource() != null ) {</span>
-<span class="nc" id="L195">            roleMapping1.setSource( roleMapping.getSource() );</span>
+<span class="nc bnc" id="L197" title="All 2 branches missed.">        if ( roleMapping.getSource() != null ) {</span>
+<span class="nc" id="L198">            roleMapping1.setSource( roleMapping.getSource() );</span>
         }
-<span class="nc bnc" id="L197" title="All 2 branches missed.">        if ( roleMapping.getTarget() != null ) {</span>
-<span class="nc" id="L198">            roleMapping1.setTarget( roleMapping.getTarget() );</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">        if ( roleMapping.getTarget() != null ) {</span>
+<span class="nc" id="L201">            roleMapping1.setTarget( roleMapping.getTarget() );</span>
         }
 
-<span class="nc" id="L201">        return roleMapping1;</span>
+<span class="nc" id="L204">        return roleMapping1;</span>
     }
 
     protected List&lt;LdaptiveAuthenticationProperties.RoleMapping&gt; roleMappingListToRoleMappingList(List&lt;AuthenticationProperties.RoleMapping&gt; list) {
-<span class="pc bpc" id="L205" title="1 of 2 branches missed.">        if ( list == null ) {</span>
-<span class="fc" id="L206">            return null;</span>
+<span class="pc bpc" id="L208" title="1 of 2 branches missed.">        if ( list == null ) {</span>
+<span class="fc" id="L209">            return null;</span>
         }
 
-<span class="nc" id="L209">        List&lt;LdaptiveAuthenticationProperties.RoleMapping&gt; list1 = new ArrayList&lt;LdaptiveAuthenticationProperties.RoleMapping&gt;( list.size() );</span>
-<span class="nc bnc" id="L210" title="All 2 branches missed.">        for ( AuthenticationProperties.RoleMapping roleMapping : list ) {</span>
-<span class="nc" id="L211">            list1.add( roleMappingToRoleMapping( roleMapping ) );</span>
-<span class="nc" id="L212">        }</span>
+<span class="nc" id="L212">        List&lt;LdaptiveAuthenticationProperties.RoleMapping&gt; list1 = new ArrayList&lt;LdaptiveAuthenticationProperties.RoleMapping&gt;( list.size() );</span>
+<span class="nc bnc" id="L213" title="All 2 branches missed.">        for ( AuthenticationProperties.RoleMapping roleMapping : list ) {</span>
+<span class="nc" id="L214">            list1.add( roleMappingToRoleMapping( roleMapping ) );</span>
+<span class="nc" id="L215">        }</span>
 
-<span class="nc" id="L214">        return list1;</span>
+<span class="nc" id="L217">        return list1;</span>
     }
 
     protected CaseTransformation caseTransformationToCaseTransformation(AuthenticationProperties.CaseTransformation caseTransformation) {
-<span class="nc bnc" id="L218" title="All 2 branches missed.">        if ( caseTransformation == null ) {</span>
-<span class="nc" id="L219">            return null;</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">        if ( caseTransformation == null ) {</span>
+<span class="nc" id="L222">            return null;</span>
         }
 
         CaseTransformation caseTransformation1;
 
-<span class="nc bnc" id="L224" title="All 4 branches missed.">        switch ( caseTransformation ) {</span>
-<span class="nc" id="L225">            case NONE: caseTransformation1 = CaseTransformation.NONE;</span>
-<span class="nc" id="L226">            break;</span>
-<span class="nc" id="L227">            case TO_UPPER_CASE: caseTransformation1 = CaseTransformation.TO_UPPER_CASE;</span>
-<span class="nc" id="L228">            break;</span>
-<span class="nc" id="L229">            case TO_LOWER_CASE: caseTransformation1 = CaseTransformation.TO_LOWER_CASE;</span>
-<span class="nc" id="L230">            break;</span>
-<span class="nc" id="L231">            default: throw new IllegalArgumentException( &quot;Unexpected enum constant: &quot; + caseTransformation );</span>
+<span class="nc bnc" id="L227" title="All 4 branches missed.">        switch ( caseTransformation ) {</span>
+<span class="nc" id="L228">            case NONE: caseTransformation1 = CaseTransformation.NONE;</span>
+<span class="nc" id="L229">            break;</span>
+<span class="nc" id="L230">            case TO_UPPER_CASE: caseTransformation1 = CaseTransformation.TO_UPPER_CASE;</span>
+<span class="nc" id="L231">            break;</span>
+<span class="nc" id="L232">            case TO_LOWER_CASE: caseTransformation1 = CaseTransformation.TO_LOWER_CASE;</span>
+<span class="nc" id="L233">            break;</span>
+<span class="nc" id="L234">            default: throw new IllegalArgumentException( &quot;Unexpected enum constant: &quot; + caseTransformation );</span>
         }
 
-<span class="nc" id="L234">        return caseTransformation1;</span>
+<span class="nc" id="L237">        return caseTransformation1;</span>
     }
 
     protected LdaptiveAuthenticationProperties.StringReplacement stringReplacementToStringReplacement(AuthenticationProperties.StringReplacement stringReplacement) {
-<span class="nc bnc" id="L238" title="All 2 branches missed.">        if ( stringReplacement == null ) {</span>
-<span class="nc" id="L239">            return null;</span>
+<span class="nc bnc" id="L241" title="All 2 branches missed.">        if ( stringReplacement == null ) {</span>
+<span class="nc" id="L242">            return null;</span>
         }
 
-<span class="nc" id="L242">        LdaptiveAuthenticationProperties.StringReplacement stringReplacement1 = new LdaptiveAuthenticationProperties.StringReplacement();</span>
+<span class="nc" id="L245">        LdaptiveAuthenticationProperties.StringReplacement stringReplacement1 = new LdaptiveAuthenticationProperties.StringReplacement();</span>
 
-<span class="nc bnc" id="L244" title="All 2 branches missed.">        if ( stringReplacement.getRegex() != null ) {</span>
-<span class="nc" id="L245">            stringReplacement1.setRegex( stringReplacement.getRegex() );</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">        if ( stringReplacement.getRegex() != null ) {</span>
+<span class="nc" id="L248">            stringReplacement1.setRegex( stringReplacement.getRegex() );</span>
         }
-<span class="nc bnc" id="L247" title="All 2 branches missed.">        if ( stringReplacement.getReplacement() != null ) {</span>
-<span class="nc" id="L248">            stringReplacement1.setReplacement( stringReplacement.getReplacement() );</span>
+<span class="nc bnc" id="L250" title="All 2 branches missed.">        if ( stringReplacement.getReplacement() != null ) {</span>
+<span class="nc" id="L251">            stringReplacement1.setReplacement( stringReplacement.getReplacement() );</span>
         }
 
-<span class="nc" id="L251">        return stringReplacement1;</span>
+<span class="nc" id="L254">        return stringReplacement1;</span>
     }
 
     protected List&lt;LdaptiveAuthenticationProperties.StringReplacement&gt; stringReplacementListToStringReplacementList(List&lt;AuthenticationProperties.StringReplacement&gt; list) {
-<span class="pc bpc" id="L255" title="1 of 2 branches missed.">        if ( list == null ) {</span>
-<span class="fc" id="L256">            return null;</span>
+<span class="pc bpc" id="L258" title="1 of 2 branches missed.">        if ( list == null ) {</span>
+<span class="fc" id="L259">            return null;</span>
         }
 
-<span class="nc" id="L259">        List&lt;LdaptiveAuthenticationProperties.StringReplacement&gt; list1 = new ArrayList&lt;LdaptiveAuthenticationProperties.StringReplacement&gt;( list.size() );</span>
-<span class="nc bnc" id="L260" title="All 2 branches missed.">        for ( AuthenticationProperties.StringReplacement stringReplacement : list ) {</span>
-<span class="nc" id="L261">            list1.add( stringReplacementToStringReplacement( stringReplacement ) );</span>
-<span class="nc" id="L262">        }</span>
+<span class="nc" id="L262">        List&lt;LdaptiveAuthenticationProperties.StringReplacement&gt; list1 = new ArrayList&lt;LdaptiveAuthenticationProperties.StringReplacement&gt;( list.size() );</span>
+<span class="nc bnc" id="L263" title="All 2 branches missed.">        for ( AuthenticationProperties.StringReplacement stringReplacement : list ) {</span>
+<span class="nc" id="L264">            list1.add( stringReplacementToStringReplacement( stringReplacement ) );</span>
+<span class="nc" id="L265">        }</span>
 
-<span class="nc" id="L264">        return list1;</span>
+<span class="nc" id="L267">        return list1;</span>
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

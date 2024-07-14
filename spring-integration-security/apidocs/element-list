@@ -1,1 +1,2 @@
 org.bremersee.spring.security.authentication
+org.bremersee.spring.security.core.authority.mapping

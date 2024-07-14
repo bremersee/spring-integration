@@ -5,6 +5,7 @@ org.bremersee.ldaptive.transcoder
 org.bremersee.minio
 org.bremersee.spring.boot.autoconfigure
 org.bremersee.spring.boot.autoconfigure.data
+org.bremersee.spring.boot.autoconfigure.data.commons
 org.bremersee.spring.boot.autoconfigure.data.mongo
 org.bremersee.spring.boot.autoconfigure.ldaptive
 org.bremersee.spring.boot.autoconfigure.minio
@@ -21,6 +22,8 @@ org.bremersee.spring.data.mongodb.core.convert
 org.bremersee.spring.security.authentication
 org.bremersee.spring.security.authentication.ldaptive
 org.bremersee.spring.security.authentication.ldaptive.provider
+org.bremersee.spring.security.core.authority.mapping
+org.bremersee.spring.security.core.userdetails.ldaptive
 org.bremersee.spring.test.api.comparator
 org.bremersee.spring.thymeleaf
 org.bremersee.spring.web

@@ -1,6 +1,7 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-Spring Integration Security,org.bremersee.spring.security.authentication,JsonPathJwtConverter,2,184,2,4,0,41,2,17,0,16
+Spring Integration Security,org.bremersee.spring.security.authentication,JsonPathJwtConverter,2,187,2,4,0,42,2,17,0,16
 Spring Integration Security,org.bremersee.spring.security.authentication,NormalizedJwtAuthenticationToken,0,15,0,0,0,5,0,1,0,1
 Spring Integration Security,org.bremersee.spring.security.authentication,JsonPathJwtParser,0,36,0,2,0,9,0,4,0,3
-Spring Integration Security,org.bremersee.spring.security.authentication,CaseTransformation,0,21,0,0,0,4,0,1,0,1
-Spring Integration Security,org.bremersee.spring.security.authentication,AuthenticationConverter,2,134,5,14,0,32,5,11,0,6
+Spring Integration Security,org.bremersee.spring.security.authentication,EmailToUsernameResolver,0,6,0,0,0,1,0,1,0,1
+Spring Integration Security,org.bremersee.spring.security.core.authority.mapping,CaseTransformation,0,21,0,0,0,4,0,1,0,1
+Spring Integration Security,org.bremersee.spring.security.core.authority.mapping,NormalizedGrantedAuthoritiesMapper,2,161,5,14,0,40,5,12,0,7
