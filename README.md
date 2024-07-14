@@ -1,6 +1,6 @@
 # Spring Integration
 
-[![codecov](https://codecov.io/gh/bremersee/spring-integration/branch/main/graph/badge.svg)](https://codecov.io/gh/bremersee/spring-integration)
+[![codecov](https://codecov.io/gh/bremersee/spring-integration/branch/develop/graph/badge.svg)](https://codecov.io/gh/bremersee/spring-integration)
 
 #### Maven Site
 
