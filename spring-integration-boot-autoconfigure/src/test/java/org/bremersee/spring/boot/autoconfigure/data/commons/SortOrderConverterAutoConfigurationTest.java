@@ -13,18 +13,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 
 /**
- * The type Sort oder converter autoconfiguration test.
+ * The sort order converter autoconfiguration test.
  */
-class SortOderConverterAutoConfigurationTest {
+class SortOrderConverterAutoConfigurationTest {
 
-  private static SortOderConverterAutoConfiguration target;
+  private static SortOrderConverterAutoConfiguration target;
 
   /**
    * Init.
    */
   @BeforeAll
   static void init() {
-    target = new SortOderConverterAutoConfiguration();
+    target = new SortOrderConverterAutoConfiguration();
     target.init();
   }
 

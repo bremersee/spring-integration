@@ -30,7 +30,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.util.ClassUtils;
 
 /**
- * The type SortOderConverterAutoConfiguration.
+ * The sort order converter autoconfiguration.
  *
  * @author Christian Bremer
  */
@@ -38,7 +38,7 @@ import org.springframework.util.ClassUtils;
     "org.bremersee.comparator.spring.converter.SortOrdersConverter"})
 @AutoConfiguration
 @Slf4j
-public class SortOderConverterAutoConfiguration {
+public class SortOrderConverterAutoConfiguration {
 
   /**
    * Init.
