@@ -1,4 +1,4 @@
-org.bremersee.spring.security.authentication.app
-org.bremersee.spring.security.authentication.ldaptive
-org.bremersee.spring.security.authentication.ldaptive.provider
-org.bremersee.spring.security.core.userdetails.ldaptive
+org.bremersee.spring.security.ldaptive.app
+org.bremersee.spring.security.ldaptive.authentication
+org.bremersee.spring.security.ldaptive.authentication.provider
+org.bremersee.spring.security.ldaptive.userdetails

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LdaptiveUser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Spring Integration Security Ldaptive</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.spring.security.ldaptive.userdetails</a> &gt; <span class="el_source">LdaptiveUser.java</span></div><h1>LdaptiveUser.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.spring.security.ldaptive.userdetails;
+
+import java.io.Serial;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import org.bremersee.ldaptive.serializable.SerLdapEntry;
+import org.ldaptive.LdapEntry;
+import org.springframework.security.core.GrantedAuthority;
+
+/**
+ * The ldaptive user.
+ *
+ * @author Christian Bremer
+ */
+@Getter
+@ToString(exclude = {&quot;password&quot;})
+@EqualsAndHashCode(callSuper = true, exclude = {&quot;password&quot;})
+public class LdaptiveUser extends SerLdapEntry
+    implements LdaptiveUserDetails {
+
+  @Serial
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * The username.
+   */
+  private final String username;
+
+  /**
+   * The first name.
+   */
+  private final String firstName;
+
+  /**
+   * The last name.
+   */
+  private final String lastName;
+
+  /**
+   * The email address.
+   */
+  private final String email;
+
+  /**
+   * The granted authorities.
+   */
+  private final Collection&lt;? extends GrantedAuthority&gt; authorities;
+
+  /**
+   * The password.
+   */
+  private final String password;
+
+  /**
+   * Says whether the account is expired or not.
+   */
+  private final boolean accountNonExpired;
+
+  /**
+   * Says whether the account is locked or not.
+   */
+  private final boolean accountNonLocked;
+
+  /**
+   * Says whether the credentials are expired or not.
+   */
+  private final boolean credentialsNonExpired;
+
+  /**
+   * Says whether the account is enabled or not.
+   */
+  private final boolean enabled;
+
+  /**
+   * Instantiates a new ldaptive user.
+   *
+   * @param ldapEntry the ldap entry
+   * @param username the username
+   * @param authorities the authorities
+   * @param password the password
+   * @param accountNonExpired the account non expired
+   * @param accountNonLocked the account non-locked
+   * @param credentialsNonExpired the credentials non expired
+   * @param enabled the enabled
+   */
+  public LdaptiveUser(
+      LdapEntry ldapEntry,
+      String username,
+      String firstName,
+      String lastName,
+      String email,
+      Collection&lt;? extends GrantedAuthority&gt; authorities,
+      String password,
+      boolean accountNonExpired,
+      boolean accountNonLocked,
+      boolean credentialsNonExpired,
+      boolean enabled) {
+<span class="fc" id="L118">    super(ldapEntry);</span>
+<span class="fc" id="L119">    this.username = username;</span>
+<span class="fc" id="L120">    this.firstName = firstName;</span>
+<span class="fc" id="L121">    this.lastName = lastName;</span>
+<span class="fc" id="L122">    this.email = email;</span>
+<span class="fc" id="L123">    this.authorities = Optional.ofNullable(authorities).orElseGet(List::of);</span>
+<span class="fc" id="L124">    this.password = Optional.ofNullable(password)</span>
+<span class="pc" id="L125">        .orElseGet(() -&gt; LdaptiveRememberMeTokenProvider.invalid().getRememberMeToken(ldapEntry));</span>
+<span class="fc" id="L126">    this.accountNonExpired = accountNonExpired;</span>
+<span class="fc" id="L127">    this.accountNonLocked = accountNonLocked;</span>
+<span class="fc" id="L128">    this.credentialsNonExpired = credentialsNonExpired;</span>
+<span class="fc" id="L129">    this.enabled = enabled;</span>
+<span class="fc" id="L130">  }</span>
+
+  @Override
+  public String getName() {
+<span class="fc" id="L134">    return getUsername();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

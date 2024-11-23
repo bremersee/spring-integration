@@ -19,9 +19,9 @@ package org.bremersee.spring.boot.autoconfigure.security.authentication;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.spring.boot.autoconfigure.security.authentication.AuthenticationProperties.RememberMeProperties;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationProperties;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveTokenBasedRememberMeServices;
+import org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationManager;
+import org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationProperties;
+import org.bremersee.spring.security.ldaptive.authentication.LdaptiveTokenBasedRememberMeServices;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -48,7 +48,7 @@ import org.springframework.util.ObjectUtils;
 @ConditionalOnWebApplication(type = Type.SERVLET)
 @ConditionalOnProperty(prefix = &quot;bremersee.authentication.remember-me&quot;, name = &quot;key&quot;)
 @ConditionalOnBean(
-    type = &quot;org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager&quot;)
+    type = &quot;org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationManager&quot;)
 @AutoConfigureAfter({LdaptiveAuthenticationAutoConfiguration.class})
 @EnableConfigurationProperties(AuthenticationProperties.class)
 <span class="fc" id="L54">@Slf4j</span>
@@ -86,7 +86,7 @@ public class LdaptiveRememberMeAutoConfiguration {
 <span class="fc" id="L86">          properties.getPasswordLastSetAttribute());</span>
     }
 <span class="fc" id="L88">    log.info(&quot;&quot;&quot;</span>
-
+            
             *********************************************************************************
             * {}
             * {}
@@ -120,7 +120,7 @@ public class LdaptiveRememberMeAutoConfiguration {
   public RememberMeServices rememberMeServices(
       LdaptiveAuthenticationManager authenticationManager) {
 <span class="fc" id="L122">    LdaptiveTokenBasedRememberMeServices services = new LdaptiveTokenBasedRememberMeServices(</span>
-<span class="fc" id="L123">        rememberMeProperties.getKey(), properties, authenticationManager);</span>
+<span class="fc" id="L123">        rememberMeProperties.getKey(), authenticationManager);</span>
 <span class="fc" id="L124">    Optional.ofNullable(rememberMeProperties.getAlwaysRemember())</span>
 <span class="fc" id="L125">        .ifPresent(services::setAlwaysRemember);</span>
 <span class="fc" id="L126">    Optional.ofNullable(rememberMeProperties.getCookieName())</span>

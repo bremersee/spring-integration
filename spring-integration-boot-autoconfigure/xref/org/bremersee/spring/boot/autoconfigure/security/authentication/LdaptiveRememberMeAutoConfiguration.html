@@ -27,9 +27,9 @@
 <a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> java.util.Optional;
 <a class="jxr_linenumber" name="L20" href="#L20">20</a>  <strong class="jxr_keyword">import</strong> lombok.extern.slf4j.Slf4j;
 <a class="jxr_linenumber" name="L21" href="#L21">21</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.boot.autoconfigure.security.authentication.AuthenticationProperties.RememberMeProperties;
-<a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager;
-<a class="jxr_linenumber" name="L23" href="#L23">23</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationProperties;
-<a class="jxr_linenumber" name="L24" href="#L24">24</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.authentication.ldaptive.LdaptiveTokenBasedRememberMeServices;
+<a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationManager;
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationProperties;
+<a class="jxr_linenumber" name="L24" href="#L24">24</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.authentication.LdaptiveTokenBasedRememberMeServices;
 <a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> org.springframework.boot.autoconfigure.AutoConfiguration;
 <a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> org.springframework.boot.autoconfigure.AutoConfigureAfter;
 <a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -56,7 +56,7 @@
 <a class="jxr_linenumber" name="L48" href="#L48">48</a>  @ConditionalOnWebApplication(type = Type.SERVLET)
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>  @ConditionalOnProperty(prefix = <span class="jxr_string">"bremersee.authentication.remember-me"</span>, name = <span class="jxr_string">"key"</span>)
 <a class="jxr_linenumber" name="L50" href="#L50">50</a>  @ConditionalOnBean(
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>      type = <span class="jxr_string">"org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager"</span>)
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>      type = <span class="jxr_string">"org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationManager"</span>)
 <a class="jxr_linenumber" name="L52" href="#L52">52</a>  @AutoConfigureAfter({LdaptiveAuthenticationAutoConfiguration.<strong class="jxr_keyword">class</strong>})
 <a class="jxr_linenumber" name="L53" href="#L53">53</a>  @EnableConfigurationProperties(AuthenticationProperties.<strong class="jxr_keyword">class</strong>)
 <a class="jxr_linenumber" name="L54" href="#L54">54</a>  @Slf4j
@@ -94,7 +94,7 @@
 <a class="jxr_linenumber" name="L86" href="#L86">86</a>            properties.getPasswordLastSetAttribute());
 <a class="jxr_linenumber" name="L87" href="#L87">87</a>      }
 <a class="jxr_linenumber" name="L88" href="#L88">88</a>      log.info(<span class="jxr_string">""</span><span class="jxr_string">"
-<a class="jxr_linenumber" name="L89" href="#L89">89</a>  
+<a class="jxr_linenumber" name="L89" href="#L89">89</a>              
 <a class="jxr_linenumber" name="L90" href="#L90">90</a>              *********************************************************************************
 <a class="jxr_linenumber" name="L91" href="#L91">91</a>              * {}
 <a class="jxr_linenumber" name="L92" href="#L92">92</a>              * {}
@@ -128,7 +128,7 @@
 <a class="jxr_linenumber" name="L120" href="#L120">120</a>   <strong class="jxr_keyword">public</strong> RememberMeServices rememberMeServices(
 <a class="jxr_linenumber" name="L121" href="#L121">121</a>       LdaptiveAuthenticationManager authenticationManager) {
 <a class="jxr_linenumber" name="L122" href="#L122">122</a>     LdaptiveTokenBasedRememberMeServices services = <strong class="jxr_keyword">new</strong> LdaptiveTokenBasedRememberMeServices(
-<a class="jxr_linenumber" name="L123" href="#L123">123</a>         rememberMeProperties.getKey(), properties, authenticationManager);
+<a class="jxr_linenumber" name="L123" href="#L123">123</a>         rememberMeProperties.getKey(), authenticationManager);
 <a class="jxr_linenumber" name="L124" href="#L124">124</a>     Optional.ofNullable(rememberMeProperties.getAlwaysRemember())
 <a class="jxr_linenumber" name="L125" href="#L125">125</a>         .ifPresent(services::setAlwaysRemember);
 <a class="jxr_linenumber" name="L126" href="#L126">126</a>     Optional.ofNullable(rememberMeProperties.getCookieName())

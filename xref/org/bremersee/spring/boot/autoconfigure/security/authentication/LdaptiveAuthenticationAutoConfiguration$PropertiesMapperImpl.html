@@ -11,26 +11,26 @@
 <a class="jxr_linenumber" name="L3" href="#L3">3</a>   <strong class="jxr_keyword">import</strong> java.util.ArrayList;
 <a class="jxr_linenumber" name="L4" href="#L4">4</a>   <strong class="jxr_keyword">import</strong> java.util.List;
 <a class="jxr_linenumber" name="L5" href="#L5">5</a>   <strong class="jxr_keyword">import</strong> javax.annotation.processing.Generated;
-<a class="jxr_linenumber" name="L6" href="#L6">6</a>   <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.authentication.ldaptive.AccountControlEvaluatorProperty;
-<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationProperties;
-<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.authentication.ldaptive.UsernameToBindDnConverterProperty;
-<a class="jxr_linenumber" name="L9" href="#L9">9</a>   <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.core.authority.mapping.CaseTransformation;
+<a class="jxr_linenumber" name="L6" href="#L6">6</a>   <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.core.authority.mapping.CaseTransformation;
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.authentication.AccountControlEvaluatorProperty;
+<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationProperties;
+<a class="jxr_linenumber" name="L9" href="#L9">9</a>   <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.authentication.UsernameToBindDnConverterProperty;
 <a class="jxr_linenumber" name="L10" href="#L10">10</a>  <strong class="jxr_keyword">import</strong> org.ldaptive.SearchScope;
 <a class="jxr_linenumber" name="L11" href="#L11">11</a>  
 <a class="jxr_linenumber" name="L12" href="#L12">12</a>  @Generated(
 <a class="jxr_linenumber" name="L13" href="#L13">13</a>      value = <span class="jxr_string">"org.mapstruct.ap.MappingProcessor"</span>,
-<a class="jxr_linenumber" name="L14" href="#L14">14</a>      date = <span class="jxr_string">"2024-11-23T13:55:43+0100"</span>,
+<a class="jxr_linenumber" name="L14" href="#L14">14</a>      date = <span class="jxr_string">"2024-11-23T18:55:17+0100"</span>,
 <a class="jxr_linenumber" name="L15" href="#L15">15</a>      comments = <span class="jxr_string">"version: 1.6.3, compiler: javac, environment: Java 17.0.13 (Debian)"</span>
 <a class="jxr_linenumber" name="L16" href="#L16">16</a>  )
 <a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">class</strong> LdaptiveAuthenticationAutoConfiguration$PropertiesMapperImpl <strong class="jxr_keyword">implements</strong> LdaptiveAuthenticationAutoConfiguration.PropertiesMapper {
 <a class="jxr_linenumber" name="L18" href="#L18">18</a>  
 <a class="jxr_linenumber" name="L19" href="#L19">19</a>      @Override
-<a class="jxr_linenumber" name="L20" href="#L20">20</a>      <strong class="jxr_keyword">public</strong> <a name="LdaptiveAuthenticationProperties" href="../../../../../../../org/bremersee/spring/security/authentication/ldaptive/LdaptiveAuthenticationProperties.html#LdaptiveAuthenticationProperties">LdaptiveAuthenticationProperties</a> map(AuthenticationProperties.LdaptiveProperties source) {
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>      <strong class="jxr_keyword">public</strong> <a name="LdaptiveAuthenticationProperties" href="../../../../../../../org/bremersee/spring/security/ldaptive/authentication/LdaptiveAuthenticationProperties.html#LdaptiveAuthenticationProperties">LdaptiveAuthenticationProperties</a> map(AuthenticationProperties.LdaptiveProperties source) {
 <a class="jxr_linenumber" name="L21" href="#L21">21</a>          <strong class="jxr_keyword">if</strong> ( source == <strong class="jxr_keyword">null</strong> ) {
 <a class="jxr_linenumber" name="L22" href="#L22">22</a>              <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
 <a class="jxr_linenumber" name="L23" href="#L23">23</a>          }
 <a class="jxr_linenumber" name="L24" href="#L24">24</a>  
-<a class="jxr_linenumber" name="L25" href="#L25">25</a>          <a name="LdaptiveAuthenticationProperties" href="../../../../../../../org/bremersee/spring/security/authentication/ldaptive/LdaptiveAuthenticationProperties.html#LdaptiveAuthenticationProperties">LdaptiveAuthenticationProperties</a> ldaptiveAuthenticationProperties = <strong class="jxr_keyword">new</strong> <a name="LdaptiveAuthenticationProperties" href="../../../../../../../org/bremersee/spring/security/authentication/ldaptive/LdaptiveAuthenticationProperties.html#LdaptiveAuthenticationProperties">LdaptiveAuthenticationProperties</a>();
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>          <a name="LdaptiveAuthenticationProperties" href="../../../../../../../org/bremersee/spring/security/ldaptive/authentication/LdaptiveAuthenticationProperties.html#LdaptiveAuthenticationProperties">LdaptiveAuthenticationProperties</a> ldaptiveAuthenticationProperties = <strong class="jxr_keyword">new</strong> <a name="LdaptiveAuthenticationProperties" href="../../../../../../../org/bremersee/spring/security/ldaptive/authentication/LdaptiveAuthenticationProperties.html#LdaptiveAuthenticationProperties">LdaptiveAuthenticationProperties</a>();
 <a class="jxr_linenumber" name="L26" href="#L26">26</a>  
 <a class="jxr_linenumber" name="L27" href="#L27">27</a>          <strong class="jxr_keyword">if</strong> ( source.getUsernameToBindDnConverter() != <strong class="jxr_keyword">null</strong> ) {
 <a class="jxr_linenumber" name="L28" href="#L28">28</a>              ldaptiveAuthenticationProperties.setUsernameToBindDnConverter( usernameToBindDnConverterPropertyToUsernameToBindDnConverterProperty( source.getUsernameToBindDnConverter() ) );
@@ -117,12 +117,12 @@
 <a class="jxr_linenumber" name="L109" href="#L109">109</a>         <strong class="jxr_keyword">return</strong> ldaptiveAuthenticationProperties;
 <a class="jxr_linenumber" name="L110" href="#L110">110</a>     }
 <a class="jxr_linenumber" name="L111" href="#L111">111</a> 
-<a class="jxr_linenumber" name="L112" href="#L112">112</a>     <strong class="jxr_keyword">protected</strong> <a name="UsernameToBindDnConverterProperty" href="../../../../../../../org/bremersee/spring/security/authentication/ldaptive/UsernameToBindDnConverterProperty.html#UsernameToBindDnConverterProperty">UsernameToBindDnConverterProperty</a> usernameToBindDnConverterPropertyToUsernameToBindDnConverterProperty(AuthenticationProperties.LdaptiveProperties.UsernameToBindDnConverterProperty usernameToBindDnConverterProperty) {
+<a class="jxr_linenumber" name="L112" href="#L112">112</a>     <strong class="jxr_keyword">protected</strong> <a name="UsernameToBindDnConverterProperty" href="../../../../../../../org/bremersee/spring/security/ldaptive/authentication/UsernameToBindDnConverterProperty.html#UsernameToBindDnConverterProperty">UsernameToBindDnConverterProperty</a> usernameToBindDnConverterPropertyToUsernameToBindDnConverterProperty(AuthenticationProperties.LdaptiveProperties.UsernameToBindDnConverterProperty usernameToBindDnConverterProperty) {
 <a class="jxr_linenumber" name="L113" href="#L113">113</a>         <strong class="jxr_keyword">if</strong> ( usernameToBindDnConverterProperty == <strong class="jxr_keyword">null</strong> ) {
 <a class="jxr_linenumber" name="L114" href="#L114">114</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
 <a class="jxr_linenumber" name="L115" href="#L115">115</a>         }
 <a class="jxr_linenumber" name="L116" href="#L116">116</a> 
-<a class="jxr_linenumber" name="L117" href="#L117">117</a>         <a name="UsernameToBindDnConverterProperty" href="../../../../../../../org/bremersee/spring/security/authentication/ldaptive/UsernameToBindDnConverterProperty.html#UsernameToBindDnConverterProperty">UsernameToBindDnConverterProperty</a> usernameToBindDnConverterProperty1;
+<a class="jxr_linenumber" name="L117" href="#L117">117</a>         <a name="UsernameToBindDnConverterProperty" href="../../../../../../../org/bremersee/spring/security/ldaptive/authentication/UsernameToBindDnConverterProperty.html#UsernameToBindDnConverterProperty">UsernameToBindDnConverterProperty</a> usernameToBindDnConverterProperty1;
 <a class="jxr_linenumber" name="L118" href="#L118">118</a> 
 <a class="jxr_linenumber" name="L119" href="#L119">119</a>         <strong class="jxr_keyword">switch</strong> ( usernameToBindDnConverterProperty ) {
 <a class="jxr_linenumber" name="L120" href="#L120">120</a>             <strong class="jxr_keyword">case</strong> BY_USER_RDN_ATTRIBUTE: usernameToBindDnConverterProperty1 = UsernameToBindDnConverterProperty.BY_USER_RDN_ATTRIBUTE;
@@ -157,12 +157,12 @@
 <a class="jxr_linenumber" name="L149" href="#L149">149</a>         <strong class="jxr_keyword">return</strong> searchScope1;
 <a class="jxr_linenumber" name="L150" href="#L150">150</a>     }
 <a class="jxr_linenumber" name="L151" href="#L151">151</a> 
-<a class="jxr_linenumber" name="L152" href="#L152">152</a>     <strong class="jxr_keyword">protected</strong> <a name="AccountControlEvaluatorProperty" href="../../../../../../../org/bremersee/spring/security/authentication/ldaptive/AccountControlEvaluatorProperty.html#AccountControlEvaluatorProperty">AccountControlEvaluatorProperty</a> accountControlEvaluatorPropertyToAccountControlEvaluatorProperty(AuthenticationProperties.LdaptiveProperties.AccountControlEvaluatorProperty accountControlEvaluatorProperty) {
+<a class="jxr_linenumber" name="L152" href="#L152">152</a>     <strong class="jxr_keyword">protected</strong> <a name="AccountControlEvaluatorProperty" href="../../../../../../../org/bremersee/spring/security/ldaptive/authentication/AccountControlEvaluatorProperty.html#AccountControlEvaluatorProperty">AccountControlEvaluatorProperty</a> accountControlEvaluatorPropertyToAccountControlEvaluatorProperty(AuthenticationProperties.LdaptiveProperties.AccountControlEvaluatorProperty accountControlEvaluatorProperty) {
 <a class="jxr_linenumber" name="L153" href="#L153">153</a>         <strong class="jxr_keyword">if</strong> ( accountControlEvaluatorProperty == <strong class="jxr_keyword">null</strong> ) {
 <a class="jxr_linenumber" name="L154" href="#L154">154</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
 <a class="jxr_linenumber" name="L155" href="#L155">155</a>         }
 <a class="jxr_linenumber" name="L156" href="#L156">156</a> 
-<a class="jxr_linenumber" name="L157" href="#L157">157</a>         <a name="AccountControlEvaluatorProperty" href="../../../../../../../org/bremersee/spring/security/authentication/ldaptive/AccountControlEvaluatorProperty.html#AccountControlEvaluatorProperty">AccountControlEvaluatorProperty</a> accountControlEvaluatorProperty1;
+<a class="jxr_linenumber" name="L157" href="#L157">157</a>         <a name="AccountControlEvaluatorProperty" href="../../../../../../../org/bremersee/spring/security/ldaptive/authentication/AccountControlEvaluatorProperty.html#AccountControlEvaluatorProperty">AccountControlEvaluatorProperty</a> accountControlEvaluatorProperty1;
 <a class="jxr_linenumber" name="L158" href="#L158">158</a> 
 <a class="jxr_linenumber" name="L159" href="#L159">159</a>         <strong class="jxr_keyword">switch</strong> ( accountControlEvaluatorProperty ) {
 <a class="jxr_linenumber" name="L160" href="#L160">160</a>             <strong class="jxr_keyword">case</strong> NONE: accountControlEvaluatorProperty1 = AccountControlEvaluatorProperty.NONE;

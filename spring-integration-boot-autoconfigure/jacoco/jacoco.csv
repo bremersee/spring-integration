@@ -12,7 +12,7 @@ Spring Integration Boot Autoconfiguration,org.bremersee.spring.boot.autoconfigur
 Spring Integration Boot Autoconfiguration,org.bremersee.spring.boot.autoconfigure.security.authentication,LdaptivePasswordEncoderProvider.DefaultLdaptivePasswordEncoderProvider,0,6,0,0,0,1,0,1,0,1
 Spring Integration Boot Autoconfiguration,org.bremersee.spring.boot.autoconfigure.security.authentication,LdaptiveAuthenticationAutoConfiguration,46,130,3,3,11,28,6,8,3,8
 Spring Integration Boot Autoconfiguration,org.bremersee.spring.boot.autoconfigure.security.authentication,LdaptiveAuthenticationAutoConfiguration.PropertiesMapper,0,5,0,0,0,1,0,1,0,1
-Spring Integration Boot Autoconfiguration,org.bremersee.spring.boot.autoconfigure.security.authentication,LdaptiveRememberMeAutoConfiguration,0,141,0,2,0,29,0,7,0,6
+Spring Integration Boot Autoconfiguration,org.bremersee.spring.boot.autoconfigure.security.authentication,LdaptiveRememberMeAutoConfiguration,0,139,0,2,0,29,0,7,0,6
 Spring Integration Boot Autoconfiguration,org.bremersee.spring.boot.autoconfigure.security.authentication,JwtConverterAutoConfiguration,30,53,2,0,6,17,3,4,2,4
 Spring Integration Boot Autoconfiguration,org.bremersee.spring.boot.autoconfigure.data.mongo,MongoCustomConversionsAutoConfiguration,0,69,0,0,0,25,0,6,0,6
 Spring Integration Boot Autoconfiguration,org.bremersee.spring.boot.autoconfigure.data.mongo,MongoCustomConversionsFilter.DefaultFilter,1,105,1,13,0,29,1,12,0,6

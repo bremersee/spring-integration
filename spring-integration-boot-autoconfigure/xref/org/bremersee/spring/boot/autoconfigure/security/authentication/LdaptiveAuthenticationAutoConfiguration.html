@@ -30,18 +30,18 @@
 <a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">import</strong> lombok.extern.slf4j.Slf4j;
 <a class="jxr_linenumber" name="L23" href="#L23">23</a>  <strong class="jxr_keyword">import</strong> org.bremersee.ldaptive.LdaptiveTemplate;
 <a class="jxr_linenumber" name="L24" href="#L24">24</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.boot.autoconfigure.ldaptive.LdaptiveAutoConfiguration;
-<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.authentication.EmailToUsernameResolver;
-<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.authentication.ldaptive.AccountControlEvaluator;
-<a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthentication;
-<a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager;
-<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationProperties;
-<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.authentication.ldaptive.ReactiveLdaptiveAuthenticationManager;
-<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.authentication.ldaptive.UsernameToBindDnConverter;
-<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.core.authority.mapping.NormalizedGrantedAuthoritiesMapper;
-<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveEvaluatedRememberMeTokenProvider;
-<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.core.userdetails.ldaptive.LdaptivePwdLastSetRememberMeTokenProvider;
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveRememberMeTokenProvider;
-<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetails;
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.core.EmailToUsernameResolver;
+<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.core.authority.mapping.NormalizedGrantedAuthoritiesMapper;
+<a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.authentication.AccountControlEvaluator;
+<a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthentication;
+<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationManager;
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationProperties;
+<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.authentication.ReactiveLdaptiveAuthenticationManager;
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.authentication.UsernameToBindDnConverter;
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.userdetails.LdaptiveEvaluatedRememberMeTokenProvider;
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.userdetails.LdaptivePwdLastSetRememberMeTokenProvider;
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.userdetails.LdaptiveRememberMeTokenProvider;
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <strong class="jxr_keyword">import</strong> org.bremersee.spring.security.ldaptive.userdetails.LdaptiveUserDetails;
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>  <strong class="jxr_keyword">import</strong> org.ldaptive.ConnectionConfig;
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>  <strong class="jxr_keyword">import</strong> org.ldaptive.ConnectionFactory;
 <a class="jxr_linenumber" name="L39" href="#L39">39</a>  <strong class="jxr_keyword">import</strong> org.ldaptive.DefaultConnectionFactory;
@@ -74,7 +74,7 @@
 <a class="jxr_linenumber" name="L66" href="#L66">66</a>  @ConditionalOnClass(name = {
 <a class="jxr_linenumber" name="L67" href="#L67">67</a>      <span class="jxr_string">"org.ldaptive.ConnectionFactory"</span>,
 <a class="jxr_linenumber" name="L68" href="#L68">68</a>      <span class="jxr_string">"org.bremersee.ldaptive.LdaptiveTemplate"</span>,
-<a class="jxr_linenumber" name="L69" href="#L69">69</a>      <span class="jxr_string">"org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager"</span>
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>      <span class="jxr_string">"org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationManager"</span>
 <a class="jxr_linenumber" name="L70" href="#L70">70</a>  })
 <a class="jxr_linenumber" name="L71" href="#L71">71</a>  @ConditionalOnBean({ConnectionConfig.<strong class="jxr_keyword">class</strong>})
 <a class="jxr_linenumber" name="L72" href="#L72">72</a>  @ConditionalOnProperty(prefix = <span class="jxr_string">"bremersee.authentication.ldaptive"</span>, name = <span class="jxr_string">"user-base-dn"</span>)
@@ -100,7 +100,7 @@
 <a class="jxr_linenumber" name="L92" href="#L92">92</a>    @EventListener(ApplicationReadyEvent.<strong class="jxr_keyword">class</strong>)
 <a class="jxr_linenumber" name="L93" href="#L93">93</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> init() {
 <a class="jxr_linenumber" name="L94" href="#L94">94</a>      log.info(<span class="jxr_string">""</span><span class="jxr_string">"
-<a class="jxr_linenumber" name="L95" href="#L95">95</a>  
+<a class="jxr_linenumber" name="L95" href="#L95">95</a>              
 <a class="jxr_linenumber" name="L96" href="#L96">96</a>              *********************************************************************************
 <a class="jxr_linenumber" name="L97" href="#L97">97</a>              * {}
 <a class="jxr_linenumber" name="L98" href="#L98">98</a>              * properties = {}
