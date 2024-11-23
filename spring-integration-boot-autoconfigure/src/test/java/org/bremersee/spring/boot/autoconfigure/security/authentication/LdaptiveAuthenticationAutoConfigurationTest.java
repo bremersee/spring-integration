@@ -5,12 +5,12 @@ import static org.mockito.Mockito.mock;
 
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
-import org.bremersee.spring.security.authentication.EmailToUsernameResolver;
-import org.bremersee.spring.security.authentication.ldaptive.AccountControlEvaluator;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthentication;
-import org.bremersee.spring.security.authentication.ldaptive.UsernameToBindDnConverter;
-import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveRememberMeTokenProvider;
-import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetails;
+import org.bremersee.spring.security.core.EmailToUsernameResolver;
+import org.bremersee.spring.security.ldaptive.authentication.AccountControlEvaluator;
+import org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthentication;
+import org.bremersee.spring.security.ldaptive.authentication.UsernameToBindDnConverter;
+import org.bremersee.spring.security.ldaptive.userdetails.LdaptiveRememberMeTokenProvider;
+import org.bremersee.spring.security.ldaptive.userdetails.LdaptiveUserDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

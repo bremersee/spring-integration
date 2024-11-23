@@ -22,18 +22,18 @@ import static org.springframework.util.ObjectUtils.isEmpty;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.ldaptive.LdaptiveTemplate;
 import org.bremersee.spring.boot.autoconfigure.ldaptive.LdaptiveAutoConfiguration;
-import org.bremersee.spring.security.authentication.EmailToUsernameResolver;
-import org.bremersee.spring.security.authentication.ldaptive.AccountControlEvaluator;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthentication;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationProperties;
-import org.bremersee.spring.security.authentication.ldaptive.ReactiveLdaptiveAuthenticationManager;
-import org.bremersee.spring.security.authentication.ldaptive.UsernameToBindDnConverter;
+import org.bremersee.spring.security.core.EmailToUsernameResolver;
 import org.bremersee.spring.security.core.authority.mapping.NormalizedGrantedAuthoritiesMapper;
-import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveEvaluatedRememberMeTokenProvider;
-import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptivePwdLastSetRememberMeTokenProvider;
-import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveRememberMeTokenProvider;
-import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetails;
+import org.bremersee.spring.security.ldaptive.authentication.AccountControlEvaluator;
+import org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthentication;
+import org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationManager;
+import org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationProperties;
+import org.bremersee.spring.security.ldaptive.authentication.ReactiveLdaptiveAuthenticationManager;
+import org.bremersee.spring.security.ldaptive.authentication.UsernameToBindDnConverter;
+import org.bremersee.spring.security.ldaptive.userdetails.LdaptiveEvaluatedRememberMeTokenProvider;
+import org.bremersee.spring.security.ldaptive.userdetails.LdaptivePwdLastSetRememberMeTokenProvider;
+import org.bremersee.spring.security.ldaptive.userdetails.LdaptiveRememberMeTokenProvider;
+import org.bremersee.spring.security.ldaptive.userdetails.LdaptiveUserDetails;
 import org.ldaptive.ConnectionConfig;
 import org.ldaptive.ConnectionFactory;
 import org.ldaptive.DefaultConnectionFactory;
@@ -66,7 +66,7 @@ import org.springframework.util.ClassUtils;
 @ConditionalOnClass(name = {
     "org.ldaptive.ConnectionFactory",
     "org.bremersee.ldaptive.LdaptiveTemplate",
-    "org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager"
+    "org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationManager"
 })
 @ConditionalOnBean({ConnectionConfig.class})
 @ConditionalOnProperty(prefix = "bremersee.authentication.ldaptive", name = "user-base-dn")
@@ -92,7 +92,7 @@ public class LdaptiveAuthenticationAutoConfiguration {
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
     log.info("""
-
+            
             *********************************************************************************
             * {}
             * properties = {}

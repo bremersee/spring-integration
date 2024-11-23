@@ -20,9 +20,9 @@ import static java.util.Objects.isNull;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.spring.boot.autoconfigure.security.authentication.AuthenticationProperties.JwtConverterProperties;
-import org.bremersee.spring.security.authentication.JsonPathJwtConverter;
 import org.bremersee.spring.security.core.authority.mapping.CaseTransformation;
 import org.bremersee.spring.security.core.authority.mapping.NormalizedGrantedAuthoritiesMapper;
+import org.bremersee.spring.security.oauth2.server.resource.authentication.JsonPathJwtConverter;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -45,7 +45,7 @@ import org.springframework.util.ClassUtils;
  */
 @AutoConfiguration
 @ConditionalOnClass(name = {
-    "org.bremersee.spring.security.authentication.JsonPathJwtConverter"
+    "org.bremersee.spring.security.oauth2.server.resource.authentication.JsonPathJwtConverter"
 })
 @ConditionalOnProperty(
     prefix = "spring.security.oauth2.resourceserver.jwt",
@@ -71,7 +71,7 @@ public class JwtConverterAutoConfiguration {
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
     log.info("""
-
+            
             *********************************************************************************
             * {}
             * properties = {}
