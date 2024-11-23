@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>spring-integration-parent</artifactId>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
   <packaging>pom</packaging>
 
   <name>Spring Integration Parent</name>
