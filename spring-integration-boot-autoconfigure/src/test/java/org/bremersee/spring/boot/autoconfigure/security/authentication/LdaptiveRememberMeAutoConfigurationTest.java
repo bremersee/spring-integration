@@ -5,8 +5,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import org.bremersee.spring.boot.autoconfigure.security.authentication.AuthenticationProperties.LdaptiveProperties.Template;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager;
-import org.bremersee.spring.security.core.userdetails.ldaptive.LdaptiveUserDetailsService;
+import org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationManager;
+import org.bremersee.spring.security.ldaptive.userdetails.LdaptiveUserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;

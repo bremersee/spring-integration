@@ -18,7 +18,6 @@ package org.bremersee.ldaptive.serializable;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.security.Principal;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -38,7 +37,7 @@ import org.ldaptive.LdapEntry;
 @Getter
 @ToString
 @EqualsAndHashCode
-public class SerLdapEntry implements Serializable, Principal {
+public class SerLdapEntry implements Serializable {
 
   @Serial
   private static final long serialVersionUID = 1L;
@@ -70,8 +69,4 @@ public class SerLdapEntry implements Serializable, Principal {
             .toUnmodifiableMap(SerLdapAttr::getAttributeName, Function.identity()));
   }
 
-  @Override
-  public String getName() {
-    return getDn();
-  }
 }

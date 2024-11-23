@@ -19,9 +19,9 @@ package org.bremersee.spring.boot.autoconfigure.security.authentication;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.spring.boot.autoconfigure.security.authentication.AuthenticationProperties.RememberMeProperties;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationProperties;
-import org.bremersee.spring.security.authentication.ldaptive.LdaptiveTokenBasedRememberMeServices;
+import org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationManager;
+import org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationProperties;
+import org.bremersee.spring.security.ldaptive.authentication.LdaptiveTokenBasedRememberMeServices;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -48,7 +48,7 @@ import org.springframework.util.ObjectUtils;
 @ConditionalOnWebApplication(type = Type.SERVLET)
 @ConditionalOnProperty(prefix = "bremersee.authentication.remember-me", name = "key")
 @ConditionalOnBean(
-    type = "org.bremersee.spring.security.authentication.ldaptive.LdaptiveAuthenticationManager")
+    type = "org.bremersee.spring.security.ldaptive.authentication.LdaptiveAuthenticationManager")
 @AutoConfigureAfter({LdaptiveAuthenticationAutoConfiguration.class})
 @EnableConfigurationProperties(AuthenticationProperties.class)
 @Slf4j
@@ -86,7 +86,7 @@ public class LdaptiveRememberMeAutoConfiguration {
           properties.getPasswordLastSetAttribute());
     }
     log.info("""
-
+            
             *********************************************************************************
             * {}
             * {}
@@ -120,7 +120,7 @@ public class LdaptiveRememberMeAutoConfiguration {
   public RememberMeServices rememberMeServices(
       LdaptiveAuthenticationManager authenticationManager) {
     LdaptiveTokenBasedRememberMeServices services = new LdaptiveTokenBasedRememberMeServices(
-        rememberMeProperties.getKey(), properties, authenticationManager);
+        rememberMeProperties.getKey(), authenticationManager);
     Optional.ofNullable(rememberMeProperties.getAlwaysRemember())
         .ifPresent(services::setAlwaysRemember);
     Optional.ofNullable(rememberMeProperties.getCookieName())
