@@ -6,12 +6,12 @@
   <parent>
     <groupId>org.bremersee</groupId>
     <artifactId>common-parent</artifactId>
-    <version>3.1.2</version>
+    <version>3.2.0-SNAPSHOT</version>
     <relativePath/>
   </parent>
 
   <artifactId>spring-integration-parent</artifactId>
-  <version>0.1.3</version>
+  <version>0.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Spring Integration Parent</name>
@@ -41,8 +41,8 @@
     <!--suppress UnresolvedMavenProperty -->
     <gh-pages-staging-dir>${maven.multiModuleProjectDirectory}/target/staging</gh-pages-staging-dir>
 
-    <common-exception.version>1.1.1</common-exception.version>
-    <comparator.version>4.1.1</comparator.version>
+    <common-exception.version>1.2.0-SNAPSHOT</common-exception.version>
+    <comparator.version>4.2.0-SNAPSHOT</comparator.version>
   </properties>
 
   <developers>

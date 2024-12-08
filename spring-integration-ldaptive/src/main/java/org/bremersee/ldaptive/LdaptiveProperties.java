@@ -190,7 +190,7 @@ public class LdaptiveProperties {
         .url(getLdapUrl())
         .build();
     if (isImmutable()) {
-      connectionConfig.makeImmutable();
+      connectionConfig.freeze();
     }
     return connectionConfig;
   }

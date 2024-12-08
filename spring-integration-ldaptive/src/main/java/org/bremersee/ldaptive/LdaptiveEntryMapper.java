@@ -17,10 +17,12 @@
 package org.bremersee.ldaptive;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -231,8 +233,7 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
             new AttributeModification(
                 Type.DELETE,
                 attr));
-      } else if (!new ArrayList<>(realValues)
-          .equals(new ArrayList<>(attr.getValues(valueTranscoder.decoder())))) {
+      } else if (areNotEqual(realValues, attr.getValues(valueTranscoder.decoder()))) {
         LdapAttribute newAttr = new LdapAttribute();
         newAttr.setBinary(isBinary);
         newAttr.setName(name);
@@ -244,6 +245,31 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
                 newAttr));
       }
     }
+  }
+
+  private static boolean areNotEqual(Collection<?> newValues, Collection<?> existingValues) {
+    if (newValues.size() != existingValues.size()) {
+      return true;
+    }
+    List<?> newValueList = new ArrayList<>(newValues);
+    List<?> existingValueList = new ArrayList<>(existingValues);
+    for (int i = 0; i < newValueList.size(); i++) {
+      Object newValue = newValueList.get(i);
+      Object existingValue = existingValueList.get(i);
+      if (newValue instanceof byte[] && existingValue instanceof byte[]) {
+        if (!Arrays.equals((byte[]) newValue, (byte[]) existingValue)) {
+          return true;
+        }
+      } else {
+        if (newValue == null && existingValue != null) {
+          return true;
+        }
+        if (newValue != null && !Objects.equals(newValue, existingValue)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**

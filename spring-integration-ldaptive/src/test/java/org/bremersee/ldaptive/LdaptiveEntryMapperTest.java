@@ -276,8 +276,9 @@ class LdaptiveEntryMapperTest {
     bytes.add(liviaBytes);
     LdaptiveEntryMapper.addAttributes(
         entry, "foo", bytes, true, BYTE_TRANSCODER, modifications);
-    assertTrue(entry.getAttribute("foo").getBinaryValues().contains(annaBytes));
-    assertTrue(entry.getAttribute("foo").getBinaryValues().contains(liviaBytes));
+    List<byte[]> actual = new ArrayList<>(entry.getAttribute("foo").getBinaryValues());
+    assertArrayEquals(annaBytes, actual.get(0));
+    assertArrayEquals(liviaBytes, actual.get(1));
     assertEquals(1, modifications.size());
     assertEquals(
         Type.ADD,
@@ -291,10 +292,14 @@ class LdaptiveEntryMapperTest {
     bytes.add(castorpBytes);
     LdaptiveEntryMapper.addAttributes(
         entry, "foo", bytes, true, BYTE_TRANSCODER, modifications);
-    assertTrue(entry.getAttribute("foo").getBinaryValues().contains(annaBytes));
-    assertTrue(entry.getAttribute("foo").getBinaryValues().contains(liviaBytes));
-    assertTrue(entry.getAttribute("foo").getBinaryValues().contains(hansBytes));
-    assertTrue(entry.getAttribute("foo").getBinaryValues().contains(castorpBytes));
+    assertTrue(entry.getAttribute("foo").getBinaryValues()
+        .stream().anyMatch(value -> Arrays.equals(value, annaBytes)));
+    assertTrue(entry.getAttribute("foo").getBinaryValues()
+        .stream().anyMatch(value -> Arrays.equals(value, liviaBytes)));
+    assertTrue(entry.getAttribute("foo").getBinaryValues()
+        .stream().anyMatch(value -> Arrays.equals(value, hansBytes)));
+    assertTrue(entry.getAttribute("foo").getBinaryValues()
+        .stream().anyMatch(value -> Arrays.equals(value, castorpBytes)));
     assertEquals(1, modifications.size());
     assertEquals(
         Type.REPLACE,
