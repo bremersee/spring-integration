@@ -260,13 +260,8 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
         if (!Arrays.equals((byte[]) newValue, (byte[]) existingValue)) {
           return true;
         }
-      } else {
-        if (newValue == null && existingValue != null) {
-          return true;
-        }
-        if (newValue != null && !Objects.equals(newValue, existingValue)) {
-          return true;
-        }
+      } else if (!Objects.equals(newValue, existingValue)) {
+        return true;
       }
     }
     return false;
