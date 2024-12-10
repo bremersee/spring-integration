@@ -91,7 +91,6 @@ public class LdaptiveAutoConfiguration {
         properties);
   }
 
-
   /**
    * Creates connection config.
    *
