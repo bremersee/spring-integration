@@ -17,10 +17,8 @@
 package org.bremersee.spring.boot.autoconfigure.data.commons;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.comparator.model.SortOrdersTextProperties;
 import org.bremersee.comparator.spring.converter.SortOrderConverter;
-import org.bremersee.comparator.spring.converter.SortOrdersConverter;
-import org.springframework.beans.factory.ObjectProvider;
+import org.bremersee.comparator.spring.converter.SortOrderItemConverter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -46,7 +44,7 @@ public class SortOrderConverterAutoConfiguration {
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
     log.info("""
-
+            
             *********************************************************************************
             * {}
             *********************************************************************************""",
@@ -56,27 +54,23 @@ public class SortOrderConverterAutoConfiguration {
   /**
    * Creates sort order converter.
    *
-   * @param properties the properties
    * @return the sort order converter
    */
   @ConditionalOnMissingBean
   @Bean
-  public SortOrderConverter sortOrderConverter(
-      ObjectProvider<SortOrdersTextProperties> properties) {
-    return new SortOrderConverter(properties.getIfAvailable(SortOrdersTextProperties::defaults));
+  public SortOrderConverter sortOrderConverter() {
+    return new SortOrderConverter();
   }
 
   /**
-   * Creates sort orders converter.
+   * Creates sort order item converter.
    *
-   * @param properties the properties
-   * @return the sort orders converter
+   * @return the sort order item converter
    */
   @ConditionalOnMissingBean
   @Bean
-  public SortOrdersConverter sortOrdersConverter(
-      ObjectProvider<SortOrdersTextProperties> properties) {
-    return new SortOrdersConverter(properties.getIfAvailable(SortOrdersTextProperties::defaults));
+  public SortOrderItemConverter sortOrderItemConverter() {
+    return new SortOrderItemConverter();
   }
 
 }

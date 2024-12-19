@@ -1,4 +1,3 @@
-org.bremersee.spring.boot.autoconfigure.data.commons.SortMapperAutoConfiguration
 org.bremersee.spring.boot.autoconfigure.data.commons.SortOrderConverterAutoConfiguration
 org.bremersee.spring.boot.autoconfigure.data.mongo.MongoCustomConversionsAutoConfiguration
 org.bremersee.spring.boot.autoconfigure.ldaptive.LdaptiveAutoConfiguration
