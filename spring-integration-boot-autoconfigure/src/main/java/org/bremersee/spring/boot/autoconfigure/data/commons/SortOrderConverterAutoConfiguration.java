@@ -33,7 +33,9 @@ import org.springframework.util.ClassUtils;
  * @author Christian Bremer
  */
 @ConditionalOnClass(name = {
-    "org.bremersee.comparator.spring.converter.SortOrdersConverter"})
+    "org.bremersee.comparator.spring.converter.SortOrderConverter",
+    "org.bremersee.comparator.spring.converter.SortOrderItemConverter"
+})
 @AutoConfiguration
 @Slf4j
 public class SortOrderConverterAutoConfiguration {
