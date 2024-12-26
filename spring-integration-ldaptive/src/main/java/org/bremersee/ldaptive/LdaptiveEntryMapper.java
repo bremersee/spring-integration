@@ -441,7 +441,7 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
   }
 
   /**
-   * Gets rdn.
+   * Gets rdn value (not the rdn attribute name).
    *
    * @param dn the dn
    * @return the rdn

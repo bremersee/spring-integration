@@ -16,16 +16,20 @@
 
 package org.bremersee.spring.boot.autoconfigure.data.commons;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.comparator.model.SortOrderTextSeparators;
 import org.bremersee.comparator.spring.converter.SortOrderConverter;
 import org.bremersee.comparator.spring.converter.SortOrderItemConverter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * The sort order converter autoconfiguration.
@@ -37,8 +41,28 @@ import org.springframework.util.ClassUtils;
     "org.bremersee.comparator.spring.converter.SortOrderItemConverter"
 })
 @AutoConfiguration
+@EnableConfigurationProperties(SortOrderConverterProperties.class)
 @Slf4j
 public class SortOrderConverterAutoConfiguration {
+
+  private final SortOrderTextSeparators separators;
+
+  /**
+   * Instantiates a new sort order converter autoconfiguration.
+   *
+   * @param properties the properties
+   */
+  public SortOrderConverterAutoConfiguration(SortOrderConverterProperties properties) {
+    SortOrderTextSeparators defaults = SortOrderTextSeparators.defaults();
+    this.separators = SortOrderTextSeparators.builder()
+        .argumentSeparator(Optional.ofNullable(properties.getArgumentSeparator())
+            .filter(StringUtils::hasText)
+            .orElse(defaults.getArgumentSeparator()))
+        .chainSeparator(Optional.ofNullable(properties.getChainSeparator())
+            .filter(StringUtils::hasText)
+            .orElse(defaults.getChainSeparator()))
+        .build();
+  }
 
   /**
    * Init.
@@ -61,7 +85,7 @@ public class SortOrderConverterAutoConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public SortOrderConverter sortOrderConverter() {
-    return new SortOrderConverter();
+    return new SortOrderConverter(separators);
   }
 
   /**
@@ -72,7 +96,7 @@ public class SortOrderConverterAutoConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public SortOrderItemConverter sortOrderItemConverter() {
-    return new SortOrderItemConverter();
+    return new SortOrderItemConverter(separators);
   }
 
 }

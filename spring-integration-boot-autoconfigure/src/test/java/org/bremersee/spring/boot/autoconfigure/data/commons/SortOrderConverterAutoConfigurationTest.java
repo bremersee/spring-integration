@@ -19,7 +19,7 @@ class SortOrderConverterAutoConfigurationTest {
    */
   @BeforeAll
   static void init() {
-    target = new SortOrderConverterAutoConfiguration();
+    target = new SortOrderConverterAutoConfiguration(new SortOrderConverterProperties());
     target.init();
   }
 

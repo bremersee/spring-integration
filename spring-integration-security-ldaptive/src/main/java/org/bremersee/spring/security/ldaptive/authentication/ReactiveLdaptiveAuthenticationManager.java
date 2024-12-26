@@ -19,7 +19,7 @@ package org.bremersee.spring.security.ldaptive.authentication;
 import org.springframework.security.authentication.ReactiveAuthenticationManagerAdapter;
 
 /**
- * The type Reactive ldaptive authentication manager.
+ * The reactive ldaptive authentication manager.
  *
  * @author Christian Bremer
  */
